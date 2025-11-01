@@ -434,20 +434,130 @@ function hideMapLoading(errorMessage) {
 function createImprovedNominatim() {
     console.log('Criando geocoder Nominatim otimizado para Teresina...');
     
-    // Usar Nominatim padrão com parâmetros otimizados
-    // Não interceptar o método geocode para evitar problemas de compatibilidade
+    // Criar instância base do Nominatim
     const nominatimInstance = L.Control.Geocoder.nominatim({
         geocodingQueryParams: {
             countrycodes: 'br',
             'accept-language': 'pt-BR,pt',
-            limit: 10,
-            addressdetails: 1
+            limit: 15,
+            addressdetails: 1,
+            viewbox: '-43.2,-5.3,-42.5,-4.9', // Bounding box de Teresina
+            bounded: 0, // Permitir resultados fora do viewbox, mas priorizar dentro
+            extratags: 1, // Extrair tags adicionais
+            namedetails: 1 // Incluir detalhes de nomes
         }
     });
     
-    console.log('✅ Instância Nominatim criada');
+    // Interceptar o método geocode para melhorar a query
+    const originalGeocode = nominatimInstance.geocode.bind(nominatimInstance);
+    
+    nominatimInstance.geocode = function(query, cb) {
+        // Processar e melhorar a query
+        const improvedQuery = improveSearchQuery(query);
+        console.log('🔍 Query original:', query);
+        console.log('🔍 Query melhorada:', improvedQuery);
+        
+        // Usar a query melhorada
+        return originalGeocode(improvedQuery, cb);
+    };
+    
+    console.log('✅ Instância Nominatim criada com melhorias');
     
     return nominatimInstance;
+}
+
+// ========================================
+// MELHORAR QUERY DE BUSCA
+// ========================================
+function improveSearchQuery(query) {
+    if (!query || typeof query !== 'string') {
+        return query;
+    }
+    
+    let improvedQuery = query.trim();
+    
+    // Se já contém "Teresina", não adicionar novamente
+    const hasTeresina = /teresina/i.test(improvedQuery);
+    const hasPI = /\bPI\b/i.test(improvedQuery) || /\bPiau[ií]\b/i.test(improvedQuery);
+    const hasBrasil = /brasil/i.test(improvedQuery);
+    
+    // Detectar padrões de endereço com número
+    // Exemplos: "Av. Ininga 1234", "Rua 13 de Maio, 500", "1234 Av Ininga"
+    const addressPatterns = [
+        /^(\d+)\s+([a-záàâãéêíóôõúç\s]+)/i, // "1234 Rua Exemplo"
+        /([a-záàâãéêíóôõúç\s]+),\s*(\d+)/i, // "Rua Exemplo, 1234"
+        /([a-záàâãéêíóôõúç\s]+)\s+(\d+)$/i  // "Rua Exemplo 1234"
+    ];
+    
+    let streetName = '';
+    let houseNumber = '';
+    
+    // Tentar extrair rua e número
+    for (let pattern of addressPatterns) {
+        const match = improvedQuery.match(pattern);
+        if (match) {
+            if (pattern === addressPatterns[0]) {
+                // Formato: "1234 Rua Exemplo"
+                houseNumber = match[1].trim();
+                streetName = match[2].trim();
+            } else {
+                // Formato: "Rua Exemplo, 1234" ou "Rua Exemplo 1234"
+                streetName = match[1].trim();
+                houseNumber = match[2].trim();
+            }
+            break;
+        }
+    }
+    
+    // Se detectou rua e número separados, construir query estruturada
+    if (streetName && houseNumber) {
+        // Formato estruturado: "Rua Exemplo, 1234, Teresina, PI"
+        improvedQuery = `${streetName}, ${houseNumber}`;
+        if (!hasTeresina) {
+            improvedQuery += ', Teresina';
+        }
+        if (!hasPI) {
+            improvedQuery += ', PI';
+        }
+        if (!hasBrasil) {
+            improvedQuery += ', Brasil';
+        }
+        console.log('✅ Endereço detectado com número:', { streetName, houseNumber, improvedQuery });
+    } else {
+        // Se não detectou padrão específico, apenas melhorar a query
+        // Remover caracteres especiais desnecessários e normalizar
+        improvedQuery = improvedQuery.replace(/\s+/g, ' '); // Múltiplos espaços em um
+        
+        // Se a query parece um número apenas, tentar buscar como número de rua
+        if (/^\d+$/.test(improvedQuery)) {
+            // É apenas um número - adicionar contexto de Teresina
+            improvedQuery = `Rua ${improvedQuery}`;
+            if (!hasTeresina) {
+                improvedQuery += ', Teresina';
+            }
+            if (!hasPI) {
+                improvedQuery += ', PI';
+            }
+        } else {
+            // Adicionar contexto de localização se não tiver
+            if (!hasTeresina) {
+                improvedQuery += ', Teresina';
+            }
+            if (!hasPI) {
+                improvedQuery += ', PI';
+            }
+            if (!hasBrasil) {
+                improvedQuery += ', Brasil';
+            }
+        }
+    }
+    
+    // Limpar e normalizar
+    improvedQuery = improvedQuery.replace(/,+/g, ','); // Múltiplas vírgulas
+    improvedQuery = improvedQuery.replace(/\s*,\s*/g, ', '); // Espaços em torno de vírgulas
+    improvedQuery = improvedQuery.trim();
+    
+    return improvedQuery;
 }
 
 // ========================================
@@ -493,14 +603,14 @@ function setupGeocoder() {
     try {
         geocoder = L.Control.geocoder({
             position: 'topright',
-            placeholder: 'Buscar endereço, bairro, rua de Teresina...',
-            errorMessage: 'Local não encontrado. Tente: "Av. Ininga, Teresina" ou "Jóquei Clube, Teresina"',
+            placeholder: 'Buscar endereço, rua com número, bairro... Ex: "Av. Ininga, 1234"',
+            errorMessage: 'Local não encontrado. Tente: "Av. Ininga, 1234, Teresina" ou "Rua 13 de Maio, 500"',
             geocoder: improvedGeocoder,
             defaultMarkGeocode: false,
             collapsed: false,
             expand: 'click',
-            suggestTimeout: 1000,
-            queryMinLength: 3,
+            suggestTimeout: 800,
+            queryMinLength: 2, // Reduzido para permitir buscas mais curtas com números
             showResultIcons: true,
             markers: {
                 draggable: false
@@ -687,8 +797,19 @@ function setupManualSearch() {
             if (input) {
                 console.log('✅ Campo de input encontrado para melhorias');
                 
-                // Adicionar dica visual
-                input.setAttribute('title', 'Digite o endereço com "Teresina" para melhores resultados. Ex: "Av. Ininga, Teresina"');
+                // Adicionar dica visual melhorada
+                input.setAttribute('title', 'Digite o endereço completo. Ex: "Av. Ininga, 1234" ou "Rua 13 de Maio, 500, Teresina"');
+                
+                // Adicionar listener para melhorar feedback
+                input.addEventListener('input', function() {
+                    const value = this.value.trim();
+                    if (value.length >= 2) {
+                        // Verificar se contém número (pode ser endereço específico)
+                        if (/\d+/.test(value)) {
+                            this.style.borderColor = '#10b981'; // Verde para indicar formato de endereço
+                        }
+                    }
+                });
             }
         }
     }, 1500);
@@ -699,9 +820,46 @@ function setupManualSearch() {
 // ========================================
 function searchDirectly(query) {
     return new Promise((resolve, reject) => {
-        // Buscar diretamente no Nominatim com parâmetros otimizados
-        const searchQuery = encodeURIComponent(query + ', Teresina, PI, Brasil');
-        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${searchQuery}&limit=10&countrycodes=br&addressdetails=1&accept-language=pt-BR&viewbox=-43.2,-5.3,-42.5,-4.9&bounded=0`;
+        // Melhorar a query antes de buscar
+        const improvedQuery = improveSearchQuery(query);
+        const searchQuery = encodeURIComponent(improvedQuery);
+        
+        // Extrair componentes da query para usar parâmetros estruturados se possível
+        const queryParts = improvedQuery.split(',').map(p => p.trim());
+        
+        // Tentar identificar rua e número
+        let street = '';
+        let housenumber = '';
+        let city = 'Teresina';
+        let state = 'PI';
+        
+        // Detectar padrões
+        for (let i = 0; i < queryParts.length; i++) {
+            const part = queryParts[i];
+            if (/^\d+$/.test(part)) {
+                // É um número
+                if (!housenumber && queryParts[i-1]) {
+                    housenumber = part;
+                    street = queryParts[i-1];
+                }
+            } else if (/teresina/i.test(part)) {
+                city = 'Teresina';
+            } else if (/PI|Piau[ií]/i.test(part)) {
+                state = 'PI';
+            }
+        }
+        
+        // Construir URL com parâmetros otimizados
+        let url;
+        if (street && housenumber) {
+            // Busca estruturada com rua e número
+            url = `https://nominatim.openstreetmap.org/search?format=json&street=${encodeURIComponent(housenumber + ' ' + street)}&city=${encodeURIComponent(city)}&state=${encodeURIComponent(state)}&country=Brasil&limit=15&addressdetails=1&accept-language=pt-BR&viewbox=-43.2,-5.3,-42.5,-4.9&bounded=0&extratags=1`;
+            console.log('🔍 Busca estruturada (rua + número):', url);
+        } else {
+            // Busca geral melhorada
+            url = `https://nominatim.openstreetmap.org/search?format=json&q=${searchQuery}&limit=15&countrycodes=br&addressdetails=1&accept-language=pt-BR&viewbox=-43.2,-5.3,-42.5,-4.9&bounded=0&extratags=1&namedetails=1`;
+            console.log('🔍 Busca geral:', url);
+        }
         
         fetch(url, {
             headers: {
