@@ -1722,19 +1722,47 @@ section {
 .map-wrapper-google-integrated {
     position: relative;
     width: 100%;
+    height: 650px;
     border-radius: var(--radius-xl);
     overflow: hidden;
     box-shadow: var(--shadow-lg);
     margin-bottom: var(--spacing-lg);
     background: var(--bg-lighter);
-    min-height: 650px;
+}
+
+/* Overlay profissional para esconder header do Google My Maps */
+.google-maps-header-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px; /* Altura do header do Google My Maps */
+    background: linear-gradient(180deg, var(--bg-white) 0%, var(--bg-white) 90%, rgba(255,255,255,0.95) 100%);
+    z-index: 200;
+    pointer-events: none;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Ajuste do iframe para esconder header - VERSÃO CORRIGIDA */
+.map-wrapper-google-integrated iframe {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 10;
+    border: none;
+    display: block;
 }
 
 .google-map-container {
     width: 100%;
-    height: 650px;
-    border-radius: var(--radius-xl);
-    position: relative;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
 }
 
 #mapVisualLayer {
@@ -1744,7 +1772,7 @@ section {
     right: 0;
     bottom: 0;
     pointer-events: none;
-    z-index: 2;
+    z-index: 100;
 }
 
 .visual-marker {
@@ -1957,10 +1985,12 @@ section {
 /* Barra de Busca Integrada no Mapa */
 .map-search-overlay {
     position: absolute;
-    top: var(--spacing-md);
-    left: var(--spacing-md);
-    right: var(--spacing-md);
-    z-index: 5;
+    top: var(--spacing-lg);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 300;
+    width: 90%;
+    max-width: 750px;
     pointer-events: none;
 }
 

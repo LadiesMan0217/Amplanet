@@ -52,17 +52,84 @@ function setupSearch() {
 }
 
 // ========================================
+// MELHORAR QUERY DE BUSCA (mesma função do Leaflet)
+// ========================================
+function improveSearchQuery(query) {
+    if (!query || typeof query !== 'string') {
+        return query;
+    }
+    
+    let improvedQuery = query.trim();
+    
+    // Se já contém "Teresina", não adicionar novamente
+    const hasTeresina = /teresina/i.test(improvedQuery);
+    const hasPI = /\bPI\b/i.test(improvedQuery) || /\bPiau[ií]\b/i.test(improvedQuery);
+    const hasBrasil = /brasil/i.test(improvedQuery);
+    
+    // Detectar padrões de endereço com número
+    const addressPatterns = [
+        /^(\d+)\s+([a-záàâãéêíóôõúç\s]+)/i, // "1234 Rua Exemplo"
+        /([a-záàâãéêíóôõúç\s]+),\s*(\d+)/i, // "Rua Exemplo, 1234"
+        /([a-záàâãéêíóôõúç\s]+)\s+(\d+)$/i  // "Rua Exemplo 1234"
+    ];
+    
+    let streetName = '';
+    let houseNumber = '';
+    
+    // Tentar extrair rua e número
+    for (let pattern of addressPatterns) {
+        const match = improvedQuery.match(pattern);
+        if (match) {
+            if (pattern === addressPatterns[0]) {
+                houseNumber = match[1].trim();
+                streetName = match[2].trim();
+            } else {
+                streetName = match[1].trim();
+                houseNumber = match[2].trim();
+            }
+            break;
+        }
+    }
+    
+    // Se detectou rua e número separados, construir query estruturada
+    if (streetName && houseNumber) {
+        improvedQuery = `${streetName}, ${houseNumber}`;
+        if (!hasTeresina) improvedQuery += ', Teresina';
+        if (!hasPI) improvedQuery += ', PI';
+        if (!hasBrasil) improvedQuery += ', Brasil';
+        console.log('✅ Endereço detectado com número:', { streetName, houseNumber, improvedQuery });
+    } else {
+        improvedQuery = improvedQuery.replace(/\s+/g, ' ');
+        
+        if (/^\d+$/.test(improvedQuery)) {
+            improvedQuery = `Rua ${improvedQuery}`;
+            if (!hasTeresina) improvedQuery += ', Teresina';
+            if (!hasPI) improvedQuery += ', PI';
+        } else {
+            if (!hasTeresina) improvedQuery += ', Teresina';
+            if (!hasPI) improvedQuery += ', PI';
+            if (!hasBrasil) improvedQuery += ', Brasil';
+        }
+    }
+    
+    improvedQuery = improvedQuery.replace(/,+/g, ',');
+    improvedQuery = improvedQuery.replace(/\s*,\s*/g, ', ');
+    improvedQuery = improvedQuery.trim();
+    
+    return improvedQuery;
+}
+
+// ========================================
 // REALIZAR BUSCA DE GEOCODING
 // ========================================
 function performGeocodeSearch(query) {
     const searchBtn = document.getElementById('integratedSearchBtn');
     const searchInput = document.getElementById('integratedSearchInput');
     
-    // Preparar query
-    let searchQuery = query.trim();
-    if (!searchQuery.toLowerCase().includes('teresina') && !searchQuery.toLowerCase().includes('pi')) {
-        searchQuery += ', Teresina, PI, Brasil';
-    }
+    // Melhorar query antes de buscar
+    const improvedQuery = improveSearchQuery(query);
+    console.log('🔍 Query original:', query);
+    console.log('🔍 Query melhorada:', improvedQuery);
     
     // Feedback visual
     searchBtn.innerHTML = '<span>Buscando...</span>';
@@ -71,27 +138,82 @@ function performGeocodeSearch(query) {
     
     clearSearchMessage();
     
-    // Buscar usando Nominatim (OpenStreetMap - gratuito)
-    const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1&addressdetails=1&countrycodes=br`;
+    // Extrair componentes para busca estruturada
+    const queryParts = improvedQuery.split(',').map(p => p.trim());
+    let street = '';
+    let housenumber = '';
+    let city = 'Teresina';
+    let state = 'PI';
+    
+    for (let i = 0; i < queryParts.length; i++) {
+        const part = queryParts[i];
+        if (/^\d+$/.test(part)) {
+            if (!housenumber && queryParts[i-1]) {
+                housenumber = part;
+                street = queryParts[i-1];
+            }
+        } else if (/teresina/i.test(part)) {
+            city = 'Teresina';
+        } else if (/PI|Piau[ií]/i.test(part)) {
+            state = 'PI';
+        }
+    }
+    
+    // Construir URL otimizada
+    let nominatimUrl;
+    if (street && housenumber) {
+        // Busca estruturada com rua e número
+        nominatimUrl = `https://nominatim.openstreetmap.org/search?format=json&street=${encodeURIComponent(housenumber + ' ' + street)}&city=${encodeURIComponent(city)}&state=${encodeURIComponent(state)}&country=Brasil&limit=15&addressdetails=1&accept-language=pt-BR&viewbox=-43.2,-5.3,-42.5,-4.9&bounded=0&extratags=1`;
+        console.log('🔍 Busca estruturada (rua + número)');
+    } else {
+        // Busca geral melhorada
+        nominatimUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(improvedQuery)}&limit=15&countrycodes=br&addressdetails=1&accept-language=pt-BR&viewbox=-43.2,-5.3,-42.5,-4.9&bounded=0&extratags=1&namedetails=1`;
+        console.log('🔍 Busca geral otimizada');
+    }
     
     fetch(nominatimUrl, {
         headers: {
-            'User-Agent': 'Amplanet-Cobertura-Map'
+            'User-Agent': 'Amplanet-Cobertura-Map/1.0'
         }
     })
     .then(response => response.json())
     .then(data => {
         if (data && data.length > 0) {
-            const result = data[0];
-            const lat = parseFloat(result.lat);
-            const lng = parseFloat(result.lon);
+            // Pegar o primeiro resultado mais relevante
+            let bestResult = data[0];
+            
+            // Se houver múltiplos resultados, preferir o que está em Teresina
+            if (data.length > 1) {
+                const teresinaResult = data.find(r => 
+                    (r.address && r.address.city && /teresina/i.test(r.address.city)) ||
+                    (r.display_name && /teresina/i.test(r.display_name))
+                );
+                if (teresinaResult) {
+                    bestResult = teresinaResult;
+                }
+            }
+            
+            const lat = parseFloat(bestResult.lat);
+            const lng = parseFloat(bestResult.lon);
+            
+            // Validar coordenadas
+            if (isNaN(lat) || isNaN(lng)) {
+                showSearchMessage('Erro: Coordenadas inválidas. Tente novamente.', 'error');
+                return;
+            }
+            
+            // Verificar se está em Teresina (aproximado)
+            if (lat < -5.5 || lat > -4.8 || lng < -43.3 || lng > -42.2) {
+                showSearchMessage('⚠️ Localização fora de Teresina. Verifique se o endereço está correto.', 'warning');
+            }
             
             // Salvar dados do marcador
             searchMarkerData = {
                 lat: lat,
                 lng: lng,
-                address: formatAddress(result),
-                coverage: checkCoverage(lat, lng)
+                address: formatAddress(bestResult),
+                coverage: checkCoverage(lat, lng),
+                displayName: bestResult.display_name || ''
             };
             
             // Atualizar iframe do Google Maps com coordenadas
@@ -101,10 +223,11 @@ function performGeocodeSearch(query) {
             showSearchResult(searchMarkerData);
             
             // Mensagem de sucesso
-            showSearchMessage(`Localização encontrada: ${searchMarkerData.address.split(',')[0]}`, 'success');
+            const addressPreview = searchMarkerData.address.split(',')[0];
+            showSearchMessage(`✓ Localização encontrada: ${addressPreview}`, 'success');
             
         } else {
-            showSearchMessage('Localização não encontrada. Tente uma busca mais específica.', 'error');
+            showSearchMessage('❌ Localização não encontrada. Tente uma busca mais específica. Ex: "Av. Ininga, 1234"', 'error');
         }
     })
     .catch(error => {
@@ -193,7 +316,7 @@ function showMarkerOverlay(lat, lng) {
 }
 
 // ========================================
-// POSICIONAR MARCADOR VISUAL
+// POSICIONAR MARCADOR VISUAL PRECISO
 // ========================================
 function positionVisualMarker(lat, lng) {
     // Remover marcador anterior
@@ -202,41 +325,78 @@ function positionVisualMarker(lat, lng) {
         existingMarker.remove();
     }
     
-    // Como não temos acesso ao iframe, vamos criar um marcador visual
-    // que aparece sobre o mapa (apenas visual, não interativo com o iframe)
+    const mapContainer = document.querySelector('#mapVisualLayer');
+    if (!mapContainer) return;
+    
+    // Criar marcador visual profissional
     const marker = document.createElement('div');
     marker.id = 'visualMarker';
-    marker.className = 'visual-marker';
-    marker.innerHTML = '📍';
+    marker.className = 'visual-marker-precise';
+    marker.innerHTML = `
+        <div class="marker-pin">
+            <div class="marker-pin-inner">📍</div>
+            <div class="marker-pin-shadow"></div>
+        </div>
+    `;
     marker.title = 'Localização encontrada';
     
-    // Posicionamento aproximado (funciona melhor se o mapa estiver no zoom padrão)
-    // Isso é uma aproximação visual
-    const mapContainer = document.querySelector('.google-map-container');
-    if (mapContainer) {
-        mapContainer.style.position = 'relative';
-        mapContainer.appendChild(marker);
-        
-        // Tentar posicionar baseado nas coordenadas (aproximado)
-        // Isso é limitado porque não temos controle total do iframe
-        marker.style.position = 'absolute';
-        marker.style.zIndex = '1000';
-        marker.style.cursor = 'pointer';
-        
-        // Por enquanto, centralizar visualmente
-        marker.style.top = '45%';
-        marker.style.left = '50%';
-        marker.style.transform = 'translate(-50%, -50%)';
-        marker.style.fontSize = '2rem';
-        marker.style.filter = 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))';
-        
-        marker.addEventListener('click', function() {
-            const overlay = document.getElementById('markerOverlay');
-            if (overlay) {
-                overlay.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
-        });
-    }
+    // Calcular posição baseada em coordenadas geográficas
+    // Teresina aprox: Lat: -5.09, Lng: -42.8 (centro)
+    // Bounding box aproximado do mapa: -5.6 a -4.6 (lat), -43.5 a -42.0 (lng)
+    const centerLat = -5.09;
+    const centerLng = -42.8;
+    const mapWidth = mapContainer.offsetWidth;
+    const mapHeight = mapContainer.offsetHeight;
+    
+    // Calcular posição relativa (aproximação)
+    // 1 grau de latitude ≈ 111km, 1 grau de longitude em Teresina ≈ 85km
+    const latDiff = lat - centerLat;
+    const lngDiff = lng - centerLng;
+    
+    // Proporção aproximada (ajustável conforme zoom do mapa)
+    const pixelsPerLat = mapHeight / 1.2; // ~1.2 graus visíveis
+    const pixelsPerLng = mapWidth / 1.5; // ~1.5 graus visíveis
+    
+    const top = (mapHeight / 2) - (latDiff * pixelsPerLat);
+    const left = (mapWidth / 2) + (lngDiff * pixelsPerLng);
+    
+    marker.style.position = 'absolute';
+    marker.style.top = `${Math.max(0, Math.min(mapHeight, top))}px`;
+    marker.style.left = `${Math.max(0, Math.min(mapWidth, left))}px`;
+    marker.style.transform = 'translate(-50%, -100%)';
+    marker.style.zIndex = '1000';
+    marker.style.cursor = 'pointer';
+    marker.style.pointerEvents = 'all';
+    
+    // Animação de entrada
+    marker.style.opacity = '0';
+    marker.style.transform = 'translate(-50%, -100%) scale(0)';
+    
+    mapContainer.appendChild(marker);
+    
+    // Animação de entrada
+    setTimeout(() => {
+        marker.style.transition = 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        marker.style.opacity = '1';
+        marker.style.transform = 'translate(-50%, -100%) scale(1)';
+    }, 100);
+    
+    // Clique no marcador
+    marker.addEventListener('click', function() {
+        const overlay = document.getElementById('markerOverlay');
+        if (overlay) {
+            overlay.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    });
+    
+    // Adicionar pulso animado
+    marker.addEventListener('mouseenter', function() {
+        this.style.transform = 'translate(-50%, -100%) scale(1.2)';
+    });
+    
+    marker.addEventListener('mouseleave', function() {
+        this.style.transform = 'translate(-50%, -100%) scale(1)';
+    });
 }
 
 // ========================================
