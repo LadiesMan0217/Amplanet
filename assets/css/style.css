@@ -1570,6 +1570,80 @@ section {
         width: 40px;
         height: 40px;
     }
+    
+    .geo-location-btn-google {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+/* Botão de Geolocalização - Google Maps */
+.geo-button-container-google {
+    pointer-events: all;
+}
+
+.geo-location-btn-google {
+    background: var(--gradient-blue);
+    border: none;
+    border-radius: var(--radius-lg);
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-base);
+    color: white;
+    box-shadow: var(--shadow-md);
+    position: relative;
+    z-index: 302;
+}
+
+.geo-location-btn-google:hover:not(:disabled) {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-colored);
+}
+
+.geo-location-btn-google:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.geo-location-btn-google:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+/* SVG de polígonos DESABILITADO temporariamente */
+#coveragePolygonsSVG {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+/* Garantir que nenhum elemento verde apareça - REMOVER TUDO */
+#mapVisualLayer svg,
+#mapVisualLayer polygon,
+#mapVisualLayer path,
+#mapVisualLayer line,
+#mapVisualLayer polyline,
+#mapVisualLayer circle {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+/* Esconder completamente o container SVG se existir */
+.google-map-container svg {
+    display: none !important;
+}
+
+/* Remover qualquer elemento verde do mapa */
+.map-wrapper-google-integrated svg,
+.map-wrapper-google-integrated polygon,
+.map-wrapper-google-integrated path[stroke*="green" i],
+.map-wrapper-google-integrated path[fill*="green" i] {
+    display: none !important;
+    visibility: hidden !important;
 }
 
 /* Busca Google Maps Style */

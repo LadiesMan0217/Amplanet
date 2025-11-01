@@ -1,7 +1,33 @@
 // ========================================
 // COBERTURA PAGE - GOOGLE MAPS INTEGRATED SEARCH
-// Solução que funciona sem API key usando iframe + busca externa
+// Versão INDEPENDENTE do Leaflet - não compartilha código
 // ========================================
+
+// GeoJSON embutido diretamente (não compartilha com Leaflet)
+const GOOGLE_COBERTURA_GEOJSON = {
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+                "coordinates": [[[-42.823044082495414, -5.0857136184084055], [-42.81518839692427, -5.09760455068546], [-42.81426763522464, -5.116557250165101], [-42.80871645278651, -5.129589135242512], [-42.79940245939349, -5.124652447991139], [-42.77882923669381, -5.115021271635186], [-42.77921431940055, -5.104739376230455], [-42.78237221438607, -5.093612840768145], [-42.79623981458474, -5.082488102452459], [-42.80478759711036, -5.081589510292517], [-42.82025994497755, -5.08058853626936], [-42.823044082495414, -5.0857136184084055]]],
+                "type": "Polygon"
+            },
+            "id": 0
+        },
+        {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+                "coordinates": [[[-42.799631358664385, -5.072449535319777], [-42.790988751934464, -5.08586065935522], [-42.777278045830826, -5.089502798567139], [-42.755465243694914, -5.0773497348858285], [-42.794315759112266, -5.0676683914009715], [-42.799631358664385, -5.072449535319777]]],
+                "type": "Polygon"
+            },
+            "id": 1
+        }
+    ]
+};
+
 let searchMarkerData = null;
 let coveragePolygonsData = null;
 let coverageSVG = null;
@@ -14,14 +40,14 @@ let mapBounds = {
     centerLng: -42.8
 };
 
-document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function() {
     loadCoverageData();
     setupSearch();
+    setupGeolocationButton();
     setupScrollReveal();
-    // Aguardar um pouco para garantir que o iframe carregou
-    setTimeout(() => {
-        drawCoveragePolygons();
-    }, 2000);
+    // POLÍGONOS SVG PERMANENTEMENTE DESABILITADOS - causavam rabiscos verdes
+    // A verificação de cobertura funciona internamente sem necessidade de desenhar polígonos
+    // Os polígonos são usados apenas para cálculo matemático (Ray Casting)
 });
 
 // ========================================
@@ -238,7 +264,10 @@ function performGeocodeSearch(query) {
                 displayName: bestResult.display_name || ''
             };
             
-            // Atualizar iframe do Google Maps com coordenadas
+            // Atualizar iframe do Google Maps para mostrar a localização buscada
+            tryUpdateIframeWithLocation(lat, lng);
+            
+            // Mostrar marcador e overlay
             updateGoogleMapFrame(lat, lng);
             
             // Mostrar resultado
@@ -265,15 +294,50 @@ function performGeocodeSearch(query) {
 }
 
 // ========================================
-// ATUALIZAR IFRAME DO GOOGLE MAPS
+// TENTAR ATUALIZAR IFRAME COM LOCALIZAÇÃO (LIMITADO)
+// ========================================
+function tryUpdateIframeWithLocation(lat, lng) {
+    const iframe = document.getElementById('googleMapFrame');
+    if (!iframe) return;
+    
+    // Construir URL do Google Maps que mostra a localização (funciona sem API key)
+    // Formato do Google Maps Embed que funciona direto
+    const embedUrl = `https://www.google.com/maps?q=${lat},${lng}&hl=pt-BR&z=16&output=embed`;
+    
+    // Atualizar o src do iframe para mostrar a localização
+    // Isso funciona porque estamos mudando a URL do iframe diretamente
+    try {
+        iframe.src = embedUrl;
+        console.log('✅ Iframe atualizado para mostrar localização:', lat, lng);
+        console.log('📍 URL do mapa:', embedUrl);
+        
+        // Aguardar iframe carregar e restaurar o overlay
+        iframe.addEventListener('load', function() {
+            // Restaurar overlay do header após carregar
+            setTimeout(() => {
+                const overlay = document.querySelector('.google-maps-header-overlay');
+                if (overlay) {
+                    overlay.style.display = 'block';
+                }
+            }, 500);
+        }, { once: true });
+    } catch (error) {
+        console.warn('⚠️ Não foi possível atualizar iframe:', error);
+    }
+}
+
+// ========================================
+// ATUALIZAR IFRAME DO GOOGLE MAPS COM LOCALIZAÇÃO
 // ========================================
 function updateGoogleMapFrame(lat, lng) {
-    // Como não podemos modificar diretamente o iframe do Google My Maps,
-    // vamos criar um overlay visual com marcador e informações
+    // Tentar atualizar iframe
+    tryUpdateIframeWithLocation(lat, lng);
+    
+    // Mostrar marcador visual sobre o iframe
     showMarkerOverlay(lat, lng);
     
-    // Também podemos tentar atualizar o iframe se possível (limitado)
-    // Mas o overlay é mais confiável
+    // Posicionar marcador visual preciso
+    positionVisualMarker(lat, lng);
 }
 
 // ========================================
@@ -446,46 +510,42 @@ function formatAddress(result) {
 // CARREGAR DADOS DE COBERTURA
 // ========================================
 function loadCoverageData() {
-    // Tentar carregar GeoJSON embutido primeiro
-    if (typeof COBERTURA_GEOJSON !== 'undefined') {
-        console.log('✅ GeoJSON embutido encontrado');
-        coveragePolygonsData = COBERTURA_GEOJSON;
-        // Desenhar polígonos após carregar
-        setTimeout(() => {
-            drawCoveragePolygons();
-        }, 1000);
-        return;
-    }
-    
-    // Fallback: tentar carregar do arquivo
-    fetch('assets/Map/map.geojson')
-        .then(response => response.json())
-        .then(data => {
-            coveragePolygonsData = data;
-            console.log('✅ GeoJSON carregado do arquivo');
-            setTimeout(() => {
-                drawCoveragePolygons();
-            }, 1000);
-        })
-        .catch(error => {
-            console.error('Erro ao carregar GeoJSON:', error);
-        });
+    // Usar GeoJSON embutido (não compartilha com Leaflet)
+        coveragePolygonsData = GOOGLE_COBERTURA_GEOJSON;
+        console.log('✅ GeoJSON carregado (versão Google Maps)');
+        // NÃO desenhar polígonos SVG - apenas usar para verificação interna
+        console.log('📊 Polígonos carregados para verificação matemática:', coveragePolygonsData.features.length);
 }
 
 // ========================================
-// DESENHAR POLÍGONOS DE COBERTURA SOBRE O IFRAME
+// DESENHAR POLÍGONOS DE COBERTURA - DESABILITADO
 // ========================================
+// Função desabilitada para evitar rabiscos verdes no mapa
+// A verificação de cobertura funciona apenas matematicamente (Ray Casting)
 function drawCoveragePolygons() {
+    // FUNÇÃO COMPLETAMENTE DESABILITADA
+    // Os polígonos SVG causavam rabiscos verdes no mapa
+    // A verificação de cobertura funciona apenas matematicamente (Ray Casting), sem desenhar
+    console.log('⚠️ Desenho de polígonos SVG desabilitado para evitar rabiscos verdes');
+    
+    // Remover qualquer SVG existente
+    const existingSVG = document.getElementById('coveragePolygonsSVG');
+    if (existingSVG) {
+        existingSVG.remove();
+        console.log('✅ SVG removido');
+    }
+    
+    return;
+    
+    /* CÓDIGO ORIGINAL COMENTADO
     if (!coveragePolygonsData || !coveragePolygonsData.features) {
         console.warn('⚠️ GeoJSON não carregado ainda');
-        setTimeout(drawCoveragePolygons, 500);
         return;
     }
     
     const mapContainer = document.querySelector('#mapVisualLayer');
     if (!mapContainer) {
         console.warn('⚠️ Container do mapa não encontrado');
-        setTimeout(drawCoveragePolygons, 500);
         return;
     }
     
@@ -500,11 +560,13 @@ function drawCoveragePolygons() {
     svg.id = 'coveragePolygonsSVG';
     svg.setAttribute('width', '100%');
     svg.setAttribute('height', '100%');
+    svg.setAttribute('preserveAspectRatio', 'none');
     svg.style.position = 'absolute';
     svg.style.top = '0';
     svg.style.left = '0';
     svg.style.pointerEvents = 'none';
     svg.style.zIndex = '50';
+    svg.style.overflow = 'hidden';
     
     const containerWidth = mapContainer.offsetWidth || 1000;
     const containerHeight = mapContainer.offsetHeight || 650;
@@ -513,15 +575,32 @@ function drawCoveragePolygons() {
     coveragePolygonsData.features.forEach((feature, index) => {
         if (feature.geometry.type === 'Polygon') {
             const coordinates = feature.geometry.coordinates[0];
+            if (!coordinates || coordinates.length < 3) {
+                console.warn('⚠️ Polígono inválido:', index);
+                return;
+            }
+            
             const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
             
             // Converter coordenadas geográficas para pixels
+            // GeoJSON formato: [lng, lat]
             const points = coordinates.map(coord => {
                 const [lng, lat] = coord;
                 const x = latLngToPixel(lat, lng, containerWidth, containerHeight);
                 const y = latLngToPixelY(lat, lng, containerWidth, containerHeight);
+                // Validar pontos
+                if (isNaN(x) || isNaN(y)) {
+                    console.warn('⚠️ Coordenada inválida:', coord);
+                    return null;
+                }
                 return `${x},${y}`;
-            }).join(' ');
+            }).filter(p => p !== null).join(' ');
+            
+            // Validar se temos pontos suficientes
+            if (!points || points.split(' ').length < 3) {
+                console.warn('⚠️ Não há pontos suficientes para desenhar polígono:', index);
+                return;
+            }
             
             polygon.setAttribute('points', points);
             polygon.setAttribute('fill', 'rgba(16, 185, 129, 0.35)');
@@ -529,40 +608,56 @@ function drawCoveragePolygons() {
             polygon.setAttribute('stroke-width', '2.5');
             polygon.setAttribute('fill-opacity', '0.4');
             polygon.style.pointerEvents = 'none';
+            polygon.style.vectorEffect = 'non-scaling-stroke';
             
             svg.appendChild(polygon);
+            console.log('✅ Polígono desenhado:', index, 'com', coordinates.length, 'pontos');
         }
     });
     
     mapContainer.appendChild(svg);
     coverageSVG = svg;
     console.log('✅ Polígonos de cobertura desenhados:', coveragePolygonsData.features.length);
+    */
 }
 
 // ========================================
-// CONVERTER COORDENADAS GEOGRÁFICAS PARA PIXELS
+// CONVERTER COORDENADAS GEOGRÁFICAS PARA PIXELS (CORRIGIDO)
 // ========================================
 function latLngToPixel(lat, lng, width, height) {
     const latRange = mapBounds.maxLat - mapBounds.minLat;
     const lngRange = mapBounds.maxLng - mapBounds.minLng;
     
+    // Normalizar longitude (x)
     const normalizedLng = (lng - mapBounds.minLng) / lngRange;
-    return normalizedLng * width;
+    const x = normalizedLng * width;
+    
+    // Garantir que está dentro dos limites
+    return Math.max(0, Math.min(width, x));
 }
 
 function latLngToPixelY(lat, lng, width, height) {
     const latRange = mapBounds.maxLat - mapBounds.minLat;
-    const normalizedLat = (mapBounds.maxLat - lat) / latRange; // Invertido porque Y começa no topo
-    return normalizedLat * height;
+    
+    // Normalizar latitude (y) - invertido porque Y começa no topo
+    const normalizedLat = (mapBounds.maxLat - lat) / latRange;
+    const y = normalizedLat * height;
+    
+    // Garantir que está dentro dos limites
+    return Math.max(0, Math.min(height, y));
 }
 
 // ========================================
-// VERIFICAR COBERTURA (ALGORITMO RAY CASTING)
+// VERIFICAR COBERTURA (ALGORITMO RAY CASTING CORRIGIDO)
 // ========================================
 function checkCoverage(lat, lng) {
     if (!coveragePolygonsData || !coveragePolygonsData.features) {
+        console.log('⚠️ GeoJSON não carregado para verificação');
         return { isCovered: false };
     }
+    
+    console.log('🔍 Verificando cobertura para:', lat, lng);
+    console.log('📊 Total de polígonos:', coveragePolygonsData.features.length);
     
     // Algoritmo Ray Casting para verificar se ponto está dentro do polígono
     for (let i = 0; i < coveragePolygonsData.features.length; i++) {
@@ -570,23 +665,52 @@ function checkCoverage(lat, lng) {
         if (feature.geometry.type !== 'Polygon') continue;
         
         const coordinates = feature.geometry.coordinates[0];
+        if (!coordinates || coordinates.length === 0) continue;
         
         let inside = false;
+        
+        // Ray casting algorithm corrigido
+        // GeoJSON formato: [lng, lat] = [x, y]
+        let intersections = 0;
+        
         for (let j = 0, k = coordinates.length - 1; j < coordinates.length; k = j++) {
-            const [xi, yi] = coordinates[j];
-            const [xj, yj] = coordinates[k];
+            const point1 = coordinates[k]; // Ponto anterior
+            const point2 = coordinates[j]; // Ponto atual
             
-            // Ray casting algorithm
-            const intersect = ((yi > lat) !== (yj > lat)) &&
-                (lng < (xj - xi) * (lat - yi) / (yj - yi) + xi);
-            if (intersect) inside = !inside;
+            // Extrair coordenadas
+            const x1 = point1[0]; // longitude do ponto 1
+            const y1 = point1[1]; // latitude do ponto 1
+            const x2 = point2[0]; // longitude do ponto 2
+            const y2 = point2[1]; // latitude do ponto 2
+            
+            // Verificar se a aresta cruza o raio horizontal que vai do ponto até o infinito
+            // O raio vai da posição (lng, lat) para a direita (lng +∞)
+            const rayY = lat; // Latitude do ponto que queremos verificar
+            const rayX = lng; // Longitude do ponto
+            
+            // Verificar se a aresta cruza o raio
+            if ((y1 > rayY) !== (y2 > rayY)) {
+                // A aresta cruza a linha horizontal do raio
+                // Calcular a interseção
+                const intersectX = (rayY - y1) * (x2 - x1) / (y2 - y1) + x1;
+                
+                // Se a interseção está à direita do ponto (raio vai para direita)
+                if (rayX < intersectX) {
+                    intersections++;
+                }
+            }
         }
         
+        // Se número de interseções é ímpar, ponto está dentro
+        inside = (intersections % 2) === 1;
+        
         if (inside) {
+            console.log('✅ Ponto está DENTRO do polígono', i);
             return { isCovered: true };
         }
     }
     
+    console.log('❌ Ponto está FORA de todos os polígonos');
     return { isCovered: false };
 }
 
@@ -621,6 +745,218 @@ function clearSearchMessage() {
     if (existingMessage) {
         existingMessage.remove();
     }
+}
+
+// ========================================
+// GEOLOCALIZAÇÃO - OBTER LOCALIZAÇÃO ATUAL
+// ========================================
+function setupGeolocationButton() {
+    // Verificar se o navegador suporta geolocalização
+    if (!navigator.geolocation) {
+        console.warn('⚠️ Geolocalização não suportada pelo navegador');
+        return;
+    }
+    
+    console.log('✅ Geolocalização disponível');
+    
+    // Criar botão de geolocalização no overlay da busca
+    const searchOverlay = document.querySelector('.map-search-overlay');
+    if (!searchOverlay) return;
+    
+    // Criar container para o botão - posicionar no canto superior direito, acima da busca
+    const geoButtonContainer = document.createElement('div');
+    geoButtonContainer.className = 'geo-button-container-google';
+    // Posicionar bem acima da barra de busca
+    geoButtonContainer.style.cssText = `
+        position: absolute;
+        top: -10px;
+        right: 20px;
+        z-index: 302;
+    `;
+    
+    const button = document.createElement('button');
+    button.className = 'geo-location-btn-google';
+    button.setAttribute('title', 'Usar minha localização atual');
+    button.setAttribute('aria-label', 'Usar localização atual');
+    button.innerHTML = '<span style="font-size: 1.25rem;">📍</span>';
+    
+    // Adicionar indicador de loading
+    const loadingIndicator = document.createElement('span');
+    loadingIndicator.className = 'geo-loading-indicator-google';
+    loadingIndicator.innerHTML = '⏳';
+    loadingIndicator.style.cssText = 'display: none; margin-left: 4px;';
+    button.appendChild(loadingIndicator);
+    
+    button.addEventListener('click', function() {
+        // Mostrar loading
+        loadingIndicator.style.display = 'inline';
+        button.disabled = true;
+        button.style.opacity = '0.6';
+        button.style.cursor = 'wait';
+        
+        getCurrentLocationGoogle(function() {
+            // Esconder loading quando terminar
+            loadingIndicator.style.display = 'none';
+            button.disabled = false;
+            button.style.opacity = '1';
+            button.style.cursor = 'pointer';
+        });
+    });
+    
+    geoButtonContainer.appendChild(button);
+    searchOverlay.appendChild(geoButtonContainer);
+}
+
+function getCurrentLocationGoogle(onComplete) {
+    console.log('🌍 Solicitando localização atual...');
+    
+    // Verificar se já temos permissão armazenada
+    const hasPermission = sessionStorage.getItem('geolocation_permission_granted_google');
+    
+    const options = {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 60000
+    };
+    
+    const complete = function() {
+        if (typeof onComplete === 'function') {
+            onComplete();
+        }
+    };
+    
+    // Se já tiver permissão, buscar automaticamente
+    if (hasPermission === 'true') {
+        console.log('✅ Permissão já concedida, buscando localização...');
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                handleLocationSuccessGoogle(position);
+                complete();
+            },
+            function(error) {
+                handleLocationErrorGoogle(error);
+                complete();
+            },
+            options
+        );
+        return;
+    }
+    
+    // Se não tiver permissão ainda, pedir uma vez
+    navigator.geolocation.getCurrentPosition(
+        function(position) {
+            sessionStorage.setItem('geolocation_permission_granted_google', 'true');
+            handleLocationSuccessGoogle(position);
+            complete();
+        },
+        function(error) {
+            if (error.code === error.PERMISSION_DENIED) {
+                sessionStorage.setItem('geolocation_permission_granted_google', 'false');
+            }
+            handleLocationErrorGoogle(error);
+            complete();
+        },
+        options
+    );
+}
+
+function handleLocationSuccessGoogle(position) {
+    const lat = position.coords.latitude;
+    const lng = position.coords.longitude;
+    
+    console.log('✅ Localização obtida:', lat, lng);
+    
+    // Verificar se está em Teresina (aproximado)
+    if (lat >= -5.5 && lat <= -4.8 && lng >= -43.3 && lng <= -42.2) {
+        // Verificar cobertura
+        const coverageResult = checkCoverage(lat, lng);
+        console.log('🔍 Verificação de cobertura (geolocalização):', coverageResult);
+        
+        // Salvar dados
+        searchMarkerData = {
+            lat: lat,
+            lng: lng,
+            address: 'Sua localização atual',
+            coverage: coverageResult,
+            displayName: 'Sua localização atual'
+        };
+        
+        // Buscar endereço reverso
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`)
+            .then(response => response.json())
+            .then(data => {
+                // Formatar endereço
+                let address = 'Sua localização atual';
+                
+                if (data.address) {
+                    const addr = data.address;
+                    const parts = [];
+                    
+                    if (addr.road || addr.pedestrian) {
+                        parts.push(addr.road || addr.pedestrian);
+                    }
+                    if (addr.house_number) {
+                        parts.push(addr.house_number);
+                    }
+                    if (addr.neighbourhood || addr.suburb || addr.quarter) {
+                        parts.push(addr.neighbourhood || addr.suburb || addr.quarter);
+                    }
+                    if (addr.postcode) {
+                        parts.push(addr.postcode);
+                    }
+                    
+                    if (parts.length > 0) {
+                        address = parts.join(', ');
+                        address += ', Teresina - PI';
+                    } else if (data.display_name) {
+                        const displayParts = data.display_name.split(',');
+                        address = displayParts.slice(0, 3).join(',');
+                    }
+                } else if (data.display_name) {
+                    const displayParts = data.display_name.split(',');
+                    address = displayParts.slice(0, 3).join(',');
+                }
+                
+                // Atualizar dados do marcador
+                searchMarkerData.address = address;
+                
+                // Mostrar resultado
+                updateGoogleMapFrame(lat, lng);
+                showMarkerOverlay(lat, lng);
+                showSearchResult(searchMarkerData);
+                
+                // Mensagem de sucesso
+                const coverageStatus = coverageResult.isCovered ? '✓ Área Coberta' : '⚠ Fora da Cobertura';
+                showSearchMessage(`${coverageStatus}: ${address.split(',')[0]}`, coverageResult.isCovered ? 'success' : 'warning');
+            })
+            .catch(error => {
+                console.error('Erro ao buscar endereço:', error);
+                // Mostrar mesmo sem endereço
+                updateGoogleMapFrame(lat, lng);
+                showMarkerOverlay(lat, lng);
+                showSearchResult(searchMarkerData);
+            });
+    } else {
+        showSearchMessage('⚠️ Você não está em Teresina, PI. Esta ferramenta verifica cobertura apenas em Teresina.', 'warning');
+    }
+}
+
+function handleLocationErrorGoogle(error) {
+    console.error('❌ Erro ao obter localização:', error);
+    let message = 'Não foi possível obter sua localização. ';
+    switch(error.code) {
+        case error.PERMISSION_DENIED:
+            message += 'Permissão negada. Por favor, permita acesso à localização no navegador.';
+            sessionStorage.setItem('geolocation_permission_granted_google', 'false');
+            break;
+        case error.POSITION_UNAVAILABLE:
+            message += 'Localização indisponível.';
+            break;
+        case error.TIMEOUT:
+            message += 'Tempo esgotado ao buscar localização.';
+            break;
+    }
+    showSearchMessage(message, 'error');
 }
 
 // ========================================
