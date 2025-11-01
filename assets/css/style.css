@@ -164,16 +164,19 @@ ul {
 }
 
 .btn-secondary {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(10px);
     color: white;
-    border-color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.4);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.6);
     transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
 .btn-outline {
@@ -198,6 +201,10 @@ ul {
 .btn-block {
     display: flex;
     width: 100%;
+    justify-content: center;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.05em;
 }
 
 /* ========================================
@@ -320,6 +327,20 @@ ul {
     object-fit: cover;
 }
 
+/* ========================================
+   FILTRO DO BANNER HERO - AJUSTAR AQUI
+   ======================================== */
+/* 
+ * Para ajustar a transparência e cor do filtro do banner:
+ * - ::before = Gradientes radiais roxos/azuis (efeito de luz)
+ * - ::after = Overlay principal com filtro roxo + camada escura
+ * 
+ * Para MAIS transparente (banner mais visível): Reduza os valores 0.25 e 0.35
+ * Para MENOS transparente (filtro mais forte): Aumente os valores
+ * 
+ * Exemplo: rgba(37, 99, 235, 0.35) onde 0.35 = 35% de opacidade
+ */
+
 .hero-background::before {
     content: '';
     position: absolute;
@@ -327,9 +348,10 @@ ul {
     left: 0;
     width: 100%;
     height: 100%;
+    /* Gradientes radiais - Efeito de luz colorida */
     background: 
-        radial-gradient(circle at 20% 50%, rgba(37, 99, 235, 0.3) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.3) 0%, transparent 50%);
+        radial-gradient(circle at 20% 50%, rgba(37, 99, 235, 0.25) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.25) 0%, transparent 50%);
     z-index: 1;
 }
 
@@ -340,7 +362,12 @@ ul {
     left: 0;
     width: 100%;
     height: 100%;
-    background: var(--gradient-hero);
+    /* Overlay principal: Filtro roxo da marca + camada escura para legibilidade */
+    /* Primeira camada: Gradiente roxo (35% opacidade) */
+    /* Segunda camada: Overlay preto (30% opacidade) para contraste do texto */
+    background: 
+        linear-gradient(135deg, rgba(37, 99, 235, 0.35) 0%, rgba(139, 92, 246, 0.35) 100%),
+        rgba(0, 0, 0, 0.3);
     z-index: 2;
 }
 
@@ -360,7 +387,7 @@ ul {
     margin-bottom: var(--spacing-md);
     line-height: 1.2;
     letter-spacing: -0.02em;
-    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .hero-subtitle {
@@ -369,6 +396,7 @@ ul {
     opacity: 0.95;
     font-weight: 400;
     line-height: 1.6;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5), 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
 .hero-buttons {
@@ -476,9 +504,16 @@ section {
 
 .planos-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: var(--spacing-xl);
     margin-top: var(--spacing-xl);
+}
+
+/* Layout responsivo para 4 planos */
+@media (min-width: 1200px) {
+    .planos-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }
 
 .plano-card {
@@ -553,6 +588,7 @@ section {
     color: var(--text-dark);
     margin-bottom: var(--spacing-sm);
     letter-spacing: -0.01em;
+    text-transform: uppercase;
 }
 
 .plano-velocidade {
@@ -591,6 +627,37 @@ section {
     width: 24px;
     text-align: center;
 }
+
+/* Ícones profissionais dos planos */
+.plano-feature .icon-pro {
+    font-size: 1.1rem;
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+    text-align: center;
+    color: var(--primary-color);
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
+    padding: 0;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-base);
+    flex-shrink: 0;
+}
+
+.plano-feature:hover .icon-pro {
+    background: var(--gradient-blue);
+    color: white;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.plano-feature span {
+    flex: 1;
+    line-height: 1.5;
+}
+
 
 .plano-preco {
     text-align: center;
