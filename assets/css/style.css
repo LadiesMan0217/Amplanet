@@ -115,6 +115,11 @@ ul {
     padding: 0 var(--spacing-lg);
 }
 
+/* Container mais largo para seção de planos */
+.planos-section .container {
+    max-width: 1800px;
+}
+
 .text-center {
     text-align: center;
 }
@@ -255,9 +260,9 @@ ul {
     background: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
     z-index: 1000;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
     transition: box-shadow 0.3s var(--timing-ease-out), background 0.3s var(--timing-ease-out);
 }
 
@@ -271,17 +276,76 @@ ul {
     align-items: center;
     justify-content: space-between;
     padding: 1.25rem var(--spacing-lg);
-    gap: var(--spacing-lg);
+    gap: var(--spacing-xl);
+    max-width: 1800px;
+    margin: 0 auto;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex-shrink: 0;
+    position: relative;
+}
+
+.navbar-brand a {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    text-decoration: none;
 }
 
 .navbar-brand .logo {
-    height: 48px;
+    height: 56px;
+    width: auto;
+    transition: var(--transition-base);
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1));
+    display: block;
+}
+
+.navbar-brand:hover .logo {
+    transform: scale(1.03);
+    filter: drop-shadow(0 4px 12px rgba(37, 99, 235, 0.25));
+}
+
+/* Estilo para quando houver dois logos separados */
+.navbar-brand .logo-primary {
+    height: 56px;
     width: auto;
     transition: var(--transition-base);
 }
 
-.navbar-brand:hover .logo {
-    transform: scale(1.05);
+.navbar-brand .logo-secondary {
+    height: 42px;
+    width: auto;
+    transition: var(--transition-base);
+    opacity: 0.85;
+}
+
+.navbar-brand::after {
+    content: '';
+    position: absolute;
+    right: -var(--spacing-md);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 32px;
+    background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.1), transparent);
+    display: none;
+}
+
+.navbar-brand:has(.logo-secondary)::after {
+    display: block;
+}
+
+.navbar-brand:hover .logo-primary {
+    transform: scale(1.03);
+}
+
+.navbar-brand:hover .logo-secondary {
+    opacity: 1;
+    transform: scale(1.02);
 }
 
 .navbar-menu {
@@ -530,10 +594,12 @@ section {
 
 /* Título e texto branco para seção de planos escura */
 .planos-section .section-title {
-    background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.9) 100%);
+    background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.95) 50%, rgba(255, 255, 255, 0.85) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    text-shadow: 0 0 40px rgba(37, 99, 235, 0.2);
+    margin-bottom: var(--spacing-lg);
 }
 
 .planos-section .section-subtitle {
@@ -579,9 +645,29 @@ section {
    PLANOS SECTION - PREMIUM (DESIGN ESCURO PROFISSIONAL)
    ======================================== */
 .planos-section {
-    background: #0f172a; /* Azul escuro profundo */
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
     position: relative;
     padding: var(--spacing-3xl) 0;
+    overflow: hidden;
+}
+
+.planos-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(37, 99, 235, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.planos-section .container {
+    position: relative;
+    z-index: 1;
 }
 
 .planos-section-alt {
@@ -593,6 +679,7 @@ section {
     grid-template-columns: 1fr;
     gap: var(--spacing-xl);
     margin-top: var(--spacing-xl);
+    padding: 0 var(--spacing-md);
 }
 
 /* Tablet: 2 colunas */
@@ -600,46 +687,70 @@ section {
     .planos-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: var(--spacing-xl);
+        padding: 0 var(--spacing-lg);
     }
 }
 
-/* Desktop: 4 colunas com largura adequada */
+/* Desktop: 4 colunas com largura adequada e espaçamento generoso */
 @media (min-width: 1200px) {
     .planos-grid {
         grid-template-columns: repeat(4, 1fr);
-        gap: var(--spacing-lg);
-        max-width: 1400px;
+        gap: var(--spacing-xl);
+        max-width: 1600px;
         margin-left: auto;
         margin-right: auto;
+        padding: 0 var(--spacing-xl);
     }
     
     .plano-card {
-        min-width: 0; /* Permite que os cards se ajustem */
+        min-width: 280px;
+        max-width: 380px;
+        margin: 0 auto;
+    }
+}
+
+/* Telas grandes: mais espaçamento e cards maiores */
+@media (min-width: 1400px) {
+    .planos-grid {
+        gap: var(--spacing-2xl);
+        max-width: 1800px;
+    }
+    
+    .plano-card {
+        min-width: 300px;
+        max-width: 400px;
     }
 }
 
 /* Telas muito grandes: garantir espaçamento adequado */
 @media (min-width: 1600px) {
     .planos-grid {
-        gap: var(--spacing-xl);
-        max-width: 1600px;
+        gap: var(--spacing-2xl);
+        max-width: 2000px;
+        padding: 0 var(--spacing-2xl);
+    }
+    
+    .plano-card {
+        min-width: 320px;
+        max-width: 420px;
     }
 }
 
 .plano-card {
-    background: #1e293b; /* Azul escuro médio */
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
     border-radius: var(--radius-2xl);
     padding: 0;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
-    transition: var(--transition-base);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.08);
     overflow: hidden;
     display: flex;
     flex-direction: column;
     width: 100%;
     max-width: 100%;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(20px);
+    transform: translateY(0) scale(1);
 }
 
 .plano-card::before {
@@ -665,12 +776,18 @@ section {
 
 .plano-card.featured {
     border: 2px solid #2563eb;
-    background: #1e293b;
-    box-shadow: 0 10px 40px rgba(37, 99, 235, 0.3);
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e293b 50%, #0f172a 100%);
+    box-shadow: 0 15px 50px rgba(37, 99, 235, 0.4), 0 0 0 1px rgba(37, 99, 235, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.plano-card.featured::before {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(139, 92, 246, 0.15) 100%);
+    opacity: 1;
 }
 
 .plano-card.featured:hover {
-    box-shadow: 0 20px 60px rgba(37, 99, 235, 0.4);
+    box-shadow: 0 25px 70px rgba(37, 99, 235, 0.5), 0 0 0 1px rgba(37, 99, 235, 0.4), 0 0 60px rgba(37, 99, 235, 0.3);
+    border-color: #3b82f6;
 }
 
 .plano-badge {
@@ -679,22 +796,37 @@ section {
     right: var(--spacing-md);
     background: var(--gradient-blue);
     color: white;
-    padding: 0.5rem 1.25rem;
+    padding: 0.625rem 1.5rem;
     border-radius: var(--radius-full);
     font-size: 0.75rem;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+    letter-spacing: 0.1em;
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3);
     z-index: 10;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: badgePulse 3s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.2);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.3), 0 0 30px rgba(37, 99, 235, 0.4);
+    }
 }
 
 .plano-header {
     text-align: center;
     margin-bottom: 0;
-    padding: var(--spacing-xl) var(--spacing-xl) var(--spacing-lg);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    padding: var(--spacing-2xl) var(--spacing-xl) var(--spacing-lg);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.12);
     position: relative;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(139, 92, 246, 0.05) 100%);
 }
 
 .plano-nome {
@@ -707,17 +839,22 @@ section {
 }
 
 .plano-velocidade {
-    font-size: 2.25rem;
+    font-size: clamp(2rem, 4vw, 2.5rem);
     font-weight: 900;
     color: white;
     letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.85) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 30px rgba(37, 99, 235, 0.3);
 }
 
 .plano-features {
     margin-bottom: 0;
-    padding: var(--spacing-lg) var(--spacing-xl);
+    padding: var(--spacing-xl) var(--spacing-xl);
     flex: 1;
-    min-height: 240px;
+    min-height: 280px;
 }
 
 .plano-feature {
@@ -783,18 +920,23 @@ section {
 .plano-preco {
     text-align: center;
     margin-bottom: 0;
-    padding: var(--spacing-lg) var(--spacing-xl);
-    border-top: 1px solid rgba(255, 255, 255, 0.15);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    padding: var(--spacing-xl) var(--spacing-xl);
+    border-top: 2px solid rgba(255, 255, 255, 0.12);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.12);
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(139, 92, 246, 0.03) 100%);
 }
 
 .preco-valor {
-    font-size: 2.5rem;
+    font-size: clamp(2.25rem, 4vw, 2.75rem);
     font-weight: 900;
     color: white;
     letter-spacing: -0.02em;
     line-height: 1;
     display: inline-block;
+    background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.9) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .preco-periodo {
@@ -808,21 +950,39 @@ section {
 
 /* Botão dentro dos cards de planos - Fundo branco com texto escuro */
 .plano-card .btn-primary {
-    background: white;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
     color: #1e293b;
     border: none;
     margin: var(--spacing-xl);
     margin-top: 0;
+    padding: 1.125rem 2rem;
     font-weight: 700;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    transition: var(--transition-base);
+    font-size: 1rem;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.2);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: var(--radius-lg);
+    position: relative;
+    overflow: hidden;
+}
+
+.plano-card .btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.4s;
 }
 
 .plano-card .btn-primary:hover {
-    background: rgba(255, 255, 255, 0.95);
+    background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
     color: #0f172a;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+
+.plano-card .btn-primary:hover::before {
+    opacity: 1;
 }
 
 /* ========================================
@@ -2770,7 +2930,6 @@ section {
     height: 56px;
     width: auto;
     margin-bottom: var(--spacing-md);
-    filter: brightness(0) invert(1);
 }
 
 .footer-description {
@@ -2820,6 +2979,30 @@ section {
     font-size: 0.9rem;
     position: relative;
     z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.footer-bottom p {
+    margin: 0;
+}
+
+@media (min-width: 768px) {
+    .footer-bottom {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: var(--spacing-lg);
+        flex-wrap: wrap;
+    }
+    
+    .footer-bottom p:not(:last-child)::after {
+        content: '•';
+        margin-left: var(--spacing-lg);
+        opacity: 0.4;
+        font-weight: 300;
+    }
 }
 
 /* ========================================
@@ -2901,6 +3084,13 @@ section {
     /* Planos */
     .planos-grid {
         grid-template-columns: 1fr;
+        padding: 0 var(--spacing-sm);
+        gap: var(--spacing-lg);
+    }
+    
+    .plano-card {
+        max-width: 100%;
+        min-width: auto;
     }
 
     /* Apps */
