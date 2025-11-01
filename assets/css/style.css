@@ -710,7 +710,8 @@ section {
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
     position: relative;
     padding: var(--spacing-3xl) 0;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: visible;
     min-height: 400px;
     width: 100%;
 }
@@ -732,10 +733,18 @@ section {
 .planos-section .container {
     position: relative;
     z-index: 1;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .planos-section-alt {
     background-color: #0f172a;
+    background: #0f172a;
+    overflow-x: hidden;
+    overflow-y: visible;
+    width: 100%;
+    min-height: 400px;
+    position: relative;
 }
 
 .planos-grid {
@@ -744,6 +753,9 @@ section {
     gap: var(--spacing-xl);
     margin-top: var(--spacing-xl);
     padding: 0 var(--spacing-md);
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 300px;
 }
 
 /* Tablet: 2 colunas */
@@ -764,12 +776,14 @@ section {
         margin-left: auto;
         margin-right: auto;
         padding: 0 var(--spacing-xl);
+        width: 100%;
     }
     
     .plano-card {
-        min-width: 280px;
-        max-width: 380px;
-        margin: 0 auto;
+        min-width: 0;
+        max-width: 100%;
+        width: 100%;
+        margin: 0;
     }
 }
 
@@ -778,11 +792,13 @@ section {
     .planos-grid {
         gap: var(--spacing-2xl);
         max-width: 1800px;
+        width: 100%;
     }
     
     .plano-card {
-        min-width: 300px;
-        max-width: 400px;
+        min-width: 0;
+        max-width: 100%;
+        width: 100%;
     }
 }
 
@@ -792,11 +808,13 @@ section {
         gap: var(--spacing-2xl);
         max-width: 2000px;
         padding: 0 var(--spacing-2xl);
+        width: 100%;
     }
     
     .plano-card {
-        min-width: 320px;
-        max-width: 420px;
+        min-width: 0;
+        max-width: 100%;
+        width: 100%;
     }
 }
 
@@ -809,13 +827,16 @@ section {
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     border: 2px solid rgba(255, 255, 255, 0.08);
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: visible;
     display: flex;
     flex-direction: column;
     width: 100%;
     max-width: 100%;
+    min-width: 0;
     transform: translateY(0) scale(1);
     min-height: 500px;
+    box-sizing: border-box;
 }
 
 /* backdrop-filter apenas se suportado */
@@ -1412,19 +1433,27 @@ section {
 
 .solucoes-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: var(--spacing-xl);
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 200px;
 }
 
 .solucao-card {
     background: var(--bg-white);
+    background: #ffffff;
     border-radius: var(--radius-2xl);
     padding: var(--spacing-xl);
     box-shadow: var(--shadow-lg);
     transition: var(--transition-base);
     border: 1px solid rgba(0, 0, 0, 0.05);
     position: relative;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: visible;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .solucao-card::before {
@@ -3169,15 +3198,25 @@ section {
     }
 
     /* Planos */
+    .planos-section {
+        overflow-x: hidden;
+        overflow-y: visible;
+        padding: var(--spacing-xl) 0;
+    }
+    
     .planos-grid {
         grid-template-columns: 1fr;
         padding: 0 var(--spacing-sm);
         gap: var(--spacing-lg);
+        width: 100%;
+        min-height: auto;
     }
     
     .plano-card {
         max-width: 100%;
-        min-width: auto;
+        min-width: 0;
+        width: 100%;
+        min-height: auto;
     }
 
     /* Apps */
@@ -3198,6 +3237,14 @@ section {
     /* Soluções */
     .solucoes-grid {
         grid-template-columns: 1fr;
+        width: 100%;
+        gap: var(--spacing-lg);
+    }
+    
+    .planos-section-alt {
+        overflow-x: hidden;
+        overflow-y: visible;
+        padding: var(--spacing-xl) 0;
     }
 
     /* Cobertura */
@@ -3258,21 +3305,46 @@ section {
     .valor-card,
     .diferencial-item {
         padding: var(--spacing-md);
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
     }
     
-    /* Garantir que todas as seções tenham background */
+    /* Garantir que todas as seções tenham background e sejam visíveis */
     section {
         background-color: var(--bg-white);
+        background: var(--bg-white);
         width: 100%;
         overflow-x: hidden;
+        overflow-y: visible;
+        display: block;
+        visibility: visible;
+        opacity: 1;
+        min-height: auto;
     }
     
-    .planos-section {
+    .planos-section,
+    .planos-section-alt {
         background-color: #0f172a;
+        background: #0f172a;
+        overflow-x: hidden;
+        overflow-y: visible;
+        display: block;
+        visibility: visible;
     }
     
     .apps-section {
         background-color: #667eea;
+        overflow-x: hidden;
+        overflow-y: visible;
+    }
+    
+    .planos-grid,
+    .solucoes-grid {
+        display: grid;
+        visibility: visible;
+        opacity: 1;
+        width: 100%;
     }
 }
 
