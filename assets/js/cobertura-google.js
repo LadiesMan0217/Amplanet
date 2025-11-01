@@ -4,11 +4,24 @@
 // ========================================
 let searchMarkerData = null;
 let coveragePolygonsData = null;
+let coverageSVG = null;
+let mapBounds = {
+    minLat: -5.6,
+    maxLat: -4.6,
+    minLng: -43.5,
+    maxLng: -42.0,
+    centerLat: -5.09,
+    centerLng: -42.8
+};
 
 document.addEventListener('DOMContentLoaded', function() {
     loadCoverageData();
     setupSearch();
     setupScrollReveal();
+    // Aguardar um pouco para garantir que o iframe carregou
+    setTimeout(() => {
+        drawCoveragePolygons();
+    }, 2000);
 });
 
 // ========================================
@@ -207,12 +220,21 @@ function performGeocodeSearch(query) {
                 showSearchMessage('⚠️ Localização fora de Teresina. Verifique se o endereço está correto.', 'warning');
             }
             
+            // Verificar cobertura PRECISAMENTE
+            const coverageResult = checkCoverage(lat, lng);
+            console.log('🔍 Verificação de cobertura:', {
+                lat,
+                lng,
+                isCovered: coverageResult.isCovered,
+                address: formatAddress(bestResult)
+            });
+            
             // Salvar dados do marcador
             searchMarkerData = {
                 lat: lat,
                 lng: lng,
                 address: formatAddress(bestResult),
-                coverage: checkCoverage(lat, lng),
+                coverage: coverageResult,
                 displayName: bestResult.display_name || ''
             };
             
@@ -222,9 +244,10 @@ function performGeocodeSearch(query) {
             // Mostrar resultado
             showSearchResult(searchMarkerData);
             
-            // Mensagem de sucesso
+            // Mensagem de sucesso com status de cobertura
             const addressPreview = searchMarkerData.address.split(',')[0];
-            showSearchMessage(`✓ Localização encontrada: ${addressPreview}`, 'success');
+            const coverageStatus = coverageResult.isCovered ? '✓ Área Coberta' : '⚠ Fora da Cobertura';
+            showSearchMessage(`${coverageStatus}: ${addressPreview}`, coverageResult.isCovered ? 'success' : 'warning');
             
         } else {
             showSearchMessage('❌ Localização não encontrada. Tente uma busca mais específica. Ex: "Av. Ininga, 1234"', 'error');
@@ -340,25 +363,13 @@ function positionVisualMarker(lat, lng) {
     `;
     marker.title = 'Localização encontrada';
     
-    // Calcular posição baseada em coordenadas geográficas
-    // Teresina aprox: Lat: -5.09, Lng: -42.8 (centro)
-    // Bounding box aproximado do mapa: -5.6 a -4.6 (lat), -43.5 a -42.0 (lng)
-    const centerLat = -5.09;
-    const centerLng = -42.8;
-    const mapWidth = mapContainer.offsetWidth;
-    const mapHeight = mapContainer.offsetHeight;
+    // Usar função de conversão precisa
+    const mapWidth = mapContainer.offsetWidth || 1000;
+    const mapHeight = mapContainer.offsetHeight || 650;
     
-    // Calcular posição relativa (aproximação)
-    // 1 grau de latitude ≈ 111km, 1 grau de longitude em Teresina ≈ 85km
-    const latDiff = lat - centerLat;
-    const lngDiff = lng - centerLng;
-    
-    // Proporção aproximada (ajustável conforme zoom do mapa)
-    const pixelsPerLat = mapHeight / 1.2; // ~1.2 graus visíveis
-    const pixelsPerLng = mapWidth / 1.5; // ~1.5 graus visíveis
-    
-    const top = (mapHeight / 2) - (latDiff * pixelsPerLat);
-    const left = (mapWidth / 2) + (lngDiff * pixelsPerLng);
+    // Converter coordenadas geográficas para pixels usando a mesma função dos polígonos
+    const left = latLngToPixel(lat, lng, mapWidth, mapHeight);
+    const top = latLngToPixelY(lat, lng, mapWidth, mapHeight);
     
     marker.style.position = 'absolute';
     marker.style.top = `${Math.max(0, Math.min(mapHeight, top))}px`;
@@ -435,10 +446,26 @@ function formatAddress(result) {
 // CARREGAR DADOS DE COBERTURA
 // ========================================
 function loadCoverageData() {
+    // Tentar carregar GeoJSON embutido primeiro
+    if (typeof COBERTURA_GEOJSON !== 'undefined') {
+        console.log('✅ GeoJSON embutido encontrado');
+        coveragePolygonsData = COBERTURA_GEOJSON;
+        // Desenhar polígonos após carregar
+        setTimeout(() => {
+            drawCoveragePolygons();
+        }, 1000);
+        return;
+    }
+    
+    // Fallback: tentar carregar do arquivo
     fetch('assets/Map/map.geojson')
         .then(response => response.json())
         .then(data => {
             coveragePolygonsData = data;
+            console.log('✅ GeoJSON carregado do arquivo');
+            setTimeout(() => {
+                drawCoveragePolygons();
+            }, 1000);
         })
         .catch(error => {
             console.error('Erro ao carregar GeoJSON:', error);
@@ -446,25 +473,110 @@ function loadCoverageData() {
 }
 
 // ========================================
-// VERIFICAR COBERTURA
+// DESENHAR POLÍGONOS DE COBERTURA SOBRE O IFRAME
+// ========================================
+function drawCoveragePolygons() {
+    if (!coveragePolygonsData || !coveragePolygonsData.features) {
+        console.warn('⚠️ GeoJSON não carregado ainda');
+        setTimeout(drawCoveragePolygons, 500);
+        return;
+    }
+    
+    const mapContainer = document.querySelector('#mapVisualLayer');
+    if (!mapContainer) {
+        console.warn('⚠️ Container do mapa não encontrado');
+        setTimeout(drawCoveragePolygons, 500);
+        return;
+    }
+    
+    // Remover SVG anterior se existir
+    const existingSVG = document.getElementById('coveragePolygonsSVG');
+    if (existingSVG) {
+        existingSVG.remove();
+    }
+    
+    // Criar SVG para desenhar os polígonos
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.id = 'coveragePolygonsSVG';
+    svg.setAttribute('width', '100%');
+    svg.setAttribute('height', '100%');
+    svg.style.position = 'absolute';
+    svg.style.top = '0';
+    svg.style.left = '0';
+    svg.style.pointerEvents = 'none';
+    svg.style.zIndex = '50';
+    
+    const containerWidth = mapContainer.offsetWidth || 1000;
+    const containerHeight = mapContainer.offsetHeight || 650;
+    
+    // Desenhar cada polígono de cobertura
+    coveragePolygonsData.features.forEach((feature, index) => {
+        if (feature.geometry.type === 'Polygon') {
+            const coordinates = feature.geometry.coordinates[0];
+            const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+            
+            // Converter coordenadas geográficas para pixels
+            const points = coordinates.map(coord => {
+                const [lng, lat] = coord;
+                const x = latLngToPixel(lat, lng, containerWidth, containerHeight);
+                const y = latLngToPixelY(lat, lng, containerWidth, containerHeight);
+                return `${x},${y}`;
+            }).join(' ');
+            
+            polygon.setAttribute('points', points);
+            polygon.setAttribute('fill', 'rgba(16, 185, 129, 0.35)');
+            polygon.setAttribute('stroke', '#10b981');
+            polygon.setAttribute('stroke-width', '2.5');
+            polygon.setAttribute('fill-opacity', '0.4');
+            polygon.style.pointerEvents = 'none';
+            
+            svg.appendChild(polygon);
+        }
+    });
+    
+    mapContainer.appendChild(svg);
+    coverageSVG = svg;
+    console.log('✅ Polígonos de cobertura desenhados:', coveragePolygonsData.features.length);
+}
+
+// ========================================
+// CONVERTER COORDENADAS GEOGRÁFICAS PARA PIXELS
+// ========================================
+function latLngToPixel(lat, lng, width, height) {
+    const latRange = mapBounds.maxLat - mapBounds.minLat;
+    const lngRange = mapBounds.maxLng - mapBounds.minLng;
+    
+    const normalizedLng = (lng - mapBounds.minLng) / lngRange;
+    return normalizedLng * width;
+}
+
+function latLngToPixelY(lat, lng, width, height) {
+    const latRange = mapBounds.maxLat - mapBounds.minLat;
+    const normalizedLat = (mapBounds.maxLat - lat) / latRange; // Invertido porque Y começa no topo
+    return normalizedLat * height;
+}
+
+// ========================================
+// VERIFICAR COBERTURA (ALGORITMO RAY CASTING)
 // ========================================
 function checkCoverage(lat, lng) {
-    if (!coveragePolygonsData) {
+    if (!coveragePolygonsData || !coveragePolygonsData.features) {
         return { isCovered: false };
     }
     
     // Algoritmo Ray Casting para verificar se ponto está dentro do polígono
     for (let i = 0; i < coveragePolygonsData.features.length; i++) {
         const feature = coveragePolygonsData.features[i];
+        if (feature.geometry.type !== 'Polygon') continue;
+        
         const coordinates = feature.geometry.coordinates[0];
         
         let inside = false;
         for (let j = 0, k = coordinates.length - 1; j < coordinates.length; k = j++) {
-            const xi = coordinates[j][0];
-            const yi = coordinates[j][1];
-            const xj = coordinates[k][0];
-            const yj = coordinates[k][1];
+            const [xi, yi] = coordinates[j];
+            const [xj, yj] = coordinates[k];
             
+            // Ray casting algorithm
             const intersect = ((yi > lat) !== (yj > lat)) &&
                 (lng < (xj - xi) * (lat - yi) / (yj - yi) + xi);
             if (intersect) inside = !inside;
