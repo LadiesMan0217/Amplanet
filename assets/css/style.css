@@ -469,6 +469,39 @@ section {
     line-height: 1.2;
 }
 
+/* Título e texto branco para seção de planos escura */
+.planos-section .section-title {
+    color: white;
+}
+
+.planos-section .section-subtitle {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.planos-section .planos-disclaimer {
+    margin-top: var(--spacing-xl);
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.875rem;
+}
+
+.planos-section .planos-disclaimer em {
+    color: rgba(255, 255, 255, 0.7);
+    font-style: italic;
+}
+
+.planos-section .btn-outline {
+    background-color: transparent;
+    color: white;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.planos-section .btn-outline:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: white;
+}
+
 .section-subtitle {
     text-align: center;
     color: var(--text-medium);
@@ -481,81 +514,85 @@ section {
 }
 
 /* ========================================
-   PLANOS SECTION - PREMIUM
+   PLANOS SECTION - PREMIUM (DESIGN ESCURO PROFISSIONAL)
    ======================================== */
 .planos-section {
-    background: linear-gradient(to bottom, var(--bg-light) 0%, var(--bg-white) 50%);
+    background: #0f172a; /* Azul escuro profundo */
     position: relative;
-}
-
-.planos-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(to right, transparent, var(--primary-color), transparent);
+    padding: var(--spacing-3xl) 0;
 }
 
 .planos-section-alt {
-    background-color: var(--bg-white);
+    background-color: #0f172a;
 }
 
 .planos-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: 1fr;
     gap: var(--spacing-xl);
     margin-top: var(--spacing-xl);
 }
 
-/* Layout responsivo para 4 planos */
+/* Tablet: 2 colunas */
+@media (min-width: 768px) {
+    .planos-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-xl);
+    }
+}
+
+/* Desktop: 4 colunas com largura adequada */
 @media (min-width: 1200px) {
     .planos-grid {
         grid-template-columns: repeat(4, 1fr);
+        gap: var(--spacing-lg);
+        max-width: 1400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .plano-card {
+        min-width: 0; /* Permite que os cards se ajustem */
+    }
+}
+
+/* Telas muito grandes: garantir espaçamento adequado */
+@media (min-width: 1600px) {
+    .planos-grid {
+        gap: var(--spacing-xl);
+        max-width: 1600px;
     }
 }
 
 .plano-card {
-    background: var(--bg-white);
+    background: #1e293b; /* Azul escuro médio */
     border-radius: var(--radius-2xl);
-    padding: var(--spacing-xl);
-    box-shadow: var(--shadow-lg);
+    padding: 0;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
     transition: var(--transition-base);
     position: relative;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     overflow: hidden;
-}
-
-.plano-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: var(--gradient-blue);
-    opacity: 0;
-    transition: var(--transition-base);
-}
-
-.plano-card:hover::before {
-    opacity: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
 }
 
 .plano-card:hover {
     transform: translateY(-8px);
-    box-shadow: var(--shadow-2xl);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 .plano-card.featured {
-    border: 2px solid var(--primary-color);
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.02) 0%, rgba(139, 92, 246, 0.02) 100%);
+    border: 2px solid #2563eb;
+    background: #1e293b;
+    box-shadow: 0 10px 40px rgba(37, 99, 235, 0.3);
 }
 
-.plano-card.featured::before {
-    opacity: 1;
-    height: 6px;
+.plano-card.featured:hover {
+    box-shadow: 0 20px 60px rgba(37, 99, 235, 0.4);
 }
 
 .plano-badge {
@@ -570,39 +607,39 @@ section {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
     z-index: 10;
 }
 
 .plano-header {
     text-align: center;
-    margin-bottom: var(--spacing-xl);
-    padding-bottom: var(--spacing-xl);
-    border-bottom: 2px solid var(--bg-lighter);
+    margin-bottom: 0;
+    padding: var(--spacing-xl) var(--spacing-xl) var(--spacing-lg);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
     position: relative;
 }
 
 .plano-nome {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     font-weight: 800;
-    color: var(--text-dark);
+    color: white;
     margin-bottom: var(--spacing-sm);
-    letter-spacing: -0.01em;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
 }
 
 .plano-velocidade {
-    font-size: 2.5rem;
+    font-size: 2.25rem;
     font-weight: 900;
-    background: var(--gradient-blue);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: white;
     letter-spacing: -0.02em;
 }
 
 .plano-features {
-    margin-bottom: var(--spacing-xl);
+    margin-bottom: 0;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    flex: 1;
+    min-height: 240px;
 }
 
 .plano-feature {
@@ -611,15 +648,22 @@ section {
     gap: var(--spacing-md);
     margin-bottom: var(--spacing-md);
     font-size: 0.95rem;
-    color: var(--text-medium);
-    padding: 0.5rem;
-    border-radius: var(--radius-sm);
+    color: rgba(255, 255, 255, 0.9);
+    padding: 0.75rem 0;
     transition: var(--transition-base);
 }
 
+.plano-feature:last-child {
+    margin-bottom: 0;
+}
+
 .plano-feature:hover {
-    background: var(--bg-lighter);
-    color: var(--text-dark);
+    color: white;
+}
+
+.plano-feature span {
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.5;
 }
 
 .plano-feature .icon {
@@ -628,17 +672,17 @@ section {
     text-align: center;
 }
 
-/* Ícones profissionais dos planos */
+/* Ícones profissionais dos planos - Design escuro */
 .plano-feature .icon-pro {
-    font-size: 1.1rem;
-    width: 32px;
-    min-width: 32px;
-    height: 32px;
+    font-size: 1rem;
+    width: 28px;
+    min-width: 28px;
+    height: 28px;
     text-align: center;
-    color: var(--primary-color);
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
     padding: 0;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -647,40 +691,60 @@ section {
 }
 
 .plano-feature:hover .icon-pro {
-    background: var(--gradient-blue);
-    color: white;
+    background: rgba(255, 255, 255, 0.2);
     transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 .plano-feature span {
     flex: 1;
     line-height: 1.5;
+    color: rgba(255, 255, 255, 0.9);
 }
 
 
 .plano-preco {
     text-align: center;
-    margin-bottom: var(--spacing-xl);
-    padding-top: var(--spacing-xl);
-    border-top: 2px solid var(--bg-lighter);
+    margin-bottom: 0;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .preco-valor {
-    font-size: 3rem;
+    font-size: 2.5rem;
     font-weight: 900;
-    background: var(--gradient-blue);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: white;
     letter-spacing: -0.02em;
     line-height: 1;
+    display: inline-block;
 }
 
 .preco-periodo {
-    font-size: 1rem;
-    color: var(--text-light);
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
     font-weight: 500;
+    margin-left: 0.25rem;
+    display: inline-block;
+    vertical-align: baseline;
+}
+
+/* Botão dentro dos cards de planos - Fundo branco com texto escuro */
+.plano-card .btn-primary {
+    background: white;
+    color: #1e293b;
+    border: none;
+    margin: var(--spacing-xl);
+    margin-top: 0;
+    font-weight: 700;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: var(--transition-base);
+}
+
+.plano-card .btn-primary:hover {
+    background: rgba(255, 255, 255, 0.95);
+    color: #0f172a;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
 /* ========================================
