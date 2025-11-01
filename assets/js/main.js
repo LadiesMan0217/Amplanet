@@ -243,5 +243,24 @@ document.addEventListener('DOMContentLoaded', function() {
             link.classList.remove('active');
         }
     });
+
+    // ========================================
+    // SPEED TEST IFRAME LOADING (teste-velocidade.html)
+    // ========================================
+    const speedtestIframe = document.getElementById('speedtestIframe');
+    if (speedtestIframe) {
+        // Garantir que o iframe esteja visível
+        speedtestIframe.style.display = 'block';
+        
+        // Verificar se o iframe carregou
+        speedtestIframe.addEventListener('load', function() {
+            console.log('✅ Speed test iframe carregado com sucesso');
+        });
+        
+        // Tratar erros de carregamento
+        speedtestIframe.addEventListener('error', function() {
+            console.error('❌ Erro ao carregar speed test iframe');
+        });
+    }
 });
 
