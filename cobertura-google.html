@@ -6,7 +6,7 @@
     <meta name="description" content="Cobertura Amplanet - Verifique se sua região está coberta pela nossa rede de fibra óptica em Teresina (PI) e São Luís (MA).">
     <title>Cobertura - Amplanet</title>
     <link rel="stylesheet" href="assets/css/style.css">
-    <!-- Google Maps API será carregada dinamicamente no JavaScript -->
+    <!-- Nota: Usamos apenas iframe do Google My Maps, não a JavaScript API -->
     <!-- <link rel="icon" href="assets/images/favicon.ico"> -->
 </head>
 <body>
@@ -74,6 +74,10 @@
                 <div class="map-header">
                     <h2 class="section-title">Mapa de Cobertura</h2>
                     <p class="map-description">As áreas em destaque no mapa representam nossa cobertura atual de fibra óptica. Digite seu endereço na busca acima do mapa para verificar se está coberto.</p>
+                    <!-- Aviso sobre servidor HTTP (será mostrado apenas se necessário) -->
+                    <div id="fileProtocolWarning" style="display: none; margin-top: 1rem; padding: 1rem; background: #fff3cd; border: 1px solid #ffc107; border-radius: 0.5rem; color: #856404;">
+                        <strong>⚠️ Importante:</strong> Para usar a busca de endereços, é necessário abrir esta página através de um servidor HTTP local. Abra o console do navegador (F12) para ver instruções detalhadas.
+                    </div>
                 </div>
                 <div class="map-wrapper-google-integrated">
                     <!-- Iframe do Google Maps - Primeiro para garantir que seja visível -->

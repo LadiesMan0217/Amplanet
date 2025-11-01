@@ -41,6 +41,20 @@ let mapBounds = {
 };
 
     document.addEventListener('DOMContentLoaded', function() {
+    // Verificar se está em file:// e mostrar aviso
+    const isFileProtocol = window.location.protocol === 'file:';
+    if (isFileProtocol) {
+        const warningDiv = document.getElementById('fileProtocolWarning');
+        if (warningDiv) {
+            warningDiv.style.display = 'block';
+        }
+        console.warn('⚠️ Arquivo aberto via file:// - A busca pode não funcionar devido a CORS');
+        console.info('💡 Para usar a busca, use um servidor HTTP local:\n' +
+            '  VS Code: Instale "Live Server" → Clique direito → "Open with Live Server"\n' +
+            '  Python: python -m http.server 8000 → http://localhost:8000\n' +
+            '  Node.js: npx http-server → http://localhost:8080');
+    }
+    
     loadCoverageData();
     setupSearch();
     setupGeolocationButton();
@@ -210,13 +224,88 @@ function performGeocodeSearch(query) {
         console.log('🔍 Busca geral otimizada');
     }
     
-    fetch(nominatimUrl, {
-        headers: {
-            'User-Agent': 'Amplanet-Cobertura-Map/1.0'
-        }
+    // ========================================
+    // EXPLICAÇÃO DOS BLOQUEIOS:
+    // ========================================
+    // 1. VIA FILE:// (arquivo local):
+    //    - CORS bloqueia porque origem é 'null'
+    //    - Navegador não permite requisições de file:// por segurança
+    //
+    // 2. VIA HTTP (servidor local):
+    //    - Nominatim retorna 403 Forbidden
+    //    - Motivo: Nominatim exige User-Agent válido
+    //    - fetch() NÃO permite enviar User-Agent customizado (limitação do navegador)
+    //
+    // SOLUÇÃO: Usar proxy CORS que faz requisição do lado do servidor
+    // O proxy tem User-Agent válido e retorna os dados sem bloqueios
+    // ========================================
+    
+    // Detectar se está sendo aberto via file:// (arquivo local)
+    const isFileProtocol = window.location.protocol === 'file:';
+    
+    if (isFileProtocol) {
+        // Mostrar mensagem clara sobre usar servidor HTTP
+        const errorMsg = `⚠️ Para usar a busca, é necessário abrir a página através de um servidor HTTP local.
+        
+Opções rápidas:
+1. VS Code: Instale "Live Server" e clique com botão direito → "Open with Live Server"
+2. Python: python -m http.server 8000 (depois acesse http://localhost:8000)
+3. Node.js: npx http-server (depois acesse http://localhost:8080)`;
+        
+        console.error('❌ Arquivo aberto via file:// - CORS bloqueado');
+        console.warn('📝 Explicação: O navegador bloqueia requisições de origem "null" (file://) por segurança');
+        console.warn(errorMsg);
+        showSearchMessage('⚠️ Para usar a busca, abra a página via servidor HTTP local. Veja o console (F12) para instruções.', 'error');
+        searchBtn.innerHTML = '<span>🔍</span>';
+        searchBtn.disabled = false;
+        searchInput.disabled = false;
+        return;
+    }
+    
+    // SOLUÇÃO: Usar proxy CORS para contornar restrições do Nominatim
+    // O Nominatim bloqueia requisições sem User-Agent apropriado
+    // fetch() não permite enviar User-Agent customizado (política do navegador)
+    // O proxy faz a requisição do lado do servidor com User-Agent válido
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(nominatimUrl)}`;
+    
+    console.log('🔍 Usando proxy CORS para buscar:', improvedQuery);
+    
+    fetch(proxyUrl, {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'omit'
     })
-    .then(response => response.json())
-    .then(data => {
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(proxyResponse => {
+        // O proxy allorigins.win retorna: { contents: "[...JSON string...]" }
+        let data;
+        try {
+            if (proxyResponse.contents) {
+                // O contents é uma string JSON que precisa ser parseada
+                data = JSON.parse(proxyResponse.contents);
+            } else if (Array.isArray(proxyResponse)) {
+                // Se já vier como array (fallback)
+                data = proxyResponse;
+            } else {
+                console.error('❌ Formato de resposta inesperado do proxy:', proxyResponse);
+                throw new Error('Formato de resposta inválido do proxy');
+            }
+        } catch (parseError) {
+            console.error('❌ Erro ao parsear resposta do proxy:', parseError);
+            console.error('Resposta recebida:', proxyResponse);
+            throw new Error('Erro ao processar resposta do serviço de busca');
+        }
+        
+        if (!Array.isArray(data)) {
+            console.error('❌ Resposta não é um array:', data);
+            throw new Error('Formato de resposta inválido');
+        }
+        
         if (data && data.length > 0) {
             // Pegar o primeiro resultado mais relevante
             let bestResult = data[0];
@@ -264,10 +353,10 @@ function performGeocodeSearch(query) {
                 displayName: bestResult.display_name || ''
             };
             
-            // Atualizar iframe do Google Maps para mostrar a localização buscada
-            tryUpdateIframeWithLocation(lat, lng);
+            // Atualizar iframe para centralizar na localização (polígonos preservados com mid)
+            console.log('📍 Localização encontrada:', lat, lng);
             
-            // Mostrar marcador e overlay
+            // Atualizar mapa e mostrar marcador
             updateGoogleMapFrame(lat, lng);
             
             // Mostrar resultado
@@ -283,37 +372,63 @@ function performGeocodeSearch(query) {
         }
     })
     .catch(error => {
-        console.error('Erro na busca:', error);
-        showSearchMessage('Erro ao buscar localização. Tente novamente.', 'error');
+        console.error('❌ Erro na busca:', error);
+        
+        // Mensagens específicas por tipo de erro
+        let errorMessage = 'Erro ao buscar localização.';
+        
+        // Detectar tipo de erro
+        const isCORS = error.message.includes('CORS') || error.message.includes('Failed to fetch') || error.message.includes('origin \'null\'');
+        const is403 = error.message.includes('403') || error.message.includes('Forbidden');
+        
+        if (isCORS) {
+            const isFileProtocol = window.location.protocol === 'file:';
+            if (isFileProtocol) {
+                errorMessage = '⚠️ Para usar a busca, abra esta página através de um servidor HTTP local (não via file://). Veja o console (F12) para instruções.';
+                console.error('❌ CORS bloqueado - Arquivo aberto via file://');
+                console.warn('💡 SOLUÇÃO: Use um servidor HTTP local:\n' +
+                    '  • VS Code: Instale "Live Server" → Clique direito → "Open with Live Server"\n' +
+                    '  • Python: python -m http.server 8000 → http://localhost:8000\n' +
+                    '  • Node.js: npx http-server → http://localhost:8080');
+            } else {
+                errorMessage = '⚠️ Erro de conexão com o serviço de busca. Verifique sua conexão ou tente novamente em alguns instantes.';
+                console.warn('💡 Dica: O Nominatim pode estar bloqueando requisições. Tente novamente em alguns segundos.');
+            }
+        } else if (is403) {
+            errorMessage = '⚠️ Serviço temporariamente indisponível. Por favor, tente novamente em alguns instantes.';
+            console.warn('💡 Dica: Muitas requisições podem ter causado bloqueio temporário. Aguarde alguns segundos.');
+        }
+        
+        showSearchMessage(errorMessage, 'error');
     })
     .finally(() => {
-        searchBtn.innerHTML = '<span>Pesquisar</span>';
+        searchBtn.innerHTML = '<span>🔍</span>';
         searchBtn.disabled = false;
         searchInput.disabled = false;
     });
 }
 
 // ========================================
-// TENTAR ATUALIZAR IFRAME COM LOCALIZAÇÃO (LIMITADO)
+// ATUALIZAR IFRAME DO GOOGLE MY MAPS COM LOCALIZAÇÃO
 // ========================================
+// Usa parâmetros de URL para centralizar mantendo o mapa original (polígonos preservados)
 function tryUpdateIframeWithLocation(lat, lng) {
     const iframe = document.getElementById('googleMapFrame');
     if (!iframe) return;
     
-    // Construir URL do Google Maps que mostra a localização (funciona sem API key)
-    // Formato do Google Maps Embed que funciona direto
-    const embedUrl = `https://www.google.com/maps?q=${lat},${lng}&hl=pt-BR&z=16&output=embed`;
+    // Google My Maps Embed suporta parâmetros ll (lat,lng) e z (zoom) para centralizar
+    // O parâmetro mid (map ID) deve ser mantido para preservar os polígonos
+    const baseUrl = 'https://www.google.com/maps/d/u/0/embed';
+    const mapId = '14iGHLTHtyeRc3mlZo8lNjbmouohSYA0';
+    const embedUrl = `${baseUrl}?mid=${mapId}&ehbc=2E312F&noprof=1&ll=${lat},${lng}&z=16`;
     
-    // Atualizar o src do iframe para mostrar a localização
-    // Isso funciona porque estamos mudando a URL do iframe diretamente
     try {
         iframe.src = embedUrl;
-        console.log('✅ Iframe atualizado para mostrar localização:', lat, lng);
-        console.log('📍 URL do mapa:', embedUrl);
+        console.log('✅ Iframe atualizado para centralizar em:', lat, lng);
+        console.log('📍 URL:', embedUrl);
         
-        // Aguardar iframe carregar e restaurar o overlay
+        // Restaurar overlay do header após carregar
         iframe.addEventListener('load', function() {
-            // Restaurar overlay do header após carregar
             setTimeout(() => {
                 const overlay = document.querySelector('.google-maps-header-overlay');
                 if (overlay) {
@@ -327,10 +442,10 @@ function tryUpdateIframeWithLocation(lat, lng) {
 }
 
 // ========================================
-// ATUALIZAR IFRAME DO GOOGLE MAPS COM LOCALIZAÇÃO
+// ATUALIZAR VISUALIZAÇÃO DO MAPA
 // ========================================
 function updateGoogleMapFrame(lat, lng) {
-    // Tentar atualizar iframe
+    // Atualizar iframe para centralizar na localização (mantendo polígonos com mid)
     tryUpdateIframeWithLocation(lat, lng);
     
     // Mostrar marcador visual sobre o iframe
@@ -427,13 +542,30 @@ function positionVisualMarker(lat, lng) {
     `;
     marker.title = 'Localização encontrada';
     
-    // Usar função de conversão precisa
+    // Calcular posição do marcador baseado nas coordenadas geográficas
+    // Teresina bounds: lat: -5.6 a -4.6, lng: -43.5 a -42.0
+    // Centro aproximado: lat: -5.09, lng: -42.8
+    
     const mapWidth = mapContainer.offsetWidth || 1000;
     const mapHeight = mapContainer.offsetHeight || 650;
     
-    // Converter coordenadas geográficas para pixels usando a mesma função dos polígonos
-    const left = latLngToPixel(lat, lng, mapWidth, mapHeight);
-    const top = latLngToPixelY(lat, lng, mapWidth, mapHeight);
+    // Bounds do mapa do Google My Maps (ajustar conforme necessário)
+    const mapLatMin = -5.6;
+    const mapLatMax = -4.6;
+    const mapLngMin = -43.5;
+    const mapLngMax = -42.0;
+    
+    // Converter coordenadas geográficas para pixels
+    const latRange = mapLatMax - mapLatMin;
+    const lngRange = mapLngMax - mapLngMin;
+    
+    // Normalizar coordenadas (0 a 1)
+    const normalizedLng = (lng - mapLngMin) / lngRange;
+    const normalizedLat = (mapLatMax - lat) / latRange; // Invertido porque Y começa no topo
+    
+    // Converter para pixels
+    const left = normalizedLng * mapWidth;
+    const top = normalizedLat * mapHeight;
     
     marker.style.position = 'absolute';
     marker.style.top = `${Math.max(0, Math.min(mapHeight, top))}px`;
@@ -662,50 +794,70 @@ function checkCoverage(lat, lng) {
     // Algoritmo Ray Casting para verificar se ponto está dentro do polígono
     for (let i = 0; i < coveragePolygonsData.features.length; i++) {
         const feature = coveragePolygonsData.features[i];
-        if (feature.geometry.type !== 'Polygon') continue;
+        if (feature.geometry.type !== 'Polygon') {
+            console.log(`⚠️ Feature ${i} não é um Polygon, tipo: ${feature.geometry.type}`);
+            continue;
+        }
         
         const coordinates = feature.geometry.coordinates[0];
-        if (!coordinates || coordinates.length === 0) continue;
+        if (!coordinates || coordinates.length === 0) {
+            console.log(`⚠️ Feature ${i} não tem coordenadas`);
+            continue;
+        }
         
+        console.log(`🔍 Verificando polígono ${i} com ${coordinates.length} pontos`);
+        console.log(`📐 Primeiro ponto: [${coordinates[0][0]}, ${coordinates[0][1]}]`);
+        
+        // Ray casting algorithm corrigido - baseado no algoritmo do Leaflet
+        // GeoJSON formato: [lng, lat] = [x, y]
         let inside = false;
         
-        // Ray casting algorithm corrigido
-        // GeoJSON formato: [lng, lat] = [x, y]
-        let intersections = 0;
-        
         for (let j = 0, k = coordinates.length - 1; j < coordinates.length; k = j++) {
-            const point1 = coordinates[k]; // Ponto anterior
-            const point2 = coordinates[j]; // Ponto atual
+            const point1 = coordinates[k]; // Ponto anterior [lng, lat]
+            const point2 = coordinates[j]; // Ponto atual [lng, lat]
             
-            // Extrair coordenadas
-            const x1 = point1[0]; // longitude do ponto 1
-            const y1 = point1[1]; // latitude do ponto 1
-            const x2 = point2[0]; // longitude do ponto 2
-            const y2 = point2[1]; // latitude do ponto 2
+            // Extrair coordenadas - GeoJSON é [lng, lat]
+            const xi = point1[0]; // longitude do ponto anterior
+            const yi = point1[1]; // latitude do ponto anterior
+            const xj = point2[0]; // longitude do ponto atual
+            const yj = point2[1]; // latitude do ponto atual
             
-            // Verificar se a aresta cruza o raio horizontal que vai do ponto até o infinito
+            // Algoritmo Ray Casting (mesmo usado no Leaflet)
+            // Verificar se a aresta cruza o raio horizontal do ponto
             // O raio vai da posição (lng, lat) para a direita (lng +∞)
             const rayY = lat; // Latitude do ponto que queremos verificar
             const rayX = lng; // Longitude do ponto
             
-            // Verificar se a aresta cruza o raio
-            if ((y1 > rayY) !== (y2 > rayY)) {
-                // A aresta cruza a linha horizontal do raio
-                // Calcular a interseção
-                const intersectX = (rayY - y1) * (x2 - x1) / (y2 - y1) + x1;
+            // A aresta cruza se:
+            // 1. Um ponto está acima do raio E o outro está abaixo (ou vice-versa)
+            // 2. A interseção X está à direita do ponto do raio
+            const yiAboveRay = yi > rayY;
+            const yjAboveRay = yj > rayY;
+            
+            // Verificar se cruza o raio horizontal
+            if (yiAboveRay !== yjAboveRay) {
+                // Calcular X da interseção usando interpolação linear
+                // x = (y - yi) * (xj - xi) / (yj - yi) + xi
+                const dy = yj - yi;
                 
-                // Se a interseção está à direita do ponto (raio vai para direita)
-                if (rayX < intersectX) {
-                    intersections++;
+                // Evitar divisão por zero (aresta horizontal)
+                if (Math.abs(dy) > 0.000001) {
+                    const intersectX = (rayY - yi) * (xj - xi) / dy + xi;
+                    
+                    // Se a interseção está à direita do ponto do raio
+                    if (rayX < intersectX) {
+                        inside = !inside; // Alternar estado (dentro/fora)
+                        console.log(`  ✓ Interseção encontrada: X=${intersectX.toFixed(6)}, estado: ${inside ? 'DENTRO' : 'FORA'}`);
+                    }
                 }
             }
         }
         
-        // Se número de interseções é ímpar, ponto está dentro
-        inside = (intersections % 2) === 1;
+        // O algoritmo alterna inside a cada interseção, então inside já é o resultado final
+        console.log(`📊 Polígono ${i}: resultado final: ${inside ? 'DENTRO' : 'FORA'}`);
         
         if (inside) {
-            console.log('✅ Ponto está DENTRO do polígono', i);
+            console.log(`✅ Ponto está DENTRO do polígono ${i}`);
             return { isCovered: true };
         }
     }
@@ -920,9 +1072,8 @@ function handleLocationSuccessGoogle(position) {
                 // Atualizar dados do marcador
                 searchMarkerData.address = address;
                 
-                // Mostrar resultado
+                // Mostrar resultado (sem atualizar iframe)
                 updateGoogleMapFrame(lat, lng);
-                showMarkerOverlay(lat, lng);
                 showSearchResult(searchMarkerData);
                 
                 // Mensagem de sucesso
@@ -931,9 +1082,8 @@ function handleLocationSuccessGoogle(position) {
             })
             .catch(error => {
                 console.error('Erro ao buscar endereço:', error);
-                // Mostrar mesmo sem endereço
+                // Mostrar mesmo sem endereço (sem atualizar iframe)
                 updateGoogleMapFrame(lat, lng);
-                showMarkerOverlay(lat, lng);
                 showSearchResult(searchMarkerData);
             });
     } else {
