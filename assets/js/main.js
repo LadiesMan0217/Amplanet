@@ -1,0 +1,191 @@
+// ========================================
+// MENU MOBILE TOGGLE
+// ========================================
+document.addEventListener('DOMContentLoaded', function() {
+    const menuToggle = document.getElementById('menuToggle');
+    const navbarMenu = document.getElementById('navbarMenu');
+    
+    if (menuToggle && navbarMenu) {
+        menuToggle.addEventListener('click', function() {
+            navbarMenu.classList.toggle('active');
+            
+            // Animate hamburger icon
+            const spans = menuToggle.querySelectorAll('span');
+            if (navbarMenu.classList.contains('active')) {
+                spans[0].style.transform = 'rotate(45deg) translateY(8px)';
+                spans[1].style.opacity = '0';
+                spans[2].style.transform = 'rotate(-45deg) translateY(-8px)';
+            } else {
+                spans[0].style.transform = 'none';
+                spans[1].style.opacity = '1';
+                spans[2].style.transform = 'none';
+            }
+        });
+
+        // Close menu when clicking on a link
+        const menuLinks = navbarMenu.querySelectorAll('a');
+        menuLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                navbarMenu.classList.remove('active');
+                const spans = menuToggle.querySelectorAll('span');
+                spans[0].style.transform = 'none';
+                spans[1].style.opacity = '1';
+                spans[2].style.transform = 'none';
+            });
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const isClickInsideMenu = navbarMenu.contains(event.target);
+            const isClickOnToggle = menuToggle.contains(event.target);
+            
+            if (!isClickInsideMenu && !isClickOnToggle && navbarMenu.classList.contains('active')) {
+                navbarMenu.classList.remove('active');
+                const spans = menuToggle.querySelectorAll('span');
+                spans[0].style.transform = 'none';
+                spans[1].style.opacity = '1';
+                spans[2].style.transform = 'none';
+            }
+        });
+    }
+
+    // ========================================
+    // MODAL FUNCTIONALITY (for servicos.html)
+    // ========================================
+    const appItems = document.querySelectorAll('.app-item');
+    const modal = document.getElementById('appModal');
+    const modalClose = document.getElementById('modalClose');
+    const modalOverlay = modal ? modal.querySelector('.modal-overlay') : null;
+    const modalAppLogo = document.getElementById('modalAppLogo');
+    const modalAppName = document.getElementById('modalAppName');
+    const modalAppDesc = document.getElementById('modalAppDesc');
+    const modalAppPrice = document.getElementById('modalAppPrice');
+    const modalAppButton = document.getElementById('modalAppButton');
+
+    if (appItems.length > 0 && modal) {
+        appItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const appName = this.getAttribute('data-name');
+                const appDesc = this.getAttribute('data-desc');
+                const appPrice = this.getAttribute('data-price');
+                const appImg = this.querySelector('img');
+                
+                if (modalAppLogo && appImg) {
+                    modalAppLogo.src = appImg.src;
+                    modalAppLogo.alt = appName;
+                }
+                
+                if (modalAppName) modalAppName.textContent = appName;
+                if (modalAppDesc) modalAppDesc.textContent = appDesc;
+                if (modalAppPrice) {
+                    modalAppPrice.textContent = appPrice === 'Consultar' 
+                        ? 'Consultar Valores' 
+                        : `Adicione por +R$ ${appPrice}/mês`;
+                }
+                
+                if (modalAppButton) {
+                    const whatsappMessage = encodeURIComponent(`Olá! Gostaria de adicionar o serviço ${appName} ao meu plano.`);
+                    modalAppButton.href = `https://wa.me/55869988230492?text=${whatsappMessage}`;
+                }
+                
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+        });
+
+        // Close modal functions
+        const closeModal = function() {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        };
+
+        if (modalClose) {
+            modalClose.addEventListener('click', closeModal);
+        }
+
+        if (modalOverlay) {
+            modalOverlay.addEventListener('click', closeModal);
+        }
+
+        // Close modal on ESC key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && modal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+    }
+
+    // ========================================
+    // SMOOTH SCROLL FOR ANCHOR LINKS
+    // ========================================
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            
+            // Skip if href is just "#"
+            if (href === '#') return;
+            
+            const target = document.querySelector(href);
+            if (target) {
+                e.preventDefault();
+                const headerOffset = 80;
+                const elementPosition = target.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+
+                // Close mobile menu if open
+                if (navbarMenu && navbarMenu.classList.contains('active')) {
+                    navbarMenu.classList.remove('active');
+                    const spans = menuToggle.querySelectorAll('span');
+                    spans[0].style.transform = 'none';
+                    spans[1].style.opacity = '1';
+                    spans[2].style.transform = 'none';
+                }
+            }
+        });
+    });
+
+    // ========================================
+    // SCROLL REVEAL ANIMATION
+    // ========================================
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('revealed');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    // Add scroll-reveal class to sections and cards
+    const revealElements = document.querySelectorAll('section, .plano-card, .app-item, .solucao-card, .valor-card, .diferencial-item');
+    revealElements.forEach(el => {
+        el.classList.add('scroll-reveal');
+        observer.observe(el);
+    });
+
+    // ========================================
+    // ACTIVE NAVIGATION LINK HIGHLIGHTING
+    // ========================================
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    const navLinks = document.querySelectorAll('.navbar-menu a');
+    
+    navLinks.forEach(link => {
+        const linkPath = link.getAttribute('href');
+        if (linkPath === currentPage || (currentPage === '' && linkPath === 'index.html')) {
+            link.classList.add('active');
+        } else {
+            link.classList.remove('active');
+        }
+    });
+});
+

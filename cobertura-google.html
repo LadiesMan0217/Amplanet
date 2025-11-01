@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Cobertura Amplanet - Verifique se sua região está coberta pela nossa rede de fibra óptica em Teresina (PI) e São Luís (MA).">
+    <title>Cobertura - Amplanet</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- Google Maps API será carregada dinamicamente no JavaScript -->
+    <!-- <link rel="icon" href="assets/images/favicon.ico"> -->
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar container">
+            <div class="navbar-brand">
+                <a href="index.html">
+                    <!-- TODO: Substituir pelo logo real -->
+                    <img src="https://placehold.co/150x50/1a73e8/ffffff?text=AMPLANET" alt="Amplanet Logo" class="logo">
+                </a>
+            </div>
+            <button class="menu-toggle" aria-label="Abrir menu" id="menuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="navbar-menu" id="navbarMenu">
+                <li><a href="index.html">Início</a></li>
+                <li><a href="planos.html">Planos</a></li>
+                <li><a href="servicos.html">Nossos Apps</a></li>
+                <li><a href="sobre.html">Sobre</a></li>
+                <li><a href="cobertura.html" class="active">Cobertura</a></li>
+            </ul>
+            <a href="https://amplanet.com.br/central_assinante_web/login" class="btn btn-primary btn-area-cliente" target="_blank">Área do Cliente</a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="page-hero">
+        <div class="container">
+            <h1 class="page-title">Verifique Nossa Cobertura</h1>
+            <p class="page-subtitle">Confira se sua região está coberta pela nossa rede de fibra óptica. Use a busca integrada no mapa para verificar seu endereço.</p>
+        </div>
+    </section>
+
+    <!-- Cobertura Section -->
+    <section class="cobertura-section">
+        <div class="container">
+            <!-- Seletor de Versões do Mapa -->
+            <div class="map-version-selector">
+                <div class="version-selector-header">
+                    <h3 class="version-selector-title">Escolha a Versão do Mapa</h3>
+                    <p class="version-selector-subtitle">Teste as duas versões disponíveis:</p>
+                </div>
+                <div class="version-buttons">
+                    <a href="cobertura.html" class="version-btn">
+                        <div class="version-btn-icon">🗺️</div>
+                        <div class="version-btn-content">
+                            <div class="version-btn-name">Versão Leaflet</div>
+                            <div class="version-btn-desc">Mapa interativo com GeoJSON</div>
+                        </div>
+                    </a>
+                    <a href="cobertura-google.html" class="version-btn version-btn-active">
+                        <div class="version-btn-icon">🌐</div>
+                        <div class="version-btn-content">
+                            <div class="version-btn-name">Versão Google Maps</div>
+                            <div class="version-btn-desc">Mapa Google My Maps integrado</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <!-- Mapa Principal -->
+            <div class="map-container-main">
+                <div class="map-header">
+                    <h2 class="section-title">Mapa de Cobertura</h2>
+                    <p class="map-description">As áreas em destaque no mapa representam nossa cobertura atual de fibra óptica. Digite seu endereço na busca acima do mapa para verificar se está coberto.</p>
+                </div>
+                <div class="map-wrapper-google-integrated">
+                    <!-- Barra de Busca Integrada -->
+                    <div class="map-search-overlay">
+                        <div class="search-box-integrated">
+                            <div class="search-icon-integrated">🔍</div>
+                            <input 
+                                type="text" 
+                                id="integratedSearchInput" 
+                                class="search-input-integrated" 
+                                placeholder="Buscar endereço, bairro ou ponto de referência..."
+                                autocomplete="off"
+                            >
+                            <button class="search-btn-integrated" id="integratedSearchBtn">
+                                <span>Pesquisar</span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Iframe do Google Maps -->
+                    <iframe 
+                        id="googleMapFrame"
+                        src="https://www.google.com/maps/d/u/0/embed?mid=14iGHLTHtyeRc3mlZo8lNjbmouohSYA0&ehbc=2E312F&noprof=1" 
+                        width="100%" 
+                        height="650"
+                        style="border:0; border-radius: var(--radius-xl); position: relative; z-index: 1;"
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade"
+                        title="Mapa de Cobertura Amplanet">
+                    </iframe>
+                    <!-- Container para marcadores visuais e overlays -->
+                    <div class="google-map-container" id="mapVisualLayer"></div>
+                </div>
+                <div class="map-legend">
+                    <div class="legend-item">
+                        <span class="legend-color legend-covered"></span>
+                        <span class="legend-text">Área com Cobertura</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color legend-expanding"></span>
+                        <span class="legend-text">Cobertura em Expansão</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informações de Cobertura -->
+            <div class="cobertura-info-grid">
+                <div class="info-card">
+                    <div class="info-icon">📍</div>
+                    <h3 class="info-title">Teresina - PI</h3>
+                    <p class="info-text">Atendemos diversas regiões de Teresina com nossa rede de fibra óptica de alta velocidade.</p>
+                    <p class="info-subtext">Verifique no mapa acima se sua região está coberta.</p>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">📍</div>
+                    <h3 class="info-title">São Luís - MA</h3>
+                    <p class="info-text">Atendimento através da SL3 Informática, nossa parceira em São Luís.</p>
+                    <p class="info-subtext"><strong>Contato SL3:</strong> (98) 3235-6604</p>
+                </div>
+            </div>
+
+            <!-- Como Usar o Mapa -->
+            <div class="cobertura-instructions">
+                <h3 class="instructions-title">Como verificar a cobertura</h3>
+                <div class="instructions-grid">
+                    <div class="instruction-item">
+                        <div class="instruction-number">1</div>
+                        <h4 class="instruction-title">Use a busca</h4>
+                        <p class="instruction-text">Digite um endereço, bairro ou ponto de referência no campo de busca acima do mapa</p>
+                    </div>
+                    <div class="instruction-item">
+                        <div class="instruction-number">2</div>
+                        <h4 class="instruction-title">Verifique o resultado</h4>
+                        <p class="instruction-text">O mapa mostrará se o local está dentro da área de cobertura destacada</p>
+                    </div>
+                    <div class="instruction-item">
+                        <div class="instruction-number">3</div>
+                        <h4 class="instruction-title">Entre em contato</h4>
+                        <p class="instruction-text">Se sua região está coberta, fale conosco para contratar seu plano</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA Section -->
+            <div class="cobertura-cta">
+                <div class="cta-content">
+                    <h3 class="cta-title">Não encontrou sua região no mapa?</h3>
+                    <p class="cta-text">Entre em contato conosco! Estamos sempre expandindo nossa rede e podemos verificar a disponibilidade na sua área.</p>
+                    <div class="cta-buttons">
+                        <a href="https://wa.me/55869988230492?text=Olá!%20Gostaria%20de%20verificar%20se%20há%20cobertura%20na%20minha%20região" class="btn btn-primary btn-large" target="_blank">
+                            📱 Verificar pelo WhatsApp
+                        </a>
+                        <a href="tel:+558621063800" class="btn btn-outline btn-large">
+                            📞 Ligar Agora: (86) 2106-3800
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <div class="footer-logo">
+                        <!-- TODO: Substituir pelo logo real -->
+                        <img src="https://placehold.co/150x50/ffffff/1a73e8?text=AMPLANET" alt="Amplanet Logo">
+                    </div>
+                    <p class="footer-description">Internet Fibra Óptica de alta velocidade. Conectando você ao melhor do entretenimento.</p>
+                </div>
+                <div class="footer-column">
+                    <h4 class="footer-title">Contatos</h4>
+                    <ul class="footer-links">
+                        <li><strong>Geral:</strong> (86) 2106-3800</li>
+                        <li><strong>Financeiro:</strong> (86) 9 8838-3975</li>
+                        <li><strong>Suporte:</strong> (86) 9 8838-3952</li>
+                        <li><strong>Comercial:</strong> (86) 9 8823-0492</li>
+                    </ul>
+                    <p class="footer-address">
+                        Avenida Ininga 1201, 392 - Jóquei Clube<br>
+                        Teresina - PI, 64048-110
+                    </p>
+                    <p class="footer-email">gerencia@amplanet.com.br</p>
+                </div>
+                <div class="footer-column">
+                    <h4 class="footer-title">Links Rápidos</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Início</a></li>
+                        <li><a href="planos.html">Planos</a></li>
+                        <li><a href="servicos.html">Nossos Apps</a></li>
+                        <li><a href="sobre.html">Sobre</a></li>
+                        <li><a href="cobertura.html">Cobertura</a></li>
+                        <li><a href="https://amplanet.com.br/central_assinante_web/login" target="_blank">Área do Cliente</a></li>
+                        <li><a href="https://amplanet.com.br/central_assinante_web/login" target="_blank">2ª Via de Boleto</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 - AMPLANET LTDA - 04.812.045/0001-11 - Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/cobertura-google.js"></script>
+</body>
+</html>
