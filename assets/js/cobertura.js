@@ -182,43 +182,106 @@ function setupGeolocationButton() {
     
     geoButton.onAdd = function(map) {
         const div = L.DomUtil.create('div', 'leaflet-control-geolocation');
-        div.innerHTML = `
-            <button class="geo-location-btn" title="Usar minha localização atual" aria-label="Usar localização atual">
-                <span style="font-size: 1.25rem;">📍</span>
-            </button>
-        `;
+        const button = L.DomUtil.create('button', 'geo-location-btn');
+        button.setAttribute('title', 'Usar minha localização atual');
+        button.setAttribute('aria-label', 'Usar localização atual');
+        button.innerHTML = '<span style="font-size: 1.25rem;">📍</span>';
+        
+        // Adicionar indicador de loading
+        const loadingIndicator = L.DomUtil.create('span', 'geo-loading-indicator');
+        loadingIndicator.innerHTML = '⏳';
+        loadingIndicator.style.display = 'none';
+        loadingIndicator.style.marginLeft = '4px';
+        button.appendChild(loadingIndicator);
         
         L.DomEvent.disableClickPropagation(div);
         
-        const button = div.querySelector('.geo-location-btn');
         button.addEventListener('click', function() {
-            getCurrentLocation();
+            // Mostrar loading
+            loadingIndicator.style.display = 'inline';
+            button.disabled = true;
+            button.style.opacity = '0.6';
+            button.style.cursor = 'wait';
+            
+            getCurrentLocation(function() {
+                // Esconder loading quando terminar
+                loadingIndicator.style.display = 'none';
+                button.disabled = false;
+                button.style.opacity = '1';
+                button.style.cursor = 'pointer';
+            });
         });
         
+        div.appendChild(button);
         return div;
     };
     
     geoButton.addTo(map);
 }
 
-function getCurrentLocation() {
+function getCurrentLocation(onComplete) {
     console.log('🌍 Solicitando localização atual...');
+    
+    // Verificar se já temos permissão armazenada
+    const hasPermission = sessionStorage.getItem('geolocation_permission_granted');
     
     const options = {
         enableHighAccuracy: true,
         timeout: 10000,
-        maximumAge: 0
+        maximumAge: 60000 // Aceitar posição com até 1 minuto de idade (evita pedir muito)
     };
     
+    const complete = function() {
+        if (typeof onComplete === 'function') {
+            onComplete();
+        }
+    };
+    
+    // Se já tiver permissão, buscar automaticamente sem pedir novamente
+    if (hasPermission === 'true') {
+        console.log('✅ Permissão já concedida, buscando localização...');
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                handleLocationSuccess(position);
+                complete();
+            },
+            function(error) {
+                handleLocationError(error);
+                complete();
+            },
+            options
+        );
+        return;
+    }
+    
+    // Se não tiver permissão ainda, pedir uma vez
     navigator.geolocation.getCurrentPosition(
         function(position) {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-            
-            console.log('✅ Localização obtida:', lat, lng);
-            
-            // Verificar se está em Teresina (aproximadamente)
-            if (lat >= -5.3 && lat <= -4.9 && lng >= -43.2 && lng <= -42.5) {
+            // Marcar que temos permissão
+            sessionStorage.setItem('geolocation_permission_granted', 'true');
+            handleLocationSuccess(position);
+            complete();
+        },
+        function(error) {
+            // Se negar, marcar como negado para não ficar pedindo
+            if (error.code === error.PERMISSION_DENIED) {
+                sessionStorage.setItem('geolocation_permission_granted', 'false');
+            }
+            handleLocationError(error);
+            complete();
+        },
+        options
+    );
+}
+
+function handleLocationSuccess(position) {
+    const lat = position.coords.latitude;
+    const lng = position.coords.longitude;
+    
+    console.log('✅ Localização obtida:', lat, lng);
+    
+    // Verificar se está em Teresina (aproximadamente)
+    if (lat >= -5.3 && lat <= -4.9 && lng >= -43.2 && lng <= -42.5) {
                 // Adicionar marcador
                 if (searchMarker) {
                     map.removeLayer(searchMarker);
@@ -244,13 +307,50 @@ function getCurrentLocation() {
                 fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`)
                     .then(response => response.json())
                     .then(data => {
-                        const address = data.display_name || 'Sua localização atual';
+                        // Formatar endereço de forma mais limpa
+                        let address = 'Sua localização atual';
+                        
+                        if (data.address) {
+                            const addr = data.address;
+                            const parts = [];
+                            
+                            // Adicionar apenas partes relevantes
+                            if (addr.road || addr.pedestrian) {
+                                parts.push(addr.road || addr.pedestrian);
+                            }
+                            if (addr.house_number) {
+                                parts.push(addr.house_number);
+                            }
+                            if (addr.neighbourhood || addr.suburb || addr.quarter) {
+                                parts.push(addr.neighbourhood || addr.suburb || addr.quarter);
+                            }
+                            if (addr.postcode) {
+                                parts.push(addr.postcode);
+                            }
+                            
+                            // Montar endereço formatado
+                            if (parts.length > 0) {
+                                address = parts.join(', ');
+                                address += ', Teresina - PI';
+                            } else {
+                                // Fallback: usar display_name mas simplificar
+                                address = (data.display_name || 'Sua localização atual')
+                                    .split(',')
+                                    .slice(0, 3) // Pegar apenas as 3 primeiras partes
+                                    .join(',');
+                            }
+                        } else if (data.display_name) {
+                            // Se não tiver address detalhado, simplificar display_name
+                            const parts = data.display_name.split(',');
+                            // Pegar apenas: rua, bairro, cidade
+                            address = parts.slice(0, 3).join(',');
+                        }
                         
                         const popupContent = `
                             <div style="min-width: 260px; padding: 0;">
                                 <div style="padding: 1rem; background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%); border-radius: 0.75rem 0.75rem 0 0;">
                                     <strong style="color: #1e40af; font-size: 1rem; display: block; margin-bottom: 0.5rem; line-height: 1.4;">📍 Sua Localização</strong>
-                                    <div style="color: #64748b; font-size: 0.85rem; line-height: 1.4;">${address}</div>
+                                    <div style="color: #64748b; font-size: 0.875rem; line-height: 1.4;">${address}</div>
                                 </div>
                                 <div style="padding: 1rem; ${coverageResult.isCovered ? 'background: #ecfdf5;' : 'background: #fef2f2;'} border-radius: 0 0 0.75rem 0.75rem;">
                                     ${coverageResult.isCovered 
@@ -287,28 +387,28 @@ function getCurrentLocation() {
                     .catch(error => {
                         console.error('Erro ao buscar endereço:', error);
                     });
-            } else {
-                alert('Você não está em Teresina, PI. Esta ferramenta verifica cobertura apenas em Teresina.');
-            }
-        },
-        function(error) {
-            console.error('❌ Erro ao obter localização:', error);
-            let message = 'Não foi possível obter sua localização. ';
-            switch(error.code) {
-                case error.PERMISSION_DENIED:
-                    message += 'Permissão negada. Por favor, permita acesso à localização no navegador.';
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    message += 'Localização indisponível.';
-                    break;
-                case error.TIMEOUT:
-                    message += 'Tempo esgotado ao buscar localização.';
-                    break;
-            }
-            alert(message);
-        },
-        options
-    );
+    } else {
+        alert('Você não está em Teresina, PI. Esta ferramenta verifica cobertura apenas em Teresina.');
+    }
+}
+
+function handleLocationError(error) {
+    console.error('❌ Erro ao obter localização:', error);
+    let message = 'Não foi possível obter sua localização. ';
+    switch(error.code) {
+        case error.PERMISSION_DENIED:
+            message += 'Permissão negada. Por favor, permita acesso à localização no navegador.';
+            // Marcar como negado para não ficar pedindo
+            sessionStorage.setItem('geolocation_permission_granted', 'false');
+            break;
+        case error.POSITION_UNAVAILABLE:
+            message += 'Localização indisponível.';
+            break;
+        case error.TIMEOUT:
+            message += 'Tempo esgotado ao buscar localização.';
+            break;
+    }
+    alert(message);
 }
 
 // ========================================
@@ -442,19 +542,42 @@ function setupGeocoder() {
         // Verificar cobertura
         const coverageResult = checkCoverage([lat, lon]);
         
-        // Formatar endereço melhor
-        let address = result.name || result.html || 'Localização encontrada';
-        // Remover tags HTML se houver
-        address = address.replace(/<[^>]*>/g, '');
-        // Adicionar informações adicionais se disponíveis
+        // Formatar endereço melhor (simplificado)
+        let address = 'Localização encontrada';
+        
         if (result.properties && result.properties.address) {
             const addr = result.properties.address;
-            if (addr.road) {
-                address = addr.road + (addr.house_number ? ', ' + addr.house_number : '');
-                if (addr.neighbourhood || addr.suburb) {
-                    address += ', ' + (addr.neighbourhood || addr.suburb);
-                }
+            const parts = [];
+            
+            // Montar endereço apenas com partes essenciais
+            if (addr.road || addr.pedestrian) {
+                parts.push(addr.road || addr.pedestrian);
             }
+            if (addr.house_number) {
+                parts.push(addr.house_number);
+            }
+            if (addr.neighbourhood || addr.suburb || addr.quarter) {
+                parts.push(addr.neighbourhood || addr.suburb || addr.quarter);
+            }
+            
+            if (parts.length > 0) {
+                address = parts.join(', ');
+            } else {
+                // Fallback para name ou html
+                address = result.name || result.html || 'Localização encontrada';
+                // Remover tags HTML se houver
+                address = address.replace(/<[^>]*>/g, '');
+                // Simplificar: pegar apenas primeiras partes
+                const addressParts = address.split(',');
+                address = addressParts.slice(0, 3).join(',').trim();
+            }
+        } else if (result.name || result.html) {
+            address = result.name || result.html;
+            // Remover tags HTML se houver
+            address = address.replace(/<[^>]*>/g, '');
+            // Simplificar: pegar apenas primeiras partes
+            const addressParts = address.split(',');
+            address = addressParts.slice(0, 3).join(',').trim();
         }
         
         // Criar conteúdo do popup profissional
