@@ -1,4 +1,22 @@
 // ========================================
+// HEADER SCROLL EFFECT
+// ========================================
+let lastScroll = 0;
+const header = document.querySelector('.header');
+
+function handleHeaderScroll() {
+    const currentScroll = window.pageYOffset;
+    if (currentScroll > 50) {
+        header.classList.add('scrolled');
+    } else {
+        header.classList.remove('scrolled');
+    }
+    lastScroll = currentScroll;
+}
+
+window.addEventListener('scroll', handleHeaderScroll, { passive: true });
+
+// ========================================
 // MENU MOBILE TOGGLE
 // ========================================
 document.addEventListener('DOMContentLoaded', function() {
@@ -150,24 +168,62 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ========================================
-    // SCROLL REVEAL ANIMATION
+    // PARALLAX EFFECT FOR HERO BANNER
+    // ========================================
+    let ticking = false;
+    const heroImage = document.querySelector('.hero-image');
+    
+    function updateParallax() {
+        if (heroImage && window.innerWidth > 768) {
+            const scrolled = window.pageYOffset;
+            const heroSection = document.querySelector('.hero');
+            if (heroSection) {
+                const heroHeight = heroSection.offsetHeight;
+                if (scrolled < heroHeight) {
+                    const parallaxSpeed = 0.3;
+                    const yPos = -(scrolled * parallaxSpeed);
+                    heroImage.style.transform = `translate3d(0, ${yPos}px, 0)`;
+                }
+            }
+        }
+        ticking = false;
+    }
+
+    function requestParallaxTick() {
+        if (!ticking) {
+            window.requestAnimationFrame(updateParallax);
+            ticking = true;
+        }
+    }
+
+    if (heroImage) {
+        window.addEventListener('scroll', requestParallaxTick, { passive: true });
+        // Initial call
+        updateParallax();
+    }
+
+    // ========================================
+    // ENHANCED SCROLL REVEAL ANIMATION
     // ========================================
     const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
+        threshold: 0.15,
+        rootMargin: '0px 0px -80px 0px'
     };
 
     const observer = new IntersectionObserver(function(entries) {
-        entries.forEach(entry => {
+        entries.forEach((entry, index) => {
             if (entry.isIntersecting) {
-                entry.target.classList.add('revealed');
+                // Stagger animation delay based on index
+                setTimeout(() => {
+                    entry.target.classList.add('revealed');
+                }, index * 50);
                 observer.unobserve(entry.target);
             }
         });
     }, observerOptions);
 
-    // Add scroll-reveal class to sections and cards
-    const revealElements = document.querySelectorAll('section, .plano-card, .app-item, .solucao-card, .valor-card, .diferencial-item');
+    // Add scroll-reveal class to sections and cards with staggered delays
+    const revealElements = document.querySelectorAll('section:not(.hero), .plano-card, .app-item, .solucao-card, .valor-card, .diferencial-item, .info-card');
     revealElements.forEach(el => {
         el.classList.add('scroll-reveal');
         observer.observe(el);
