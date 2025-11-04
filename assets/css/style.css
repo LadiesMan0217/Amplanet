@@ -1174,6 +1174,8 @@ section {
 .apps-gallery-section {
     padding: var(--spacing-3xl) 0;
     background: linear-gradient(to bottom, var(--bg-white) 0%, var(--bg-light) 50%);
+    opacity: 1 !important;
+    transform: none !important;
 }
 
 .apps-tier {
@@ -1183,6 +1185,8 @@ section {
     border-radius: var(--radius-2xl);
     box-shadow: var(--shadow-lg);
     border: 1px solid rgba(0, 0, 0, 0.05);
+    opacity: 1 !important;
+    transform: none !important;
 }
 
 .tier-title {
@@ -1229,6 +1233,8 @@ section {
     border: 2px solid transparent;
     position: relative;
     overflow: hidden;
+    opacity: 1 !important;
+    transform: none !important;
 }
 
 .app-item::before {
