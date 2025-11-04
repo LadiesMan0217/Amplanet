@@ -405,7 +405,7 @@ ul {
 }
 
 .navbar-brand .logo {
-    height: 56px;
+    height: 80px;
     width: auto;
     transition: var(--transition-base);
     filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.8)) 
@@ -435,7 +435,7 @@ ul {
 
 /* Estilo para quando houver dois logos separados */
 .navbar-brand .logo-primary {
-    height: 56px;
+    height: 80px;
     width: auto;
     transition: var(--transition-base);
 }
@@ -3387,7 +3387,7 @@ section {
     
     .navbar-menu {
         position: fixed;
-        top: 72px;
+        top: 90px;
         left: 0;
         right: 0;
         background: #ffffff;
@@ -3602,7 +3602,7 @@ section {
     }
     
     .navbar-brand .logo {
-        height: 44px;
+        height: 64px;
     }
     
     .hero-title {
