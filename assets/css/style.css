@@ -3422,11 +3422,11 @@ section {
         flex-wrap: nowrap;
     }
     
-    /* Botão Área do Cliente sempre visível no mobile - acima do menu */
+    /* Botão Área do Cliente sempre visível no mobile - mantém tamanho original */
     .btn-area-cliente {
         display: inline-flex !important;
-        padding: 0.625rem 1rem;
-        font-size: 0.8rem;
+        padding: 0.75rem 1.5rem !important;
+        font-size: clamp(0.75rem, 2vw, 0.9rem) !important;
         position: relative;
         z-index: 1001;
         white-space: nowrap;
@@ -3586,11 +3586,11 @@ section {
         box-sizing: border-box;
     }
     
-    /* Botão Área do Cliente sempre visível em telas muito pequenas */
+    /* Botão Área do Cliente sempre visível em telas muito pequenas - mantém tamanho original */
     .btn-area-cliente {
         display: inline-flex !important;
-        padding: 0.5rem 0.875rem;
-        font-size: 0.75rem;
+        padding: 0.75rem 1.5rem !important;
+        font-size: clamp(0.75rem, 2vw, 0.9rem) !important;
         white-space: nowrap;
         flex-shrink: 0;
         min-width: fit-content;
