@@ -10,16 +10,16 @@
 }
 
 :root {
-    /* Premium Color Palette */
-    --primary-color: #2563eb;
-    --primary-dark: #1e40af;
-    --primary-light: #3b82f6;
+    /* Premium Color Palette - Tons Claros de Azul */
+    --primary-color: #3b82f6;
+    --primary-dark: #2563eb;
+    --primary-light: #60a5fa;
     --secondary-color: #10b981;
-    --accent-color: #8b5cf6;
+    --accent-color: #60a5fa;
     --warning-color: #f59e0b;
     
     /* Neutral Colors */
-    --text-dark: #0f172a;
+    --text-dark: #1e293b;
     --text-medium: #475569;
     --text-light: #64748b;
     --text-lighter: #94a3b8;
@@ -28,12 +28,12 @@
     --bg-white: #ffffff;
     --bg-light: #f8fafc;
     --bg-lighter: #f1f5f9;
-    --bg-dark: #0f172a;
+    --bg-dark: #ffffff;
     
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --gradient-blue: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-    --gradient-hero: linear-gradient(135deg, rgba(37, 99, 235, 0.95) 0%, rgba(139, 92, 246, 0.95) 100%);
+    /* Gradients - Tons Claros de Azul */
+    --gradient-primary: linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%);
+    --gradient-blue: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    --gradient-hero: linear-gradient(135deg, rgba(59, 130, 246, 0.9) 0%, rgba(96, 165, 250, 0.9) 100%);
     --gradient-card: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
     
     /* Shadows - Professional */
@@ -134,7 +134,47 @@ ul {
 
 /* Container mais largo para seção de planos */
 .planos-section .container {
-    max-width: 1800px;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(59, 130, 246, 0.3) transparent;
+    padding-bottom: 1rem;
+    position: relative;
+    z-index: 1;
+}
+
+.planos-section .container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.planos-section .container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.planos-section .container::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.3);
+    border-radius: 4px;
+}
+
+.planos-section .container::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.5);
+}
+
+/* Desktop: Container com scroll horizontal para mostrar 4º plano */
+@media (min-width: 1200px) {
+    .planos-section .container {
+        overflow-x: auto;
+        overflow-y: visible;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 var(--spacing-xl);
+    }
+    
+    .planos-grid {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
 }
 
 .text-center {
@@ -457,7 +497,7 @@ ul {
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    background-color: #2563eb;
+    background-color: #ffffff;
     width: 100%;
 }
 
@@ -502,10 +542,10 @@ ul {
     left: 0;
     width: 100%;
     height: 100%;
-    /* Gradientes radiais - Efeito de luz colorida */
+    /* Gradientes radiais - Efeito de luz azul suave */
     background: 
-        radial-gradient(circle at 20% 50%, rgba(37, 99, 235, 0.25) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.25) 0%, transparent 50%);
+        radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(96, 165, 250, 0.08) 0%, transparent 50%);
     z-index: 1;
 }
 
@@ -516,12 +556,10 @@ ul {
     left: 0;
     width: 100%;
     height: 100%;
-    /* Overlay principal: Filtro roxo da marca + camada escura para legibilidade */
-    /* Primeira camada: Gradiente roxo (35% opacidade) */
-    /* Segunda camada: Overlay preto (30% opacidade) para contraste do texto */
+    /* Overlay principal: Gradiente azul claro para legibilidade */
     background: 
-        linear-gradient(135deg, rgba(37, 99, 235, 0.35) 0%, rgba(139, 92, 246, 0.35) 100%),
-        rgba(0, 0, 0, 0.3);
+        linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(96, 165, 250, 0.05) 100%),
+        rgba(255, 255, 255, 0.4);
     z-index: 2;
 }
 
@@ -529,7 +567,7 @@ ul {
     position: relative;
     z-index: 3;
     text-align: center;
-    color: white;
+    color: var(--text-dark);
     padding: var(--spacing-2xl) var(--spacing-lg);
     max-width: 900px;
     margin: 0 auto;
@@ -643,51 +681,51 @@ section {
     }
 }
 
-/* Título e texto branco para seção de planos escura */
+/* Título e texto para seção de planos com fundo claro */
 .planos-section .section-title {
-    color: #ffffff;
-    background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.95) 50%, rgba(255, 255, 255, 0.85) 100%);
+    color: var(--text-dark);
+    background: linear-gradient(135deg, var(--text-dark) 0%, var(--primary-color) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 40px rgba(37, 99, 235, 0.2);
+    text-shadow: none;
     margin-bottom: var(--spacing-lg);
 }
 
 /* Fallback para navegadores que não suportam background-clip */
 @supports not (background-clip: text) {
     .planos-section .section-title {
-        color: #ffffff;
+        color: var(--text-dark);
         background: none;
-        -webkit-text-fill-color: #ffffff;
+        -webkit-text-fill-color: var(--text-dark);
     }
 }
 
 .planos-section .section-subtitle {
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--text-medium);
 }
 
 .planos-section .planos-disclaimer {
     margin-top: var(--spacing-xl);
     text-align: center;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--text-medium);
     font-size: 0.875rem;
 }
 
 .planos-section .planos-disclaimer em {
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--text-medium);
     font-style: italic;
 }
 
 .planos-section .btn-outline {
     background-color: transparent;
-    color: white;
-    border-color: rgba(255, 255, 255, 0.3);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
 }
 
 .planos-section .btn-outline:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.5);
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
     color: white;
 }
 
@@ -706,8 +744,8 @@ section {
    PLANOS SECTION - PREMIUM (DESIGN ESCURO PROFISSIONAL)
    ======================================== */
 .planos-section {
-    background: #0f172a;
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    background: #ffffff;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #ffffff 100%);
     position: relative;
     padding: var(--spacing-3xl) 0;
     overflow-x: hidden;
@@ -724,8 +762,8 @@ section {
     right: 0;
     bottom: 0;
     background: 
-        radial-gradient(circle at 20% 30%, rgba(37, 99, 235, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+        radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(96, 165, 250, 0.05) 0%, transparent 50%);
     pointer-events: none;
     z-index: 0;
 }
@@ -735,11 +773,32 @@ section {
     z-index: 1;
     width: 100%;
     box-sizing: border-box;
+    overflow-x: auto;
+    overflow-y: visible;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(59, 130, 246, 0.3) transparent;
+}
+
+.planos-section .container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.planos-section .container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.planos-section .container::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.3);
+    border-radius: 4px;
+}
+
+.planos-section .container::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.5);
 }
 
 .planos-section-alt {
-    background-color: #0f172a;
-    background: #0f172a;
+    background-color: #ffffff;
+    background: #ffffff;
     overflow-x: hidden;
     overflow-y: visible;
     width: 100%;
@@ -756,6 +815,7 @@ section {
     width: 100%;
     box-sizing: border-box;
     min-height: 300px;
+    align-items: stretch;
 }
 
 /* Tablet: 2 colunas */
@@ -767,66 +827,95 @@ section {
     }
 }
 
-/* Desktop: 4 colunas com largura adequada e espaçamento generoso */
+/* Desktop: Mostrar apenas 3 colunas visíveis */
 @media (min-width: 1200px) {
     .planos-grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: var(--spacing-xl);
-        max-width: 1600px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--spacing-md);
+        max-width: 1200px;
         margin-left: auto;
         margin-right: auto;
         padding: 0 var(--spacing-xl);
         width: 100%;
+        overflow-x: auto;
+        overflow-y: visible;
+        align-items: stretch;
     }
     
     .plano-card {
         min-width: 0;
-        max-width: 100%;
+        max-width: 380px;
         width: 100%;
-        margin: 0;
+        margin: 0 auto;
+        height: 100%;
+    }
+    
+    /* Centralizar o 4º plano quando ele estiver abaixo dos outros 3 */
+    .planos-grid .plano-card:nth-child(4) {
+        grid-column: 2 / 3;
+        justify-self: center;
     }
 }
 
-/* Telas grandes: mais espaçamento e cards maiores */
+/* Telas grandes: manter 3 colunas */
 @media (min-width: 1400px) {
     .planos-grid {
-        gap: var(--spacing-2xl);
-        max-width: 1800px;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--spacing-md);
+        max-width: 1200px;
         width: 100%;
     }
     
     .plano-card {
         min-width: 0;
-        max-width: 100%;
+        max-width: 380px;
         width: 100%;
+        margin: 0 auto;
+        height: 100%;
+    }
+    
+    /* Centralizar o 4º plano quando ele estiver abaixo dos outros 3 */
+    .planos-grid .plano-card:nth-child(4) {
+        grid-column: 2 / 3;
+        justify-self: center;
     }
 }
 
-/* Telas muito grandes: garantir espaçamento adequado */
+/* Telas muito grandes: manter 3 colunas */
 @media (min-width: 1600px) {
     .planos-grid {
-        gap: var(--spacing-2xl);
-        max-width: 2000px;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--spacing-md);
+        max-width: 1200px;
         padding: 0 var(--spacing-2xl);
         width: 100%;
     }
     
     .plano-card {
         min-width: 0;
-        max-width: 100%;
+        max-width: 380px;
         width: 100%;
+        margin: 0 auto;
+        height: 100%;
+    }
+    
+    /* Centralizar o 4º plano quando ele estiver abaixo dos outros 3 */
+    .planos-grid .plano-card:nth-child(4) {
+        grid-column: 2 / 3;
+        justify-self: center;
     }
 }
 
 .plano-card {
-    background: #1e293b;
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    background: #ffffff;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
     border-radius: var(--radius-2xl);
     padding: 0;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.1), 0 0 0 1px rgba(59, 130, 246, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
-    border: 2px solid rgba(255, 255, 255, 0.08);
+    border: 2px solid rgba(59, 130, 246, 0.15);
     overflow-x: hidden;
     overflow-y: visible;
     display: flex;
@@ -835,7 +924,7 @@ section {
     max-width: 100%;
     min-width: 0;
     transform: translateY(0) scale(1);
-    min-height: 500px;
+    min-height: 480px;
     box-sizing: border-box;
 }
 
@@ -850,7 +939,7 @@ section {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(96, 165, 250, 0.05) 100%);
     opacity: 0;
     transition: opacity 0.4s var(--timing-ease-out);
     z-index: 0;
@@ -863,24 +952,24 @@ section {
 
 .plano-card:hover {
     transform: translateY(-12px) scale(1.02);
-    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.7), 0 0 40px rgba(37, 99, 235, 0.3);
-    border-color: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 25px 70px rgba(59, 130, 246, 0.2), 0 0 40px rgba(59, 130, 246, 0.15);
+    border-color: var(--primary-color);
 }
 
 .plano-card.featured {
-    border: 2px solid #2563eb;
-    background: linear-gradient(135deg, #1e3a8a 0%, #1e293b 50%, #0f172a 100%);
-    box-shadow: 0 15px 50px rgba(37, 99, 235, 0.4), 0 0 0 1px rgba(37, 99, 235, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    border: 2px solid var(--primary-color);
+    background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
+    box-shadow: 0 15px 50px rgba(59, 130, 246, 0.25), 0 0 0 1px rgba(59, 130, 246, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .plano-card.featured::before {
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(139, 92, 246, 0.15) 100%);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(96, 165, 250, 0.08) 100%);
     opacity: 1;
 }
 
 .plano-card.featured:hover {
-    box-shadow: 0 25px 70px rgba(37, 99, 235, 0.5), 0 0 0 1px rgba(37, 99, 235, 0.4), 0 0 60px rgba(37, 99, 235, 0.3);
-    border-color: #3b82f6;
+    box-shadow: 0 25px 70px rgba(59, 130, 246, 0.35), 0 0 0 1px rgba(59, 130, 246, 0.3), 0 0 60px rgba(59, 130, 246, 0.2);
+    border-color: var(--primary-light);
 }
 
 .plano-badge {
@@ -916,16 +1005,16 @@ section {
 .plano-header {
     text-align: center;
     margin-bottom: 0;
-    padding: var(--spacing-2xl) var(--spacing-xl) var(--spacing-lg);
-    border-bottom: 2px solid rgba(255, 255, 255, 0.12);
+    padding: var(--spacing-xl) var(--spacing-xl) var(--spacing-md);
+    border-bottom: 2px solid rgba(59, 130, 246, 0.1);
     position: relative;
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(139, 92, 246, 0.05) 100%);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(96, 165, 250, 0.03) 100%);
 }
 
 .plano-nome {
     font-size: 1.5rem;
     font-weight: 800;
-    color: white;
+    color: var(--text-dark);
     margin-bottom: var(--spacing-sm);
     letter-spacing: 0.05em;
     text-transform: uppercase;
@@ -934,31 +1023,31 @@ section {
 .plano-velocidade {
     font-size: clamp(2rem, 4vw, 2.5rem);
     font-weight: 900;
-    color: white;
+    color: var(--primary-color);
     letter-spacing: -0.02em;
-    background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.85) 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    text-shadow: 0 0 30px rgba(37, 99, 235, 0.3);
 }
 
 .plano-features {
     margin-bottom: 0;
-    padding: var(--spacing-xl) var(--spacing-xl);
+    padding: var(--spacing-lg) var(--spacing-xl);
     flex: 1;
-    min-height: 280px;
+    min-height: auto;
 }
 
 .plano-feature {
     display: flex;
     align-items: center;
-    gap: var(--spacing-md);
-    margin-bottom: var(--spacing-md);
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
     font-size: 0.95rem;
-    color: rgba(255, 255, 255, 0.9);
-    padding: 0.75rem 0;
+    color: var(--text-dark);
+    padding: 0.5rem 0;
     transition: var(--transition-base);
+    line-height: 1.4;
 }
 
 .plano-feature:last-child {
@@ -966,11 +1055,11 @@ section {
 }
 
 .plano-feature:hover {
-    color: white;
+    color: var(--primary-color);
 }
 
 .plano-feature span {
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--text-dark);
     line-height: 1.5;
 }
 
@@ -980,15 +1069,15 @@ section {
     text-align: center;
 }
 
-/* Ícones profissionais dos planos - Design escuro */
+/* Ícones profissionais dos planos - Design claro */
 .plano-feature .icon-pro {
-    font-size: 1rem;
-    width: 28px;
-    min-width: 28px;
-    height: 28px;
+    font-size: 0.9rem;
+    width: 24px;
+    min-width: 24px;
+    height: 24px;
     text-align: center;
-    color: white;
-    background: rgba(255, 255, 255, 0.1);
+    color: var(--primary-color);
+    background: rgba(59, 130, 246, 0.1);
     padding: 0;
     border-radius: var(--radius-sm);
     display: flex;
@@ -999,59 +1088,63 @@ section {
 }
 
 .plano-feature:hover .icon-pro {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(59, 130, 246, 0.2);
     transform: scale(1.05);
 }
 
 .plano-feature span {
     flex: 1;
-    line-height: 1.5;
-    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.4;
+    color: var(--text-dark);
+    font-weight: 500;
 }
 
 
 .plano-preco {
     text-align: center;
     margin-bottom: 0;
-    padding: var(--spacing-xl) var(--spacing-xl);
-    border-top: 2px solid rgba(255, 255, 255, 0.12);
-    border-bottom: 2px solid rgba(255, 255, 255, 0.12);
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(139, 92, 246, 0.03) 100%);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-top: 2px solid rgba(59, 130, 246, 0.1);
+    border-bottom: 2px solid rgba(59, 130, 246, 0.1);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(96, 165, 250, 0.03) 100%);
+    position: relative;
+    z-index: 1;
 }
 
 .preco-valor {
-    font-size: clamp(2.25rem, 4vw, 2.75rem);
+    font-size: clamp(2rem, 4vw, 2.5rem);
     font-weight: 900;
-    color: white;
+    color: var(--primary-color);
     letter-spacing: -0.02em;
     line-height: 1;
     display: inline-block;
-    background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.9) 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    margin-bottom: 0.25rem;
 }
 
 .preco-periodo {
     font-size: 0.875rem;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--text-medium);
     font-weight: 500;
     margin-left: 0.25rem;
     display: inline-block;
     vertical-align: baseline;
 }
 
-/* Botão dentro dos cards de planos - Fundo branco com texto escuro */
+/* Botão dentro dos cards de planos */
 .plano-card .btn-primary {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    color: #1e293b;
+    background: var(--gradient-blue);
+    color: white;
     border: none;
     margin: var(--spacing-xl);
     margin-top: 0;
     padding: 1.125rem 2rem;
     font-weight: 700;
     font-size: 1rem;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3), 0 0 0 1px rgba(59, 130, 246, 0.2);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     border-radius: var(--radius-lg);
     position: relative;
@@ -1062,16 +1155,16 @@ section {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(96, 165, 250, 0.15) 100%);
     opacity: 0;
     transition: opacity 0.4s;
 }
 
 .plano-card .btn-primary:hover {
-    background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
-    color: #0f172a;
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-color) 100%);
+    color: white;
     transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.3);
+    box-shadow: 0 12px 35px rgba(59, 130, 246, 0.4), 0 0 0 1px rgba(59, 130, 246, 0.3);
 }
 
 .plano-card .btn-primary:hover::before {
@@ -1082,9 +1175,9 @@ section {
    APPS SECTION - PREMIUM
    ======================================== */
 .apps-section {
-    background: #667eea;
-    background: var(--gradient-primary);
-    color: white;
+    background: #ffffff;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
+    color: var(--text-dark);
     position: relative;
     overflow: hidden;
     min-height: 400px;
@@ -1107,9 +1200,18 @@ section {
     to { transform: rotate(360deg); }
 }
 
-.apps-section .section-title,
+.apps-section .section-title {
+    color: var(--text-dark);
+    background: linear-gradient(135deg, var(--text-dark) 0%, var(--primary-color) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    position: relative;
+    z-index: 1;
+}
+
 .apps-section .section-subtitle {
-    color: white;
+    color: var(--text-medium);
     position: relative;
     z-index: 1;
 }
@@ -1124,27 +1226,21 @@ section {
 }
 
 .app-item-large {
-    background: rgba(255, 255, 255, 0.25);
-    background: rgba(255, 255, 255, 0.15);
+    background: #ffffff;
     border-radius: var(--radius-xl);
     padding: var(--spacing-xl);
     text-align: center;
     transition: var(--transition-base);
     cursor: pointer;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-@supports (backdrop-filter: blur(1px)) {
-    .app-item-large {
-        backdrop-filter: blur(20px);
-    }
+    border: 2px solid rgba(59, 130, 246, 0.15);
+    box-shadow: var(--shadow-md);
 }
 
 .app-item-large:hover {
-    background: rgba(255, 255, 255, 0.25);
+    background: #ffffff;
     transform: translateY(-8px) scale(1.02);
     box-shadow: var(--shadow-xl);
-    border-color: rgba(255, 255, 255, 0.4);
+    border-color: var(--primary-color);
 }
 
 .app-item-large img {
@@ -1163,7 +1259,7 @@ section {
 .app-item-large span {
     display: block;
     font-weight: 700;
-    color: white;
+    color: var(--text-dark);
     font-size: 1rem;
     letter-spacing: 0.01em;
 }
@@ -3011,7 +3107,7 @@ section {
    FOOTER - PREMIUM
    ======================================== */
 .footer {
-    background: linear-gradient(135deg, var(--bg-dark) 0%, #1e293b 100%);
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
     color: white;
     padding: var(--spacing-3xl) 0 var(--spacing-lg);
     position: relative;
@@ -3203,19 +3299,27 @@ section {
         padding: var(--spacing-2xl) var(--spacing-md);
     }
 
-    /* Planos */
+    /* Planos Mobile - Layout Profissional */
     .planos-section {
         overflow-x: hidden;
         overflow-y: visible;
         padding: var(--spacing-xl) 0;
     }
     
+    .planos-section .container {
+        overflow-x: visible;
+        padding: 0 var(--spacing-md);
+        max-width: 100%;
+    }
+    
     .planos-grid {
+        display: grid;
         grid-template-columns: 1fr;
-        padding: 0 var(--spacing-sm);
+        padding: 0;
         gap: var(--spacing-lg);
         width: 100%;
         min-height: auto;
+        align-items: stretch;
     }
     
     .plano-card {
@@ -3223,6 +3327,26 @@ section {
         min-width: 0;
         width: 100%;
         min-height: auto;
+        margin: 0 auto;
+        box-shadow: 0 8px 24px rgba(59, 130, 246, 0.12);
+    }
+    
+    .plano-header {
+        padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-md);
+    }
+    
+    .plano-features {
+        padding: var(--spacing-md) var(--spacing-lg);
+        min-height: auto;
+    }
+    
+    .plano-preco {
+        padding: var(--spacing-md) var(--spacing-lg);
+    }
+    
+    .plano-card .btn-primary {
+        margin: var(--spacing-md) var(--spacing-lg);
+        width: calc(100% - 2 * var(--spacing-lg));
     }
 
     /* Apps */
@@ -3275,7 +3399,7 @@ section {
     }
     
     .container {
-        padding: 0 1rem;
+        padding: 0 var(--spacing-sm);
         width: 100%;
         box-sizing: border-box;
     }
@@ -3291,6 +3415,78 @@ section {
     .section-title {
         font-size: 1.5rem;
         color: var(--text-dark);
+    }
+
+    /* Planos Mobile - Ajustes Finais */
+    .planos-section {
+        padding: var(--spacing-lg) 0;
+    }
+    
+    .planos-section .container {
+        padding: 0 var(--spacing-sm);
+        overflow-x: visible;
+    }
+    
+    .planos-grid {
+        gap: var(--spacing-md);
+        padding: 0;
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+    
+    /* Resetar centralização do 4º plano no mobile - ele deve ficar na coluna única */
+    .planos-grid .plano-card:nth-child(4) {
+        grid-column: 1;
+        justify-self: stretch;
+    }
+    
+    .plano-card {
+        min-height: auto;
+        border-radius: var(--radius-xl);
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .plano-header {
+        padding: var(--spacing-md) var(--spacing-md);
+    }
+    
+    .plano-nome {
+        font-size: 1.25rem;
+    }
+    
+    .plano-velocidade {
+        font-size: 1.75rem;
+    }
+    
+    .plano-features {
+        padding: var(--spacing-md);
+        min-height: auto;
+    }
+    
+    .plano-feature {
+        padding: 0.4rem 0;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .plano-feature:last-child {
+        margin-bottom: 0;
+    }
+    
+    .plano-preco {
+        padding: var(--spacing-md);
+    }
+    
+    .preco-valor {
+        font-size: 2rem;
+    }
+    
+    .plano-card .btn-primary {
+        margin: var(--spacing-md);
+        padding: 1rem 1.5rem;
+        font-size: 0.95rem;
+        width: calc(100% - 2 * var(--spacing-md));
     }
 
     .apps-grid-main,
@@ -3331,8 +3527,8 @@ section {
     
     .planos-section,
     .planos-section-alt {
-        background-color: #0f172a;
-        background: #0f172a;
+        background-color: #ffffff;
+        background: #ffffff;
         overflow-x: hidden;
         overflow-y: visible;
         display: block;
@@ -3340,7 +3536,7 @@ section {
     }
     
     .apps-section {
-        background-color: #667eea;
+        background-color: #ffffff;
         overflow-x: hidden;
         overflow-y: visible;
     }
