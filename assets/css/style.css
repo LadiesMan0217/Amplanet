@@ -381,11 +381,11 @@ ul {
     gap: var(--spacing-md);
     flex-shrink: 0;
     position: relative;
-    padding: 0.5rem 1rem;
+    padding: 0;
     border-radius: var(--radius-lg);
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     transition: var(--transition-base);
 }
 
@@ -585,25 +585,28 @@ ul {
 .hero {
     position: relative;
     width: 100%;
-    margin: 0;
+    margin: 0 auto;
     padding: 0;
     margin-top: 0;
     padding-top: 0;
     background-color: #ffffff;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
     overflow: hidden;
+    text-align: center;
 }
 
 .hero-background {
     position: relative;
     width: 100%;
+    height: auto;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
     z-index: 1;
     overflow: hidden;
+    margin: 0 auto;
 }
 
 .hero-image {
@@ -611,40 +614,59 @@ ul {
     height: auto;
     display: block;
     object-fit: contain;
-    object-position: top center;
+    object-position: center center;
     max-width: 100%;
+    margin: 0 auto;
 }
 
-/* Desktop: Banner em altura completa */
+/* Desktop: Banner em altura completa - mostrar toda a imagem */
 @media (min-width: 1200px) {
     .hero {
-        min-height: 85vh;
+        min-height: auto;
+        height: auto;
+    }
+    
+    .hero-background {
+        height: auto;
     }
     
     .hero-image {
-        max-height: 95vh;
+        height: auto;
+        max-height: none;
     }
 }
 
-/* Tablet: Banner ajustado */
+/* Tablet: Banner ajustado - mostrar toda a imagem */
 @media (min-width: 768px) and (max-width: 1199px) {
     .hero {
-        min-height: 60vh;
+        min-height: auto;
+        height: auto;
+    }
+    
+    .hero-background {
+        height: auto;
     }
     
     .hero-image {
-        max-height: 80vh;
+        height: auto;
+        max-height: none;
     }
 }
 
-/* Mobile: Banner compacto */
+/* Mobile: Banner compacto - mostrar toda a imagem */
 @media (max-width: 767px) {
     .hero {
-        min-height: 40vh;
+        min-height: auto;
+        height: auto;
+    }
+    
+    .hero-background {
+        height: auto;
     }
     
     .hero-image {
-        max-height: 60vh;
+        height: auto;
+        max-height: none;
     }
 }
 
@@ -3394,11 +3416,17 @@ section {
 
     /* Hero Tablet - Sobrescreve media query anterior */
     .hero {
-        min-height: 60vh;
+        min-height: auto;
+        height: auto;
+    }
+    
+    .hero-background {
+        height: auto;
     }
     
     .hero-image {
-        max-height: 80vh;
+        height: auto;
+        max-height: none;
     }
 
     .hero-content {
@@ -3525,11 +3553,17 @@ section {
     
     /* Hero Mobile */
     .hero {
-        min-height: 40vh;
+        min-height: auto;
+        height: auto;
+    }
+    
+    .hero-background {
+        height: auto;
     }
     
     .hero-image {
-        max-height: 60vh;
+        height: auto;
+        max-height: none;
     }
     
     .hero-title {
@@ -4168,12 +4202,13 @@ section {
 }
 
 /* ========================================
-   SCROLL REVEAL ANIMATIONS - PREMIUM
+   SCROLL REVEAL ANIMATIONS - PREMIUM ENHANCED
    ======================================== */
 .scroll-reveal {
     opacity: 0;
-    transform: translateY(50px) scale(0.98);
-    transition: opacity 0.8s var(--timing-ease-out), transform 0.8s var(--timing-ease-out);
+    transform: translateY(60px) scale(0.95);
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
+                transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: opacity, transform;
 }
 
@@ -4182,15 +4217,99 @@ section {
     transform: translateY(0) scale(1);
 }
 
-/* Animação escalonada para grid items */
-.planos-grid .plano-card {
+/* Animação para cards de planos com delay escalonado */
+.planos-grid .plano-card.scroll-reveal {
     transition-delay: 0ms;
 }
 
-.planos-grid .plano-card:nth-child(1) { transition-delay: 0ms; }
-.planos-grid .plano-card:nth-child(2) { transition-delay: 100ms; }
-.planos-grid .plano-card:nth-child(3) { transition-delay: 200ms; }
-.planos-grid .plano-card:nth-child(4) { transition-delay: 300ms; }
+.planos-grid .plano-card.scroll-reveal.revealed {
+    animation: fadeInUpScale 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.planos-grid .plano-card:nth-child(1).scroll-reveal.revealed { 
+    animation-delay: 0ms; 
+}
+.planos-grid .plano-card:nth-child(2).scroll-reveal.revealed { 
+    animation-delay: 100ms; 
+}
+.planos-grid .plano-card:nth-child(3).scroll-reveal.revealed { 
+    animation-delay: 200ms; 
+}
+.planos-grid .plano-card:nth-child(4).scroll-reveal.revealed { 
+    animation-delay: 300ms; 
+}
+
+/* Animação para seções */
+section.scroll-reveal {
+    transform: translateY(40px);
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
+                transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+section.scroll-reveal.revealed {
+    transform: translateY(0);
+}
+
+/* Animação para apps */
+.app-item.scroll-reveal,
+.app-item-large.scroll-reveal {
+    transform: translateY(30px) scale(0.9);
+    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
+                transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.app-item.scroll-reveal.revealed,
+.app-item-large.scroll-reveal.revealed {
+    transform: translateY(0) scale(1);
+}
+
+/* Animação para cards de soluções */
+.solucao-card.scroll-reveal {
+    transform: translateY(40px);
+    transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), 
+                transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.solucao-card.scroll-reveal.revealed {
+    transform: translateY(0);
+}
+
+/* Animação para títulos de seção */
+.section-title.scroll-reveal {
+    transform: translateY(20px);
+    opacity: 0;
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
+                transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.section-title.scroll-reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Animação para subtítulos */
+.section-subtitle.scroll-reveal {
+    transform: translateY(15px);
+    opacity: 0;
+    transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.2s, 
+                transform 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.2s;
+}
+
+.section-subtitle.scroll-reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@keyframes fadeInUpScale {
+    from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
 
 /* ========================================
    UTILITY CLASSES

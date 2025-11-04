@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ========================================
-    // PARALLAX EFFECT FOR HERO BANNER
+    // PARALLAX EFFECT FOR HERO BANNER (Suave)
     // ========================================
     let ticking = false;
     const heroImage = document.querySelector('.hero-image');
@@ -180,9 +180,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if (heroSection) {
                 const heroHeight = heroSection.offsetHeight;
                 if (scrolled < heroHeight) {
-                    const parallaxSpeed = 0.3;
+                    const parallaxSpeed = 0.15; // Mais suave
                     const yPos = -(scrolled * parallaxSpeed);
                     heroImage.style.transform = `translate3d(0, ${yPos}px, 0)`;
+                    heroImage.style.opacity = Math.max(0, 1 - (scrolled / heroHeight) * 0.3);
+                } else {
+                    heroImage.style.transform = 'translate3d(0, 0, 0)';
+                    heroImage.style.opacity = 0.7;
                 }
             }
         }
@@ -206,24 +210,38 @@ document.addEventListener('DOMContentLoaded', function() {
     // ENHANCED SCROLL REVEAL ANIMATION
     // ========================================
     const observerOptions = {
-        threshold: 0.15,
-        rootMargin: '0px 0px -80px 0px'
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
     };
 
     const observer = new IntersectionObserver(function(entries) {
-        entries.forEach((entry, index) => {
+        entries.forEach((entry) => {
             if (entry.isIntersecting) {
-                // Stagger animation delay based on index
+                // Add revealed class with a small delay for smooth animation
                 setTimeout(() => {
                     entry.target.classList.add('revealed');
-                }, index * 50);
+                }, 50);
                 observer.unobserve(entry.target);
             }
         });
     }, observerOptions);
 
-    // Add scroll-reveal class to sections and cards with staggered delays
-    const revealElements = document.querySelectorAll('section:not(.hero), .plano-card, .app-item, .solucao-card, .valor-card, .diferencial-item, .info-card');
+    // Add scroll-reveal class to sections, titles, and cards
+    const revealElements = document.querySelectorAll(`
+        section:not(.hero), 
+        .section-title, 
+        .section-subtitle,
+        .plano-card, 
+        .app-item, 
+        .app-item-large,
+        .solucao-card, 
+        .valor-card, 
+        .diferencial-item, 
+        .info-card,
+        .teste-velocidade-card,
+        .teste-dicas-card
+    `);
+    
     revealElements.forEach(el => {
         el.classList.add('scroll-reveal');
         observer.observe(el);
