@@ -629,11 +629,11 @@ ul {
 /* Desktop e Tablet: Mostrar banner PC, esconder banner mobile */
 @media (min-width: 768px) {
     .hero-image-mobile {
-        display: none;
+        display: none !important;
     }
     
     .hero-image-desktop {
-        display: block;
+        display: block !important;
     }
     
     .hero {
@@ -649,11 +649,11 @@ ul {
 /* Mobile: Mostrar banner celular, esconder banner PC */
 @media (max-width: 767px) {
     .hero-image-mobile {
-        display: block;
+        display: block !important;
     }
     
     .hero-image-desktop {
-        display: none;
+        display: none !important;
     }
     
     .hero {
@@ -3484,6 +3484,15 @@ section {
     .hero-image {
         max-height: none;
         object-fit: contain;
+    }
+    
+    /* Garantir que apenas o banner mobile seja exibido */
+    .hero-image-mobile {
+        display: block !important;
+    }
+    
+    .hero-image-desktop {
+        display: none !important;
     }
 
     .hero-content {
