@@ -3469,11 +3469,26 @@ section {
    FOOTER - PREMIUM
    ======================================== */
 .footer {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    color: white;
+    background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%);
+    color: #1e293b;
     padding: var(--spacing-3xl) 0 var(--spacing-lg);
     position: relative;
     overflow: hidden;
+    border-top: 1px solid #e2e8f0;
+}
+
+/* Estilos específicos para elementos do footer com contraste adequado */
+.footer-title,
+.footer-links a,
+.footer-company-name,
+.footer-email,
+.footer-address,
+.footer-bottom p {
+    color: #1e293b !important; /* Texto escuro para contraste com fundo claro */
+}
+
+.footer-description {
+    color: #334155 !important; /* Cinza escuro para descrição */
 }
 
 .footer::before {
@@ -3552,6 +3567,42 @@ section {
     gap: var(--spacing-sm);
     margin-bottom: var(--spacing-md);
     align-items: flex-start; /* Impede que os botões se estiquem */
+}
+
+/* Garantir visibilidade dos botões WhatsApp em fundo claro */
+.whatsapp-button,
+.whatsapp-button:hover,
+.whatsapp-button:active {
+    background: rgba(37, 211, 102, 0.1) !important;
+    color: #16a34a !important;
+    border: 1px solid rgba(37, 211, 102, 0.3) !important;
+}
+
+/* Estilos de contraste para todos os elementos do rodapé */
+.footer-links a,
+.footer-links a:visited,
+.footer-links a:active {
+    color: #334155 !important;
+}
+
+.footer-email,
+.footer-address,
+.footer-company-name {
+    color: #334155 !important;
+}
+
+.footer-bottom {
+    color: #334155 !important;
+}
+
+.footer-bottom p {
+    color: #334155 !important;
+}
+
+.footer-manual-link,
+.footer-manual-link:visited {
+    color: #ffd700 !important;
+    text-shadow: none !important;
 }
 
 .footer-company-contact {
