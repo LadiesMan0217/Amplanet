@@ -4,17 +4,18 @@
 let lastScroll = 0;
 const header = document.querySelector('.header');
 
-function handleHeaderScroll() {
-    const currentScroll = window.pageYOffset;
-    if (currentScroll > 50) {
-        header.classList.add('scrolled');
-    } else {
-        header.classList.remove('scrolled');
-    }
-    lastScroll = currentScroll;
-}
+// Efeito de scroll desabilitado - navbar estática
+// function handleHeaderScroll() {
+//     const currentScroll = window.pageYOffset;
+//     if (currentScroll > 50) {
+//         header.classList.add('scrolled');
+//     } else {
+//         header.classList.remove('scrolled');
+//     }
+//     lastScroll = currentScroll;
+// }
 
-window.addEventListener('scroll', handleHeaderScroll, { passive: true });
+// window.addEventListener('scroll', handleHeaderScroll, { passive: true });
 
 // ========================================
 // MENU MOBILE TOGGLE
