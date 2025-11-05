@@ -597,6 +597,8 @@ ul {
 .hero {
     position: relative;
     width: 100%;
+    height: 75vh;
+    max-height: 800px;
     margin: 0 auto;
     padding: 0;
     margin-top: 0;
@@ -610,75 +612,80 @@ ul {
 }
 
 .hero-background {
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: auto;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1;
     overflow: hidden;
-    margin: 0 auto;
 }
 
 .hero-image {
     width: 100%;
-    height: auto;
+    height: 100%;
     display: block;
-    object-fit: contain;
+    object-fit: cover;
     object-position: center center;
-    max-width: 100%;
-    margin: 0 auto;
+    max-width: none;
 }
 
-/* Desktop: Banner em altura completa - mostrar toda a imagem */
+/* Desktop: Banner otimizado - mostra início do conteúdo abaixo */
 @media (min-width: 1200px) {
     .hero {
-        min-height: auto;
-        height: auto;
+        height: 75vh;
+        max-height: 800px;
     }
     
     .hero-background {
-        height: auto;
+        height: 100%;
     }
     
     .hero-image {
-        height: auto;
-        max-height: none;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center center;
     }
 }
 
-/* Tablet: Banner ajustado - mostrar toda a imagem */
+/* Tablet: Banner ajustado para viewport */
 @media (min-width: 768px) and (max-width: 1199px) {
     .hero {
-        min-height: auto;
-        height: auto;
+        height: 80vh;
     }
     
     .hero-background {
-        height: auto;
+        height: 100%;
     }
     
     .hero-image {
-        height: auto;
-        max-height: none;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center center;
     }
 }
 
-/* Mobile: Banner compacto - mostrar toda a imagem */
+/* Mobile: Banner compacto */
 @media (max-width: 767px) {
     .hero {
-        min-height: auto;
-        height: auto;
+        height: 60vh;
+        min-height: 400px;
     }
     
     .hero-background {
-        height: auto;
+        height: 100%;
     }
     
     .hero-image {
-        height: auto;
-        max-height: none;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center center;
     }
 }
 
@@ -3388,17 +3395,20 @@ section {
     .navbar-menu {
         position: fixed;
         top: 90px;
-        left: 0;
-        right: 0;
-        background: #ffffff;
-        background: rgba(255, 255, 255, 0.98);
+        right: 20px;
+        width: 280px;
+        max-width: calc(100vw - 40px);
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
         flex-direction: column;
-        padding: var(--spacing-xl);
-        box-shadow: var(--shadow-xl);
-        transform: translateX(-100%);
-        transition: transform var(--transition-base);
+        padding: var(--spacing-lg);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        border-radius: var(--radius-lg);
+        transform: translateY(-20px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         z-index: 999;
-        gap: var(--spacing-lg);
+        gap: var(--spacing-md);
     }
     
     @supports (backdrop-filter: blur(1px)) {
@@ -3408,7 +3418,48 @@ section {
     }
 
     .navbar-menu.active {
-        transform: translateX(0);
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    /* Overlay escuro quando menu está aberto */
+    .navbar-menu.active::before {
+        content: '';
+        position: fixed;
+        top: 90px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: -1;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    /* Links do menu mobile com cor escura */
+    .navbar-menu a {
+        color: var(--text-dark) !important;
+        text-shadow: none !important;
+        font-weight: 600;
+        padding: 0.75rem 1rem;
+        border-radius: var(--radius-md);
+        transition: all 0.3s ease;
+        background: transparent;
+    }
+    
+    .navbar-menu a.active {
+        color: var(--primary-color) !important;
+    }
+    
+    .navbar-menu a:hover {
+        color: var(--primary-color) !important;
+        background: rgba(0, 51, 153, 0.1);
+        transform: scale(1.02);
     }
 
     .menu-toggle {
@@ -3417,22 +3468,27 @@ section {
 
     /* Navbar ajustado para mobile */
     .navbar {
-        padding: 1rem var(--spacing-md);
-        gap: var(--spacing-sm);
+        padding: 0.75rem var(--spacing-md);
+        gap: 0.5rem;
         flex-wrap: nowrap;
     }
     
-    /* Botão Área do Cliente sempre visível no mobile - mantém tamanho original */
+    /* Botão Área do Cliente reduzido para mobile */
     .btn-area-cliente {
         display: inline-flex !important;
-        padding: 0.75rem 1.5rem !important;
-        font-size: clamp(0.75rem, 2vw, 0.9rem) !important;
+        padding: 0.6rem 1.2rem !important;
+        font-size: 0.8rem !important;
         position: relative;
         z-index: 1001;
         white-space: nowrap;
         flex-shrink: 0;
         min-width: fit-content;
         order: 2;
+    }
+    
+    /* Logo reduzida em mobile */
+    .navbar-brand .logo {
+        height: 56px;
     }
     
     /* Menu toggle à direita */
@@ -3447,21 +3503,33 @@ section {
         text-align: center;
         justify-content: center;
         margin-top: var(--spacing-md);
+        background: var(--gradient-blue) !important;
+        color: #ffffff !important;
+        border: none;
+        box-shadow: 0 4px 12px rgba(0, 51, 153, 0.3);
+    }
+    
+    .navbar-menu .btn-area-cliente:hover {
+        background: var(--primary-dark) !important;
+        transform: translateX(0) !important;
+        box-shadow: 0 6px 16px rgba(0, 51, 153, 0.4);
     }
 
-    /* Hero Tablet - Sobrescreve media query anterior */
+    /* Hero Mobile - Centralizado vertical e horizontalmente */
     .hero {
-        min-height: auto;
-        height: auto;
+        height: 60vh;
+        min-height: 400px;
     }
     
     .hero-background {
-        height: auto;
+        height: 100%;
     }
     
     .hero-image {
-        height: auto;
-        max-height: none;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center center;
     }
 
     .hero-content {
@@ -3586,23 +3654,49 @@ section {
         box-sizing: border-box;
     }
     
-    /* Botão Área do Cliente sempre visível em telas muito pequenas - mantém tamanho original */
+    /* Botão Área do Cliente reduzido para mobile */
     .btn-area-cliente {
         display: inline-flex !important;
-        padding: 0.75rem 1.5rem !important;
-        font-size: clamp(0.75rem, 2vw, 0.9rem) !important;
+        padding: 0.5rem 1rem !important;
+        font-size: 0.75rem !important;
         white-space: nowrap;
         flex-shrink: 0;
         min-width: fit-content;
     }
     
     .navbar {
-        gap: var(--spacing-xs);
-        padding: 0.75rem var(--spacing-sm);
+        gap: 0.5rem;
+        padding: 0.5rem var(--spacing-sm);
     }
     
     .navbar-brand .logo {
-        height: 64px;
+        height: 45px;
+    }
+    
+    /* Ajustar tamanho do menu mobile */
+    .navbar-menu {
+        top: 65px;
+        right: 10px;
+    }
+    
+    .navbar-menu.active::before {
+        top: 65px;
+    }
+    
+    .menu-toggle {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .menu-toggle span {
+        height: 2px;
+        width: 22px;
+    }
+    
+    /* Reduzir tamanho dos itens do menu */
+    .navbar-menu a {
+        font-size: 0.9rem !important;
+        padding: 0.7rem 0.8rem !important;
     }
     
     .hero-title {
