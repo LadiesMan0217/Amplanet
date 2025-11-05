@@ -617,8 +617,25 @@ ul {
     padding: 0;
 }
 
-/* Desktop: Banner otimizado - largura total sempre */
-@media (min-width: 1200px) {
+/* Controle de visibilidade dos banners por dispositivo */
+.hero-image-mobile {
+    display: block;
+}
+
+.hero-image-desktop {
+    display: none;
+}
+
+/* Desktop e Tablet: Mostrar banner PC, esconder banner mobile */
+@media (min-width: 768px) {
+    .hero-image-mobile {
+        display: none;
+    }
+    
+    .hero-image-desktop {
+        display: block;
+    }
+    
     .hero {
         min-height: auto;
     }
@@ -629,20 +646,16 @@ ul {
     }
 }
 
-/* Tablet: Banner ajustado - largura total sempre */
-@media (min-width: 768px) and (max-width: 1199px) {
-    .hero {
-        min-height: auto;
-    }
-    
-    .hero-image {
-        max-height: none;
-        object-fit: contain;
-    }
-}
-
-/* Mobile: Banner compacto - largura total sempre */
+/* Mobile: Mostrar banner celular, esconder banner PC */
 @media (max-width: 767px) {
+    .hero-image-mobile {
+        display: block;
+    }
+    
+    .hero-image-desktop {
+        display: none;
+    }
+    
     .hero {
         min-height: auto;
     }
