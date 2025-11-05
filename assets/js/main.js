@@ -169,13 +169,139 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ========================================
-    // PARALLAX EFFECT FOR HERO BANNER (Suave)
+    // CARROSSEL DE BANNERS - DESKTOP
+    // ========================================
+    const carouselTrack = document.getElementById('carouselTrack');
+    const carouselPrev = document.getElementById('carouselPrev');
+    const carouselNext = document.getElementById('carouselNext');
+    const carouselIndicators = document.getElementById('carouselIndicators');
+    
+    if (carouselTrack && carouselPrev && carouselNext) {
+        const slides = carouselTrack.querySelectorAll('.carousel-slide');
+        let currentIndex = 0;
+        let autoplayInterval = null;
+        const autoplayDelay = 5000; // 5 segundos
+        
+        // Criar indicadores
+        if (carouselIndicators && slides.length > 0) {
+            slides.forEach((slide, index) => {
+                const indicator = document.createElement('button');
+                indicator.classList.add('carousel-indicator');
+                if (index === 0) indicator.classList.add('active');
+                indicator.setAttribute('aria-label', `Ir para banner ${index + 1}`);
+                indicator.addEventListener('click', () => goToSlide(index));
+                carouselIndicators.appendChild(indicator);
+            });
+        }
+        
+        // Função para atualizar o carrossel
+        function updateCarousel() {
+            carouselTrack.style.transform = `translateX(-${currentIndex * 100}%)`;
+            
+            // Atualizar indicadores
+            if (carouselIndicators) {
+                const indicators = carouselIndicators.querySelectorAll('.carousel-indicator');
+                indicators.forEach((indicator, index) => {
+                    if (index === currentIndex) {
+                        indicator.classList.add('active');
+                    } else {
+                        indicator.classList.remove('active');
+                    }
+                });
+            }
+        }
+        
+        // Função para ir para um slide específico
+        function goToSlide(index) {
+            currentIndex = index;
+            if (currentIndex < 0) {
+                currentIndex = slides.length - 1;
+            } else if (currentIndex >= slides.length) {
+                currentIndex = 0;
+            }
+            updateCarousel();
+            resetAutoplay();
+        }
+        
+        // Função para próximo slide
+        function nextSlide() {
+            currentIndex = (currentIndex + 1) % slides.length;
+            updateCarousel();
+            resetAutoplay();
+        }
+        
+        // Função para slide anterior
+        function prevSlide() {
+            currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+            updateCarousel();
+            resetAutoplay();
+        }
+        
+        // Função para resetar autoplay
+        function resetAutoplay() {
+            clearInterval(autoplayInterval);
+            startAutoplay();
+        }
+        
+        // Função para iniciar autoplay
+        function startAutoplay() {
+            // Só funciona em desktop
+            if (window.innerWidth >= 768) {
+                autoplayInterval = setInterval(nextSlide, autoplayDelay);
+            }
+        }
+        
+        // Event listeners
+        carouselNext.addEventListener('click', nextSlide);
+        carouselPrev.addEventListener('click', prevSlide);
+        
+        // Pausar autoplay ao passar o mouse
+        const carouselContainer = document.querySelector('.hero-carousel-desktop');
+        if (carouselContainer) {
+            carouselContainer.addEventListener('mouseenter', () => {
+                clearInterval(autoplayInterval);
+            });
+            
+            carouselContainer.addEventListener('mouseleave', () => {
+                startAutoplay();
+            });
+        }
+        
+        // Iniciar autoplay
+        startAutoplay();
+        
+        // Reiniciar autoplay ao redimensionar (para mudanças mobile/desktop)
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                clearInterval(autoplayInterval);
+                if (window.innerWidth >= 768) {
+                    startAutoplay();
+                }
+            }, 250);
+        });
+        
+        // Navegação por teclado
+        document.addEventListener('keydown', (e) => {
+            if (window.innerWidth >= 768 && carouselContainer && carouselContainer.offsetParent !== null) {
+                if (e.key === 'ArrowLeft') {
+                    prevSlide();
+                } else if (e.key === 'ArrowRight') {
+                    nextSlide();
+                }
+            }
+        });
+    }
+
+    // ========================================
+    // PARALLAX EFFECT FOR HERO BANNER MOBILE (Suave)
     // ========================================
     let ticking = false;
-    const heroImage = document.querySelector('.hero-image');
+    const heroImageMobile = document.querySelector('.hero-image-mobile');
     
     function updateParallax() {
-        if (heroImage && window.innerWidth > 768) {
+        if (heroImageMobile && window.innerWidth < 768) {
             const scrolled = window.pageYOffset;
             const heroSection = document.querySelector('.hero');
             if (heroSection) {
@@ -183,11 +309,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (scrolled < heroHeight) {
                     const parallaxSpeed = 0.15; // Mais suave
                     const yPos = -(scrolled * parallaxSpeed);
-                    heroImage.style.transform = `translate3d(0, ${yPos}px, 0)`;
-                    heroImage.style.opacity = Math.max(0, 1 - (scrolled / heroHeight) * 0.3);
+                    heroImageMobile.style.transform = `translate3d(0, ${yPos}px, 0)`;
+                    heroImageMobile.style.opacity = Math.max(0, 1 - (scrolled / heroHeight) * 0.3);
                 } else {
-                    heroImage.style.transform = 'translate3d(0, 0, 0)';
-                    heroImage.style.opacity = 0.7;
+                    heroImageMobile.style.transform = 'translate3d(0, 0, 0)';
+                    heroImageMobile.style.opacity = 0.7;
                 }
             }
         }
@@ -201,7 +327,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    if (heroImage) {
+    if (heroImageMobile) {
         window.addEventListener('scroll', requestParallaxTick, { passive: true });
         // Initial call
         updateParallax();
