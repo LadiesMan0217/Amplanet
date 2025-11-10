@@ -4004,8 +4004,8 @@ section {
 }
 
 .footer-content {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    display: flex;
+    flex-direction: column;
     gap: var(--spacing-xl);
     margin-bottom: var(--spacing-xl);
     position: relative;
@@ -4015,6 +4015,8 @@ section {
 .footer-column {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    text-align: center;
 }
 
 .footer-logo img {
@@ -4034,6 +4036,8 @@ section {
     font-weight: 700;
     margin-bottom: var(--spacing-md);
     letter-spacing: 0.01em;
+    text-align: center;
+    width: 100%;
 }
 
 .footer-links {
@@ -4042,16 +4046,52 @@ section {
     gap: var(--spacing-sm);
 }
 
+.footer-links-inline {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: var(--spacing-md);
+    align-items: center;
+    justify-content: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+.footer-links-inline li {
+    white-space: nowrap;
+    display: inline-block;
+}
+
 .footer-links li,
 .footer-links a {
     color: rgba(255, 255, 255, 0.7);
     font-size: 0.95rem;
-    transition: var(--transition-base);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    display: inline-block;
 }
 
 .footer-links a:hover {
     color: white;
-    transform: translateX(5px);
+    transform: scale(1.05);
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.footer-links-inline a:hover {
+    animation: linkPulse 0.6s ease-in-out;
+}
+
+@keyframes linkPulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1.05);
+    }
 }
 
 .footer-address,
@@ -4060,6 +4100,8 @@ section {
     color: rgba(255, 255, 255, 0.7);
     font-size: 0.95rem;
     line-height: 1.7;
+    text-align: center;
+    width: 100%;
 }
 
 /* Botões WhatsApp no Footer */
@@ -4068,13 +4110,12 @@ section {
     flex-direction: column;
     gap: var(--spacing-sm);
     margin-bottom: var(--spacing-md);
-    align-items: flex-start; /* Impede que os botões se estiquem */
+    align-items: center;
+    width: 100%;
 }
 
 /* Garantir visibilidade dos botões WhatsApp em fundo claro */
-.whatsapp-button,
-.whatsapp-button:hover,
-.whatsapp-button:active {
+.whatsapp-button {
     background: rgba(37, 211, 102, 0.1) !important;
     color: #16a34a !important;
     border: 1px solid rgba(37, 211, 102, 0.3) !important;
@@ -4108,6 +4149,10 @@ section {
 }
 
 .footer-company-contact {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
     margin-bottom: var(--spacing-lg);
 }
 
@@ -4115,11 +4160,38 @@ section {
     margin-bottom: 0;
 }
 
+.footer-fale-conosco {
+    width: 100%;
+}
+
+.footer-companies-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-xl);
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .footer-companies-wrapper {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-lg);
+    }
+    
+    .footer-links-inline {
+        flex-wrap: wrap;
+        gap: var(--spacing-sm);
+    }
+}
+
 .footer-company-name {
     font-size: 0.95rem;
     font-weight: 600;
     color: rgba(255, 255, 255, 0.9);
     margin-bottom: var(--spacing-xs);
+    text-align: center;
+    width: 100%;
 }
 
 .footer-company-contact .footer-contact-buttons {
@@ -4137,13 +4209,13 @@ section {
     border-radius: var(--radius-sm);
     font-size: 0.85rem;
     font-weight: 400;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: none;
     border: 1px solid rgba(37, 211, 102, 0.15);
     position: relative;
-    width: auto; /* Permite que o botão tenha largura automática */
-    min-width: 120px; /* Define uma largura mínima para o botão */
-    justify-content: center; /* Centraliza o conteúdo */
+    width: auto;
+    min-width: 120px;
+    justify-content: center;
 }
 
 .whatsapp-button::before {
@@ -4151,15 +4223,31 @@ section {
 }
 
 .whatsapp-button:hover {
-    transform: none;
-    box-shadow: 0 1px 2px rgba(37, 211, 102, 0.15);
-    background: rgba(37, 211, 102, 0.12);
-    border-color: rgba(37, 211, 102, 0.25);
+    transform: scale(1.05) !important;
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25), 0 0 0 3px rgba(37, 211, 102, 0.1) !important;
+    background: rgba(37, 211, 102, 0.18) !important;
+    border-color: rgba(37, 211, 102, 0.4) !important;
+    animation: buttonPulse 0.6s ease-in-out;
 }
 
 .whatsapp-button:active {
-    transform: none;
-    box-shadow: none;
+    transform: scale(0.98);
+    box-shadow: 0 2px 6px rgba(37, 211, 102, 0.2);
+}
+
+@keyframes buttonPulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.2);
+    }
+    50% {
+        transform: scale(1.08);
+        box-shadow: 0 0 0 8px rgba(37, 211, 102, 0);
+    }
+    100% {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25), 0 0 0 3px rgba(37, 211, 102, 0.1);
+    }
 }
 
 .whatsapp-button svg {

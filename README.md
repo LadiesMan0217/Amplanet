@@ -9,7 +9,6 @@ Este é um site estático responsivo desenvolvido para a Amplanet, incluindo:
 - Página inicial com apresentação da empresa
 - Planos de internet fibra óptica
 - Serviços e aplicativos disponíveis
-- Sobre a empresa
 - **Mapa de cobertura interativo** com GeoJSON
 - Integração com Google Maps (versão alternativa)
 
@@ -52,7 +51,6 @@ Amplanet/
 ├── index.html                 # Página inicial
 ├── planos.html                # Planos de internet
 ├── servicos.html              # Serviços e apps
-├── sobre.html                 # Sobre a empresa
 ├── cobertura.html             # Mapa Leaflet
 ├── cobertura-google.html      # Mapa Google
 ├── README.md                  # Este arquivo
@@ -99,7 +97,6 @@ O projeto inclui o GeoJSON embutido em `assets/js/cobertura-geojson.js` para evi
 - **index.html** - Página inicial
 - **planos.html** - Planos de internet fibra óptica
 - **servicos.html** - Serviços e aplicativos extras
-- **sobre.html** - Sobre a empresa
 - **cobertura.html** - Mapa de cobertura (Leaflet)
 - **cobertura-google.html** - Mapa de cobertura (Google Maps)
 
