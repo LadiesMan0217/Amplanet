@@ -137,8 +137,8 @@ ul {
 /* Container mais largo para seção de planos */
 .planos-section .container {
     max-width: 100%;
-    overflow-x: visible;
-    overflow-y: visible;
+    overflow-x: hidden;
+    overflow-y: hidden;
     padding-bottom: 1rem;
     position: relative;
     z-index: 1;
@@ -149,8 +149,8 @@ ul {
 /* Desktop: Container com scroll horizontal para mostrar 4º plano */
 @media (min-width: 1200px) {
     .planos-section .container {
-        overflow-x: visible;
-        overflow-y: visible;
+        overflow-x: hidden;
+        overflow-y: hidden;
         max-width: 1400px;
         margin: 0 auto;
         padding: 0 var(--spacing-xl);
@@ -1127,7 +1127,7 @@ section {
     position: relative;
     padding: var(--spacing-3xl) 0;
     overflow-x: hidden;
-    overflow-y: visible;
+    overflow-y: hidden;
     min-height: 400px;
     width: 100%;
 }
@@ -1151,8 +1151,8 @@ section {
     z-index: 1;
     width: 100%;
     box-sizing: border-box;
-    overflow-x: visible;
-    overflow-y: visible;
+    overflow-x: hidden;
+    overflow-y: hidden;
 }
 
 /* Scrollbar removido - sem necessidade de scroll horizontal */
@@ -1170,21 +1170,27 @@ section {
 .planos-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--spacing-xl);
-    margin-top: var(--spacing-xl);
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
     padding: 0 var(--spacing-md);
     width: 100%;
     box-sizing: border-box;
     min-height: 300px;
     align-items: stretch;
+    overflow-x: hidden;
+    overflow-y: hidden;
 }
 
 /* Tablet: 2 colunas */
 @media (min-width: 768px) {
     .planos-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: var(--spacing-xl);
-        padding: 0 var(--spacing-lg);
+        gap: var(--spacing-lg);
+        padding: 0 var(--spacing-md);
+    }
+    
+    .plano-card {
+        min-height: 300px;
     }
 }
 
@@ -1197,19 +1203,20 @@ section {
         max-width: 1200px;
         margin-left: auto;
         margin-right: auto;
-        padding: 0 var(--spacing-xl);
+        padding: 0 var(--spacing-lg);
         width: 100%;
-        overflow-x: auto;
-        overflow-y: visible;
+        overflow-x: hidden;
+        overflow-y: hidden;
         align-items: stretch;
     }
     
     .plano-card {
         min-width: 0;
-        max-width: 380px;
+        max-width: 320px;
         width: 100%;
         margin: 0 auto;
         height: 100%;
+        min-height: 320px;
     }
     
     /* Centralizar o 4º plano quando ele estiver abaixo dos outros 3 */
@@ -1271,12 +1278,12 @@ section {
 .plano-card {
     background: #ffffff;
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    border-radius: var(--radius-2xl);
+    border-radius: var(--radius-xl);
     padding: 0;
-    box-shadow: 0 10px 30px rgba(0, 51, 153, 0.1), 0 0 0 1px rgba(0, 51, 153, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    box-shadow: 0 8px 20px rgba(0, 51, 153, 0.08), 0 0 0 1px rgba(0, 51, 153, 0.06);
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
-    border: 2px solid rgba(0, 51, 153, 0.15);
+    border: 1px solid rgba(0, 51, 153, 0.12);
     overflow-x: hidden;
     overflow-y: visible;
     display: flex;
@@ -1285,8 +1292,13 @@ section {
     max-width: 100%;
     min-width: 0;
     transform: translateY(0) scale(1);
-    min-height: 480px;
+    min-height: 280px;
     box-sizing: border-box;
+}
+
+.plano-card.expanded {
+    min-height: auto;
+    overflow-y: visible;
 }
 
 /* backdrop-filter apenas se suportado */
@@ -1319,8 +1331,41 @@ section {
 
 .plano-card.featured {
     border: 2px solid var(--primary-color);
-    background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
-    box-shadow: 0 15px 50px rgba(0, 51, 153, 0.25), 0 0 0 1px rgba(0, 51, 153, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    background: linear-gradient(135deg, var(--primary-color) 0%, #4a6cf7 100%);
+    box-shadow: 0 15px 50px rgba(0, 51, 153, 0.25), 0 0 0 1px rgba(0, 51, 153, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.plano-card.featured .plano-nome,
+.plano-card.featured .plano-velocidade,
+.plano-card.featured .plano-descricao,
+.plano-card.featured .preco-valor,
+.plano-card.featured .preco-periodo {
+    color: #ffffff;
+    -webkit-text-fill-color: #ffffff;
+    background: none;
+    -webkit-background-clip: unset;
+    background-clip: unset;
+}
+
+.plano-card.featured .plano-header {
+    background: transparent;
+}
+
+.plano-card.featured .plano-preco {
+    background: transparent;
+}
+
+.plano-card.featured .plano-feature span {
+    color: #ffffff;
+}
+
+.plano-card.featured .plano-feature .icon-pro {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.plano-card.featured .plano-feature:hover .icon-pro {
+    background: rgba(255, 255, 255, 0.3);
 }
 
 .plano-card.featured::before {
@@ -1335,17 +1380,18 @@ section {
 
 .plano-badge {
     position: absolute;
-    top: var(--spacing-md);
-    right: var(--spacing-md);
+    top: var(--spacing-xs);
+    left: 50%;
+    transform: translateX(-50%);
     background: var(--gradient-blue);
     color: white;
-    padding: 0.625rem 1.5rem;
+    padding: 0.375rem 1rem;
     border-radius: var(--radius-full);
-    font-size: 0.75rem;
+    font-size: 0.625rem;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    box-shadow: 0 6px 20px rgba(0, 51, 153, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 51, 153, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3);
     z-index: 10;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -1354,11 +1400,11 @@ section {
 
 @keyframes badgePulse {
     0%, 100% {
-        transform: scale(1);
+        transform: translateX(-50%) scale(1);
         box-shadow: 0 6px 20px rgba(0, 51, 153, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.2);
     }
     50% {
-        transform: scale(1.05);
+        transform: translateX(-50%) scale(1.05);
         box-shadow: 0 8px 25px rgba(0, 51, 153, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.3), 0 0 30px rgba(0, 51, 153, 0.4);
     }
 }
@@ -1366,23 +1412,35 @@ section {
 .plano-header {
     text-align: center;
     margin-bottom: 0;
-    padding: var(--spacing-xl) var(--spacing-xl) var(--spacing-md);
-    border-bottom: 2px solid rgba(0, 51, 153, 0.1);
+    padding: var(--spacing-md) var(--spacing-md) var(--spacing-sm);
     position: relative;
-    background: linear-gradient(135deg, rgba(0, 51, 153, 0.05) 0%, rgba(0, 102, 204, 0.03) 100%);
+    background: transparent;
+}
+
+.plano-card:has(.plano-badge) .plano-header {
+    padding-top: calc(var(--spacing-md) + 1.25rem);
 }
 
 .plano-nome {
-    font-size: 1.5rem;
+    font-size: 1rem;
     font-weight: 800;
     color: var(--text-dark);
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: 0.25rem;
     letter-spacing: 0.05em;
     text-transform: uppercase;
 }
 
+.plano-descricao {
+    font-size: 0.75rem;
+    color: var(--text-medium);
+    margin-top: 0.25rem;
+    margin-bottom: 0;
+    font-weight: 400;
+    line-height: 1.3;
+}
+
 .plano-velocidade {
-    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-size: clamp(1.5rem, 3vw, 1.875rem);
     font-weight: 900;
     color: var(--primary-color);
     letter-spacing: -0.02em;
@@ -1390,29 +1448,33 @@ section {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    margin-bottom: 0.125rem;
+    margin-top: 0.125rem;
 }
 
 .plano-features {
     margin-bottom: 0;
-    padding: var(--spacing-lg) var(--spacing-xl);
+    padding: 0;
     flex: 1;
     min-height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+.plano-card.expanded .plano-features {
+    margin-bottom: var(--spacing-sm);
 }
 
 .plano-feature {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
-    margin-bottom: var(--spacing-sm);
-    font-size: 0.95rem;
+    gap: var(--spacing-xs);
+    font-size: 0.8125rem;
     color: var(--text-dark);
-    padding: 0.5rem 0;
+    padding: 0.375rem 0;
     transition: var(--transition-base);
-    line-height: 1.4;
-}
-
-.plano-feature:last-child {
-    margin-bottom: 0;
+    line-height: 1.3;
 }
 
 .plano-feature:hover {
@@ -1432,10 +1494,10 @@ section {
 
 /* Ícones profissionais dos planos - Design claro */
 .plano-feature .icon-pro {
-    font-size: 0.9rem;
-    width: 24px;
-    min-width: 24px;
-    height: 24px;
+    font-size: 0.75rem;
+    width: 20px;
+    min-width: 20px;
+    height: 20px;
     text-align: center;
     color: var(--primary-color);
     background: rgba(0, 51, 153, 0.1);
@@ -1464,16 +1526,14 @@ section {
 .plano-preco {
     text-align: center;
     margin-bottom: 0;
-    padding: var(--spacing-lg) var(--spacing-xl);
-    border-top: 2px solid rgba(0, 51, 153, 0.1);
-    border-bottom: 2px solid rgba(0, 51, 153, 0.1);
-    background: linear-gradient(135deg, rgba(0, 51, 153, 0.05) 0%, rgba(0, 102, 204, 0.03) 100%);
+    padding: var(--spacing-sm) var(--spacing-md) var(--spacing-sm);
+    background: transparent;
     position: relative;
     z-index: 1;
 }
 
 .preco-valor {
-    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-size: clamp(1.5rem, 3vw, 1.875rem);
     font-weight: 900;
     color: var(--primary-color);
     letter-spacing: -0.02em;
@@ -1483,11 +1543,11 @@ section {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.125rem;
 }
 
 .preco-periodo {
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     color: var(--text-medium);
     font-weight: 500;
     margin-left: 0.25rem;
@@ -1500,16 +1560,81 @@ section {
     background: var(--gradient-blue);
     color: white;
     border: none;
-    margin: var(--spacing-xl);
-    margin-top: 0;
-    padding: 1.125rem 2rem;
+    margin: 0 var(--spacing-md) var(--spacing-md);
+    padding: 0.75rem 1.25rem;
     font-weight: 700;
-    font-size: 1rem;
-    box-shadow: 0 8px 25px rgba(0, 51, 153, 0.3), 0 0 0 1px rgba(0, 51, 153, 0.2);
+    font-size: 0.875rem;
+    box-shadow: 0 6px 20px rgba(0, 51, 153, 0.25), 0 0 0 1px rgba(0, 51, 153, 0.15);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-md);
     position: relative;
     overflow: hidden;
+    width: calc(100% - 2 * var(--spacing-md));
+    box-sizing: border-box;
+}
+
+/* Botão Mais Informações */
+.btn-mais-info {
+    background: rgba(0, 51, 153, 0.05);
+    border: 1px solid rgba(0, 51, 153, 0.15);
+    color: var(--primary-color);
+    padding: 0.5rem 1rem;
+    margin: var(--spacing-sm) var(--spacing-md) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    position: relative;
+    z-index: 2;
+    width: calc(100% - 2 * var(--spacing-md));
+    box-sizing: border-box;
+}
+
+.btn-mais-info:hover {
+    background: rgba(0, 51, 153, 0.1);
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.btn-mais-info i {
+    transition: transform 0.3s ease;
+}
+
+.plano-card.expanded .btn-mais-info i {
+    transform: rotate(180deg);
+}
+
+.plano-card.featured .btn-mais-info {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+}
+
+.plano-card.featured .btn-mais-info:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Área expansível de detalhes */
+.plano-details {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.4s ease, opacity 0.3s ease, margin 0.4s ease;
+    padding: 0 var(--spacing-md);
+    opacity: 0;
+    margin: 0;
+}
+
+.plano-card.expanded .plano-details {
+    opacity: 1;
+    padding: var(--spacing-md) var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+    max-height: 500px;
 }
 
 .plano-card .btn-primary::before {
@@ -1619,11 +1744,219 @@ section {
 
 .app-item-large span {
     display: block;
-    font-weight: 600;
+    font-size: 0.75rem;
     color: var(--text-dark);
-    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Manual de Acesso Card - Design Criativo */
+.apps-cta-wrapper {
+    margin-top: var(--spacing-3xl);
+    margin-bottom: var(--spacing-xl);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.manual-access-card {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #4a6cf7 100%);
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-2xl);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xl);
+    box-shadow: 0 20px 60px rgba(0, 51, 153, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+    max-width: 900px;
+    width: 100%;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.manual-access-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    animation: pulse 4s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.1);
+    }
+}
+
+.manual-access-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 30px 80px rgba(0, 51, 153, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+.manual-access-icon {
+    flex-shrink: 0;
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.manual-access-card:hover .manual-access-icon {
+    transform: scale(1.1) rotate(5deg);
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.manual-access-icon i {
+    font-size: 2.5rem;
+    color: #ffffff;
+    transition: transform 0.3s ease;
+}
+
+.manual-access-card:hover .manual-access-icon i {
+    transform: scale(1.1);
+}
+
+.manual-access-content {
+    flex: 1;
+    color: #ffffff;
+}
+
+.manual-access-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: var(--spacing-sm);
+    color: #ffffff;
     line-height: 1.2;
-    text-align: center;
+}
+
+.manual-access-text {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.5;
+    margin: 0;
+}
+
+.btn-manual-access {
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--primary-color);
+    padding: 1rem 2rem;
+    border-radius: var(--radius-lg);
+    font-weight: 700;
+    font-size: 1rem;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-manual-access::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.9) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.btn-manual-access:hover {
+    background: #ffffff;
+    transform: translateX(4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+.btn-manual-access:hover::before {
+    opacity: 1;
+}
+
+.btn-manual-access span {
+    position: relative;
+    z-index: 1;
+}
+
+.btn-manual-access i {
+    position: relative;
+    z-index: 1;
+    transition: transform 0.3s ease;
+}
+
+.btn-manual-access:hover i {
+    transform: translateX(4px);
+}
+
+/* Responsividade para o card do manual */
+@media (max-width: 768px) {
+    .manual-access-card {
+        flex-direction: column;
+        text-align: center;
+        padding: var(--spacing-xl);
+        gap: var(--spacing-lg);
+    }
+    
+    .manual-access-icon {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .manual-access-icon i {
+        font-size: 2rem;
+    }
+    
+    .manual-access-title {
+        font-size: 1.25rem;
+    }
+    
+    .manual-access-text {
+        font-size: 0.9rem;
+    }
+    
+    .btn-manual-access {
+        width: 100%;
+        justify-content: center;
+        padding: 0.875rem 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .manual-access-card {
+        padding: var(--spacing-lg);
+    }
+    
+    .manual-access-icon {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .manual-access-icon i {
+        font-size: 1.75rem;
+    }
+    
+    .manual-access-title {
+        font-size: 1.125rem;
+    }
+    
+    .manual-access-text {
+        font-size: 0.875rem;
+    }
 }
 
 /* ========================================
@@ -3991,12 +4324,13 @@ section {
     /* Planos Mobile - Layout Profissional */
     .planos-section {
         overflow-x: hidden;
-        overflow-y: visible;
+        overflow-y: hidden;
         padding: var(--spacing-xl) 0;
     }
     
     .planos-section .container {
-        overflow-x: visible;
+        overflow-x: hidden;
+        overflow-y: hidden;
         padding: 0 var(--spacing-md);
         max-width: 100%;
     }
@@ -4158,7 +4492,8 @@ section {
     
     .planos-section .container {
         padding: 0 var(--spacing-sm);
-        overflow-x: visible;
+        overflow-x: hidden;
+        overflow-y: hidden;
     }
     
     .planos-grid {
@@ -4264,7 +4599,7 @@ section {
         background-color: #ffffff;
         background: #ffffff;
         overflow-x: hidden;
-        overflow-y: visible;
+        overflow-y: hidden;
         display: block;
         visibility: visible;
     }

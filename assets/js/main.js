@@ -407,5 +407,39 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('❌ Erro ao carregar speed test iframe');
         });
     }
+
+    // ========================================
+    // PLANOS EXPANSÃO/COLAPSO
+    // ========================================
+    const maisInfoButtons = document.querySelectorAll('.btn-mais-info');
+    
+    maisInfoButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const planoCard = this.closest('.plano-card');
+            const planoDetails = planoCard.querySelector('.plano-details');
+            
+            if (planoCard.classList.contains('expanded')) {
+                // Colapsar
+                planoCard.classList.remove('expanded');
+                planoDetails.style.maxHeight = '0';
+                planoDetails.style.opacity = '0';
+                planoDetails.style.paddingTop = '0';
+                planoDetails.style.paddingBottom = '0';
+                planoDetails.style.marginBottom = '0';
+            } else {
+                // Expandir
+                planoCard.classList.add('expanded');
+                // Calcular altura real do conteúdo com padding
+                const tempHeight = planoDetails.scrollHeight;
+                // Adicionar espaço extra para garantir que tudo seja visível
+                const contentHeight = tempHeight + 40; // Espaço extra para garantir visibilidade
+                planoDetails.style.maxHeight = contentHeight + 'px';
+                planoDetails.style.opacity = '1';
+                planoDetails.style.paddingTop = '';
+                planoDetails.style.paddingBottom = '';
+                planoDetails.style.marginBottom = '';
+            }
+        });
+    });
 });
 
