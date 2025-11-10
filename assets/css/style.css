@@ -1693,135 +1693,308 @@ section {
 .apps-section .section-subtitle {
     color: var(--text-medium);
     font-size: 1.125rem;
-    margin-bottom: var(--spacing-xl);
-    max-width: 600px;
+    margin-bottom: 0;
+    max-width: 700px;
     margin-left: auto;
     margin-right: auto;
+    text-align: center;
+    line-height: 1.6;
 }
 
 .apps-grid-main {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: var(--spacing-md);
+    align-items: center;
+    gap: var(--spacing-lg);
     margin-top: var(--spacing-2xl);
-    max-width: 900px;
+    max-width: 1000px;
     margin-left: auto;
     margin-right: auto;
+    padding: 0 var(--spacing-md);
 }
 
-.app-item-large {
-    background: #ffffff;
-    border-radius: var(--radius-md);
-    padding: var(--spacing-md);
-    text-align: center;
-    transition: all 0.3s ease;
+/* Flip Card para Apps - Efeito 3D */
+.app-flip-card {
+    perspective: 1000px;
+    width: 120px;
+    height: 120px;
     cursor: pointer;
-    border: 1px solid #e5e7eb;
-    width: 100px;
+}
+
+.app-flip-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+}
+
+.app-flip-card:hover .app-flip-inner {
+    transform: rotateY(180deg);
+}
+
+.app-flip-front,
+.app-flip-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--spacing-sm);
+    justify-content: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm);
+    box-sizing: border-box;
 }
 
-.app-item-large:hover {
-    border-color: var(--primary-color);
-    box-shadow: 0 4px 12px rgba(0, 51, 153, 0.15);
-    transform: translateY(-4px);
+.app-flip-back {
+    justify-content: flex-start;
+    padding-top: var(--spacing-xs);
 }
 
-.app-item-large img {
-    width: 60px;
-    height: 60px;
+.app-flip-front {
+    background: transparent;
+    color: var(--text-dark);
+}
+
+.app-flip-back {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+    color: #ffffff;
+    transform: rotateY(180deg);
+    padding: 0.5rem 0.375rem;
+    overflow: hidden;
+    justify-content: center;
+    align-items: center;
+}
+
+.app-flip-front img {
+    width: 48px;
+    height: 48px;
     object-fit: contain;
+    border-radius: 12px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
     transition: transform 0.3s ease;
 }
 
-.app-item-large:hover img {
-    transform: scale(1.1);
+.app-flip-card:hover .app-flip-front img {
+    transform: scale(1.05);
 }
 
-.app-item-large span {
+.app-flip-front span {
     display: block;
     font-size: 0.75rem;
-    color: var(--text-dark);
+    color: #1f2937;
     font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: 0;
+    margin-top: 0.25rem;
+    text-align: center;
+}
+
+.app-flip-back h4 {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    margin: 0 0 0.375rem 0;
+    color: #ffffff;
+    line-height: 1.1;
+    text-align: center;
+    width: 100%;
+}
+
+.app-flip-back p {
+    font-size: 0.625rem;
+    color: rgba(255, 255, 255, 0.95);
+    line-height: 1.25;
+    margin: 0;
+    text-align: center;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    width: 100%;
+    word-break: break-word;
+}
+
+/* Responsividade para flip cards de apps */
+@media (min-width: 1200px) {
+    .apps-grid-main {
+        gap: var(--spacing-xl);
+        max-width: 1000px;
+    }
+    
+    .app-flip-card {
+        width: 140px;
+        height: 140px;
+    }
+    
+    .app-flip-front img {
+        width: 52px;
+        height: 52px;
+    }
+    
+    .app-flip-front span {
+        font-size: 0.8125rem;
+    }
+    
+    .app-flip-back h4 {
+        font-size: 0.875rem;
+    }
+    
+    .app-flip-back p {
+        font-size: 0.6875rem;
+        -webkit-line-clamp: 4;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+    .apps-grid-main {
+        gap: var(--spacing-lg);
+    }
+    
+    .app-flip-card {
+        width: 130px;
+        height: 130px;
+    }
+    
+    .app-flip-front img {
+        width: 48px;
+        height: 48px;
+    }
+    
+    .app-flip-back p {
+        -webkit-line-clamp: 4;
+    }
+}
+
+@media (max-width: 767px) {
+    .apps-grid-main {
+        gap: var(--spacing-md);
+        padding: 0 var(--spacing-md);
+    }
+    
+    .app-flip-card {
+        width: 110px;
+        height: 110px;
+    }
+    
+    .app-flip-front img {
+        width: 44px;
+        height: 44px;
+    }
+    
+    .app-flip-front span {
+        font-size: 0.6875rem;
+    }
+    
+    .app-flip-back h4 {
+        font-size: 0.75rem;
+    }
+    
+    .app-flip-back p {
+        font-size: 0.5625rem;
+        -webkit-line-clamp: 3;
+    }
+}
+
+@media (max-width: 480px) {
+    .apps-grid-main {
+        gap: var(--spacing-sm);
+    }
+    
+    .app-flip-card {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .app-flip-front img {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .app-flip-front span {
+        font-size: 0.625rem;
+    }
+    
+    .app-flip-back h4 {
+        font-size: 0.6875rem;
+    }
+    
+    .app-flip-back p {
+        font-size: 0.5rem;
+        -webkit-line-clamp: 2;
+    }
 }
 
 /* Manual de Acesso Card - Design Criativo */
 .apps-cta-wrapper {
     margin-top: var(--spacing-3xl);
-    margin-bottom: var(--spacing-xl);
+    margin-bottom: var(--spacing-2xl);
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 0 var(--spacing-md);
 }
 
 .manual-access-card {
-    background: linear-gradient(135deg, var(--primary-color) 0%, #4a6cf7 100%);
-    border-radius: var(--radius-2xl);
+    background: #ffffff;
+    border-radius: 12px;
     padding: var(--spacing-2xl);
     display: flex;
     align-items: center;
     gap: var(--spacing-xl);
-    box-shadow: 0 20px 60px rgba(0, 51, 153, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    border: 1px solid #e5e7eb;
     position: relative;
     overflow: hidden;
     max-width: 900px;
     width: 100%;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .manual-access-card::before {
     content: '';
     position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-    animation: pulse 4s ease-in-out infinite;
-    pointer-events: none;
-}
-
-@keyframes pulse {
-    0%, 100% {
-        opacity: 0.3;
-        transform: scale(1);
-    }
-    50% {
-        opacity: 0.5;
-        transform: scale(1.1);
-    }
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--primary-color) 0%, var(--primary-light) 100%);
+    transition: width 0.3s ease;
 }
 
 .manual-access-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 30px 80px rgba(0, 51, 153, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+    border-color: rgba(0, 51, 153, 0.2);
+}
+
+.manual-access-card:hover::before {
+    width: 6px;
 }
 
 .manual-access-icon {
     flex-shrink: 0;
-    width: 80px;
-    height: 80px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: var(--radius-full);
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(255, 255, 255, 0.3);
     transition: all 0.3s ease;
 }
 
 .manual-access-card:hover .manual-access-icon {
-    transform: scale(1.1) rotate(5deg);
-    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
 }
 
 .manual-access-icon i {
-    font-size: 2.5rem;
+    font-size: 1.75rem;
     color: #ffffff;
     transition: transform 0.3s ease;
 }
@@ -1832,60 +2005,47 @@ section {
 
 .manual-access-content {
     flex: 1;
-    color: #ffffff;
+    color: var(--text-dark);
 }
 
 .manual-access-title {
-    font-size: 1.5rem;
-    font-weight: 800;
-    margin-bottom: var(--spacing-sm);
-    color: #ffffff;
-    line-height: 1.2;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: var(--spacing-xs);
+    color: var(--text-dark);
+    line-height: 1.3;
 }
 
 .manual-access-text {
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.9375rem;
+    color: var(--text-medium);
     line-height: 1.5;
     margin: 0;
 }
 
 .btn-manual-access {
     flex-shrink: 0;
-    background: rgba(255, 255, 255, 0.95);
-    color: var(--primary-color);
-    padding: 1rem 2rem;
-    border-radius: var(--radius-lg);
-    font-weight: 700;
-    font-size: 1rem;
+    background: var(--primary-color);
+    color: #ffffff;
+    padding: 0.875rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9375rem;
     text-decoration: none;
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-xs);
     transition: all 0.3s ease;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-    border: 2px solid transparent;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    border: 1px solid transparent;
     position: relative;
     overflow: hidden;
 }
 
-.btn-manual-access::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.9) 100%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
 .btn-manual-access:hover {
-    background: #ffffff;
-    transform: translateX(4px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-}
-
-.btn-manual-access:hover::before {
-    opacity: 1;
+    background: var(--primary-light);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transform: translateY(-1px);
 }
 
 .btn-manual-access span {
@@ -1897,10 +2057,11 @@ section {
     position: relative;
     z-index: 1;
     transition: transform 0.3s ease;
+    font-size: 0.875rem;
 }
 
 .btn-manual-access:hover i {
-    transform: translateX(4px);
+    transform: translateX(2px);
 }
 
 /* Responsividade para o card do manual */
@@ -1913,20 +2074,20 @@ section {
     }
     
     .manual-access-icon {
-        width: 70px;
-        height: 70px;
+        width: 56px;
+        height: 56px;
     }
     
     .manual-access-icon i {
-        font-size: 2rem;
+        font-size: 1.5rem;
     }
     
     .manual-access-title {
-        font-size: 1.25rem;
+        font-size: 1.125rem;
     }
     
     .manual-access-text {
-        font-size: 0.9rem;
+        font-size: 0.875rem;
     }
     
     .btn-manual-access {
@@ -1939,24 +2100,32 @@ section {
 @media (max-width: 480px) {
     .manual-access-card {
         padding: var(--spacing-lg);
+        gap: var(--spacing-md);
     }
     
     .manual-access-icon {
-        width: 60px;
-        height: 60px;
+        width: 48px;
+        height: 48px;
     }
     
     .manual-access-icon i {
-        font-size: 1.75rem;
+        font-size: 1.25rem;
     }
     
     .manual-access-title {
-        font-size: 1.125rem;
+        font-size: 1rem;
     }
     
     .manual-access-text {
-        font-size: 0.875rem;
+        font-size: 0.8125rem;
     }
+}
+
+/* Botão final da seção de apps */
+.apps-footer-cta {
+    text-align: center;
+    margin-top: var(--spacing-2xl);
+    padding-top: var(--spacing-xl);
 }
 
 /* ========================================
