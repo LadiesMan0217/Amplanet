@@ -82,6 +82,7 @@ html {
     width: 100%;
     height: 100%;
     overflow-x: hidden;
+    overflow-y: visible;
 }
 
 /* Garantir que html e body sempre tenham background */
@@ -97,6 +98,7 @@ body {
     background-color: var(--bg-white);
     background: var(--bg-white);
     overflow-x: hidden;
+    overflow-y: visible;
     font-weight: 400;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -137,11 +139,12 @@ ul {
 /* Container mais largo para seção de planos */
 .planos-section .container {
     max-width: 100%;
-    overflow-x: hidden;
-    overflow-y: hidden;
+    overflow: hidden;
     padding-bottom: 1rem;
     position: relative;
     z-index: 1;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* Scrollbar removido - sem necessidade de scroll horizontal */
@@ -149,11 +152,12 @@ ul {
 /* Desktop: Container com scroll horizontal para mostrar 4º plano */
 @media (min-width: 1200px) {
     .planos-section .container {
-        overflow-x: hidden;
-        overflow-y: hidden;
+        overflow: hidden;
         max-width: 1400px;
         margin: 0 auto;
         padding: 0 var(--spacing-xl);
+        width: 100%;
+        box-sizing: border-box;
     }
     
     .planos-grid {
@@ -1084,15 +1088,128 @@ section {
 }
 
 .planos-section .planos-disclaimer {
-    margin-top: var(--spacing-xl);
-    text-align: center;
-    color: var(--text-medium);
-    font-size: 0.875rem;
+    margin-top: var(--spacing-2xl);
+    margin-bottom: var(--spacing-lg);
 }
 
-.planos-section .planos-disclaimer em {
+.planos-disclaimer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-2xl);
+    background: #ffffff;
+    border-radius: var(--radius-xl);
+    border: 1px solid rgba(0, 51, 153, 0.12);
+    box-shadow: 0 2px 12px rgba(0, 51, 153, 0.08), 0 0 0 1px rgba(0, 51, 153, 0.04);
+    position: relative;
+    overflow: hidden;
+}
+
+.planos-disclaimer-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-light) 100%);
+}
+
+.planos-disclaimer-icon {
+    width: 72px;
+    height: 72px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2rem;
+    box-shadow: 0 6px 20px rgba(0, 51, 153, 0.25);
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+
+.planos-disclaimer-icon:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 24px rgba(0, 51, 153, 0.3);
+}
+
+.planos-disclaimer-text {
+    text-align: center;
+    max-width: 600px;
+}
+
+.planos-disclaimer-title {
+    font-size: 1.625rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin: 0 0 var(--spacing-sm) 0;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+}
+
+.planos-disclaimer-subtitle {
+    font-size: 1.0625rem;
     color: var(--text-medium);
-    font-style: italic;
+    margin: 0;
+    line-height: 1.6;
+    font-weight: 500;
+}
+
+.btn-whatsapp-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    padding: 1rem 2.25rem;
+    background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+    color: white;
+    font-weight: 700;
+    font-size: 1.0625rem;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.35);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    border: none;
+    position: relative;
+    overflow: hidden;
+    min-width: 240px;
+}
+
+.btn-whatsapp-cta::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn-whatsapp-cta:hover::before {
+    left: 100%;
+}
+
+.btn-whatsapp-cta:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(37, 211, 102, 0.45);
+    background: linear-gradient(135deg, #25D366 0%, #20BA5A 100%);
+}
+
+.btn-whatsapp-cta:active {
+    transform: translateY(-1px);
+}
+
+.btn-whatsapp-cta .fab {
+    font-size: 1.375rem;
+}
+
+.btn-whatsapp-cta span {
+    font-weight: 700;
+    letter-spacing: 0.03em;
 }
 
 .planos-section .btn-outline {
@@ -1126,11 +1243,12 @@ section {
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #ffffff 100%);
     position: relative;
     padding: var(--spacing-3xl) 0;
-    overflow-x: hidden;
-    overflow-y: hidden;
+    overflow: hidden;
     min-height: 400px;
     width: 100%;
+    max-width: 100%;
 }
+
 
 .planos-section::before {
     content: '';
@@ -1146,14 +1264,18 @@ section {
     z-index: 0;
 }
 
+
 .planos-section .container {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     width: 100%;
+    max-width: 100%;
     box-sizing: border-box;
-    overflow-x: hidden;
-    overflow-y: hidden;
+    overflow: hidden;
+    padding-top: var(--spacing-lg);
+    padding-bottom: var(--spacing-lg);
 }
+
 
 /* Scrollbar removido - sem necessidade de scroll horizontal */
 
@@ -1172,25 +1294,49 @@ section {
     grid-template-columns: 1fr;
     gap: var(--spacing-md);
     margin-top: var(--spacing-lg);
-    padding: 0 var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-md);
     width: 100%;
+    max-width: 100%;
     box-sizing: border-box;
     min-height: 300px;
-    align-items: stretch;
-    overflow-x: hidden;
-    overflow-y: hidden;
+    align-items: start;
+    overflow: hidden;
+    position: relative;
 }
+
 
 /* Tablet: 2 colunas */
 @media (min-width: 768px) {
     .planos-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: var(--spacing-lg);
-        padding: 0 var(--spacing-md);
+        padding: var(--spacing-md) var(--spacing-md);
     }
     
     .plano-card {
-        min-height: 300px;
+        min-height: 420px;
+        position: relative;
+        z-index: 5;
+    }
+    
+    .plano-card:not(.expanded) {
+        min-height: 420px;
+    }
+    
+    .planos-disclaimer-content {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--spacing-lg);
+    }
+    
+    .planos-disclaimer-text {
+        text-align: left;
+        flex: 1;
+    }
+    
+    .btn-whatsapp-cta {
+        flex-shrink: 0;
     }
 }
 
@@ -1198,16 +1344,17 @@ section {
 @media (min-width: 1200px) {
     .planos-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(4, 1fr);
         gap: var(--spacing-md);
-        max-width: 1200px;
+        max-width: 1400px;
         margin-left: auto;
         margin-right: auto;
-        padding: 0 var(--spacing-lg);
+        padding: var(--spacing-md) var(--spacing-lg);
         width: 100%;
-        overflow-x: hidden;
-        overflow-y: hidden;
-        align-items: stretch;
+        max-width: 100%;
+        overflow: hidden;
+        align-items: start;
+        box-sizing: border-box;
     }
     
     .plano-card {
@@ -1215,63 +1362,72 @@ section {
         max-width: 320px;
         width: 100%;
         margin: 0 auto;
-        height: 100%;
-        min-height: 320px;
+        height: auto;
+        min-height: 420px;
+        position: relative;
+        z-index: 5;
     }
     
-    /* Centralizar o 4º plano quando ele estiver abaixo dos outros 3 */
-    .planos-grid .plano-card:nth-child(4) {
-        grid-column: 2 / 3;
-        justify-self: center;
+    .plano-card:not(.expanded) {
+        min-height: 420px;
     }
 }
 
-/* Telas grandes: manter 3 colunas */
+/* Telas grandes: manter 4 colunas */
 @media (min-width: 1400px) {
     .planos-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(4, 1fr);
         gap: var(--spacing-md);
-        max-width: 1200px;
+        max-width: 1400px;
         width: 100%;
+        max-width: 100%;
+        padding: var(--spacing-md) var(--spacing-lg);
+        overflow: hidden;
+        box-sizing: border-box;
     }
     
     .plano-card {
         min-width: 0;
-        max-width: 380px;
+        max-width: 320px;
         width: 100%;
         margin: 0 auto;
-        height: 100%;
+        height: auto;
+        min-height: 420px;
+        position: relative;
+        z-index: 5;
     }
     
-    /* Centralizar o 4º plano quando ele estiver abaixo dos outros 3 */
-    .planos-grid .plano-card:nth-child(4) {
-        grid-column: 2 / 3;
-        justify-self: center;
+    .plano-card:not(.expanded) {
+        min-height: 420px;
     }
 }
 
-/* Telas muito grandes: manter 3 colunas */
+/* Telas muito grandes: manter 4 colunas */
 @media (min-width: 1600px) {
     .planos-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(4, 1fr);
         gap: var(--spacing-md);
-        max-width: 1200px;
-        padding: 0 var(--spacing-2xl);
+        max-width: 1400px;
+        padding: var(--spacing-md) var(--spacing-2xl);
         width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+        box-sizing: border-box;
     }
     
     .plano-card {
         min-width: 0;
-        max-width: 380px;
+        max-width: 320px;
         width: 100%;
         margin: 0 auto;
-        height: 100%;
+        height: auto;
+        min-height: 420px;
+        position: relative;
+        z-index: 5;
     }
     
-    /* Centralizar o 4º plano quando ele estiver abaixo dos outros 3 */
-    .planos-grid .plano-card:nth-child(4) {
-        grid-column: 2 / 3;
-        justify-self: center;
+    .plano-card:not(.expanded) {
+        min-height: 420px;
     }
 }
 
@@ -1280,12 +1436,13 @@ section {
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
     border-radius: var(--radius-xl);
     padding: 0;
-    box-shadow: 0 8px 20px rgba(0, 51, 153, 0.08), 0 0 0 1px rgba(0, 51, 153, 0.06);
+    box-shadow: none;
+    filter: drop-shadow(0 2px 4px rgba(0, 51, 153, 0.06)) drop-shadow(0 4px 8px rgba(0, 51, 153, 0.04)) drop-shadow(0 8px 16px rgba(0, 51, 153, 0.03));
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
+    z-index: 5;
     border: 1px solid rgba(0, 51, 153, 0.12);
-    overflow-x: hidden;
-    overflow-y: visible;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -1294,6 +1451,27 @@ section {
     transform: translateY(0) scale(1);
     min-height: 280px;
     box-sizing: border-box;
+}
+
+/* Wrapper para alinhar botões na parte inferior */
+.plano-card > .btn-mais-info {
+    margin-top: auto;
+    flex-shrink: 0;
+}
+
+.plano-card > .btn-primary {
+    margin-top: 0;
+    flex-shrink: 0;
+}
+
+/* Garantir que o conteúdo acima dos botões tenha altura consistente */
+.plano-card:not(.expanded) {
+    min-height: 420px;
+}
+
+.plano-card:not(.expanded) .plano-header,
+.plano-card:not(.expanded) .plano-preco {
+    flex-shrink: 0;
 }
 
 .plano-card.expanded {
@@ -1325,14 +1503,16 @@ section {
 
 .plano-card:hover {
     transform: translateY(-12px) scale(1.02);
-    box-shadow: 0 25px 70px rgba(0, 51, 153, 0.2), 0 0 40px rgba(0, 51, 153, 0.15);
+    box-shadow: none;
+    filter: drop-shadow(0 4px 8px rgba(0, 51, 153, 0.08)) drop-shadow(0 8px 16px rgba(0, 51, 153, 0.06)) drop-shadow(0 16px 32px rgba(0, 51, 153, 0.04)) drop-shadow(0 24px 48px rgba(0, 51, 153, 0.02));
     border-color: var(--primary-color);
 }
 
 .plano-card.featured {
     border: 2px solid var(--primary-color);
     background: linear-gradient(135deg, var(--primary-color) 0%, #4a6cf7 100%);
-    box-shadow: 0 15px 50px rgba(0, 51, 153, 0.25), 0 0 0 1px rgba(0, 51, 153, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    box-shadow: none;
+    filter: drop-shadow(0 2px 4px rgba(0, 51, 153, 0.1)) drop-shadow(0 4px 8px rgba(0, 51, 153, 0.08)) drop-shadow(0 8px 16px rgba(0, 51, 153, 0.06));
 }
 
 .plano-card.featured .plano-nome,
@@ -1374,7 +1554,8 @@ section {
 }
 
 .plano-card.featured:hover {
-    box-shadow: 0 25px 70px rgba(0, 51, 153, 0.35), 0 0 0 1px rgba(0, 51, 153, 0.3), 0 0 60px rgba(0, 51, 153, 0.2);
+    box-shadow: none;
+    filter: drop-shadow(0 4px 8px rgba(0, 51, 153, 0.12)) drop-shadow(0 8px 16px rgba(0, 51, 153, 0.1)) drop-shadow(0 16px 32px rgba(0, 51, 153, 0.08)) drop-shadow(0 24px 48px rgba(0, 51, 153, 0.06));
     border-color: var(--primary-light);
 }
 
@@ -1415,19 +1596,26 @@ section {
     padding: var(--spacing-md) var(--spacing-md) var(--spacing-sm);
     position: relative;
     background: transparent;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .plano-card:has(.plano-badge) .plano-header {
     padding-top: calc(var(--spacing-md) + 1.25rem);
+    min-height: calc(120px + 1.25rem);
 }
 
 .plano-nome {
     font-size: 1rem;
     font-weight: 800;
     color: var(--text-dark);
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.375rem;
     letter-spacing: 0.05em;
     text-transform: uppercase;
+    line-height: 1.2;
+    min-height: 1.2em;
 }
 
 .plano-descricao {
@@ -1437,10 +1625,14 @@ section {
     margin-bottom: 0;
     font-weight: 400;
     line-height: 1.3;
+    min-height: 2.6em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .plano-velocidade {
-    font-size: clamp(1.5rem, 3vw, 1.875rem);
+    font-size: 1.875rem;
     font-weight: 900;
     color: var(--primary-color);
     letter-spacing: -0.02em;
@@ -1450,6 +1642,9 @@ section {
     background-clip: text;
     margin-bottom: 0.125rem;
     margin-top: 0.125rem;
+    line-height: 1.2;
+    min-height: 2.25rem;
+    display: block;
 }
 
 .plano-features {
@@ -1530,20 +1725,26 @@ section {
     background: transparent;
     position: relative;
     z-index: 1;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
 }
 
 .preco-valor {
-    font-size: clamp(1.5rem, 3vw, 1.875rem);
+    font-size: 1.875rem;
     font-weight: 900;
     color: var(--primary-color);
     letter-spacing: -0.02em;
-    line-height: 1;
+    line-height: 1.2;
     display: inline-block;
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin-bottom: 0.125rem;
+    margin-bottom: 0;
+    min-height: 2.25rem;
 }
 
 .preco-periodo {
@@ -1553,6 +1754,8 @@ section {
     margin-left: 0.25rem;
     display: inline-block;
     vertical-align: baseline;
+    line-height: 1;
+    min-height: 0.9rem;
 }
 
 /* Botão dentro dos cards de planos */
@@ -1560,7 +1763,7 @@ section {
     background: var(--gradient-blue);
     color: white;
     border: none;
-    margin: 0 var(--spacing-md) var(--spacing-md);
+    margin: var(--spacing-sm) var(--spacing-md) var(--spacing-md);
     padding: 0.75rem 1.25rem;
     font-weight: 700;
     font-size: 0.875rem;
@@ -1571,6 +1774,7 @@ section {
     overflow: hidden;
     width: calc(100% - 2 * var(--spacing-md));
     box-sizing: border-box;
+    flex-shrink: 0;
 }
 
 /* Botão Mais Informações */
@@ -1579,7 +1783,7 @@ section {
     border: 1px solid rgba(0, 51, 153, 0.15);
     color: var(--primary-color);
     padding: 0.5rem 1rem;
-    margin: var(--spacing-sm) var(--spacing-md) var(--spacing-sm);
+    margin: var(--spacing-sm) var(--spacing-md) 0;
     border-radius: var(--radius-sm);
     font-size: 0.75rem;
     font-weight: 600;
@@ -1593,6 +1797,7 @@ section {
     z-index: 2;
     width: calc(100% - 2 * var(--spacing-md));
     box-sizing: border-box;
+    flex-shrink: 0;
 }
 
 .btn-mais-info:hover {
@@ -1628,6 +1833,7 @@ section {
     padding: 0 var(--spacing-md);
     opacity: 0;
     margin: 0;
+    flex-shrink: 0;
 }
 
 .plano-card.expanded .plano-details {
@@ -4425,11 +4631,12 @@ section {
         right: 20px;
         width: 280px;
         max-width: calc(100vw - 40px);
-        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        background: #ffffff;
         flex-direction: column;
         padding: var(--spacing-lg);
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
         border-radius: var(--radius-lg);
+        border: 1px solid rgba(0, 51, 153, 0.1);
         transform: translateY(-20px);
         opacity: 0;
         visibility: hidden;
@@ -4438,11 +4645,6 @@ section {
         gap: var(--spacing-md);
     }
     
-    @supports (backdrop-filter: blur(1px)) {
-        .navbar-menu {
-            backdrop-filter: blur(20px);
-        }
-    }
 
     .navbar-menu.active {
         transform: translateY(0);
@@ -4450,18 +4652,7 @@ section {
         visibility: visible;
     }
     
-    /* Overlay escuro quando menu está aberto */
-    .navbar-menu.active::before {
-        content: '';
-        position: fixed;
-        top: 90px;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: -1;
-        animation: fadeIn 0.3s ease;
-    }
+    /* Overlay removido - menu totalmente branco */
     
     @keyframes fadeIn {
         from { opacity: 0; }
@@ -4580,16 +4771,16 @@ section {
 
     /* Planos Mobile - Layout Profissional */
     .planos-section {
-        overflow-x: hidden;
-        overflow-y: hidden;
+        overflow: hidden;
         padding: var(--spacing-xl) 0;
+        max-width: 100%;
     }
     
     .planos-section .container {
-        overflow-x: hidden;
-        overflow-y: hidden;
+        overflow: hidden;
         padding: 0 var(--spacing-md);
         max-width: 100%;
+        width: 100%;
     }
     
     .planos-grid {
@@ -4598,8 +4789,10 @@ section {
         padding: 0;
         gap: var(--spacing-lg);
         width: 100%;
+        max-width: 100%;
         min-height: auto;
-        align-items: stretch;
+        align-items: start;
+        overflow: hidden;
     }
     
     .plano-card {
@@ -4655,6 +4848,41 @@ section {
         overflow-x: hidden;
         overflow-y: visible;
         padding: var(--spacing-xl) 0;
+    }
+    
+    .planos-disclaimer-content {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--spacing-2xl);
+        padding: var(--spacing-2xl);
+    }
+    
+    .planos-disclaimer-icon {
+        width: 80px;
+        height: 80px;
+        font-size: 2.25rem;
+        border-radius: 20px;
+    }
+    
+    .planos-disclaimer-text {
+        text-align: left;
+        flex: 1;
+        max-width: none;
+    }
+    
+    .planos-disclaimer-title {
+        font-size: 1.75rem;
+        margin-bottom: var(--spacing-xs);
+    }
+    
+    .planos-disclaimer-subtitle {
+        font-size: 1.125rem;
+    }
+    
+    .btn-whatsapp-cta {
+        min-width: 260px;
+        flex-shrink: 0;
     }
 
     /* Cobertura */
@@ -4745,12 +4973,45 @@ section {
     /* Planos Mobile - Ajustes Finais */
     .planos-section {
         padding: var(--spacing-lg) 0;
+        overflow: hidden;
+        max-width: 100%;
     }
     
     .planos-section .container {
         padding: 0 var(--spacing-sm);
-        overflow-x: hidden;
-        overflow-y: hidden;
+        overflow: hidden;
+        max-width: 100%;
+        width: 100%;
+    }
+    
+    .planos-section .planos-disclaimer {
+        margin-top: var(--spacing-xl);
+    }
+    
+    .planos-disclaimer-content {
+        padding: var(--spacing-xl) var(--spacing-lg);
+        gap: var(--spacing-lg);
+    }
+    
+    .planos-disclaimer-icon {
+        width: 64px;
+        height: 64px;
+        font-size: 1.875rem;
+    }
+    
+    .planos-disclaimer-title {
+        font-size: 1.375rem;
+    }
+    
+    .planos-disclaimer-subtitle {
+        font-size: 1rem;
+    }
+    
+    .btn-whatsapp-cta {
+        padding: 0.9375rem 1.75rem;
+        font-size: 1rem;
+        width: 100%;
+        min-width: auto;
     }
     
     .planos-grid {
@@ -4758,6 +5019,9 @@ section {
         padding: 0;
         display: grid;
         grid-template-columns: 1fr;
+        overflow: hidden;
+        max-width: 100%;
+        width: 100%;
     }
     
     /* Resetar centralização do 4º plano no mobile - ele deve ficar na coluna única */
@@ -4783,6 +5047,24 @@ section {
     
     .plano-velocidade {
         font-size: 1.75rem;
+        min-height: 2.1rem;
+    }
+    
+    .preco-valor {
+        font-size: 1.75rem;
+        min-height: 2.1rem;
+    }
+    
+    .plano-header {
+        min-height: 110px;
+    }
+    
+    .plano-card:has(.plano-badge) .plano-header {
+        min-height: calc(110px + 1.25rem);
+    }
+    
+    .plano-preco {
+        min-height: 55px;
     }
     
     .plano-features {
@@ -4805,7 +5087,25 @@ section {
     }
     
     .preco-valor {
-        font-size: 2rem;
+        font-size: 1.75rem;
+        min-height: 2.1rem;
+    }
+    
+    .plano-velocidade {
+        font-size: 1.75rem;
+        min-height: 2.1rem;
+    }
+    
+    .plano-header {
+        min-height: 110px;
+    }
+    
+    .plano-card:has(.plano-badge) .plano-header {
+        min-height: calc(110px + 1.25rem);
+    }
+    
+    .plano-preco {
+        min-height: 55px;
     }
     
     .plano-card .btn-primary {
@@ -4855,10 +5155,11 @@ section {
     .planos-section-alt {
         background-color: #ffffff;
         background: #ffffff;
-        overflow-x: hidden;
-        overflow-y: hidden;
+        overflow: hidden;
         display: block;
         visibility: visible;
+        max-width: 100%;
+        width: 100%;
     }
     
     .apps-section {
