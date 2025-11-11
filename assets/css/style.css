@@ -2626,6 +2626,10 @@ section {
     width: 100%;
     min-width: 0;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
 }
 
 .solucao-card::before {
@@ -2659,6 +2663,8 @@ section {
     margin-bottom: var(--spacing-md);
     color: var(--text-dark);
     letter-spacing: -0.01em;
+    text-align: center;
+    width: 100%;
 }
 
 .solucao-text {
@@ -2666,30 +2672,45 @@ section {
     margin-bottom: var(--spacing-xl);
     line-height: 1.7;
     font-size: 1.05rem;
+    text-align: center;
+    width: 100%;
 }
 
 .solucao-features {
     margin-bottom: var(--spacing-xl);
+    list-style: none;
+    padding: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .solucao-features li {
     padding: var(--spacing-sm) 0;
-    padding-left: var(--spacing-xl);
+    padding-left: 0;
     position: relative;
     color: var(--text-dark);
     font-weight: 500;
     transition: var(--transition-base);
+    text-align: center;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
 }
 
 .solucao-features li::before {
     content: '✓';
-    position: absolute;
-    left: 0;
+    position: relative;
+    left: auto;
     color: var(--secondary-color);
     font-weight: 700;
     font-size: 1.25rem;
     width: 24px;
     height: 24px;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2699,7 +2720,14 @@ section {
 
 .solucao-features li:hover {
     color: var(--primary-color);
-    transform: translateX(5px);
+    transform: translateY(-2px);
+}
+
+.solucao-card .btn-primary {
+    align-self: center;
+    margin-top: auto;
+    width: auto;
+    min-width: 200px;
 }
 
 /* ========================================
