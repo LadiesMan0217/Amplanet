@@ -1299,7 +1299,7 @@ section {
     max-width: 100%;
     box-sizing: border-box;
     min-height: 300px;
-    align-items: start;
+    align-items: stretch;
     overflow: hidden;
     position: relative;
 }
@@ -1311,12 +1311,14 @@ section {
         grid-template-columns: repeat(2, 1fr);
         gap: var(--spacing-lg);
         padding: var(--spacing-md) var(--spacing-md);
+        align-items: stretch;
     }
     
     .plano-card {
         min-height: 420px;
         position: relative;
         z-index: 5;
+        height: 100%;
     }
     
     .plano-card:not(.expanded) {
@@ -1353,7 +1355,7 @@ section {
         width: 100%;
         max-width: 100%;
         overflow: hidden;
-        align-items: start;
+        align-items: stretch;
         box-sizing: border-box;
     }
     
@@ -1362,7 +1364,7 @@ section {
         max-width: 320px;
         width: 100%;
         margin: 0 auto;
-        height: auto;
+        height: 100%;
         min-height: 420px;
         position: relative;
         z-index: 5;
@@ -1384,6 +1386,7 @@ section {
         padding: var(--spacing-md) var(--spacing-lg);
         overflow: hidden;
         box-sizing: border-box;
+        align-items: stretch;
     }
     
     .plano-card {
@@ -1391,7 +1394,7 @@ section {
         max-width: 320px;
         width: 100%;
         margin: 0 auto;
-        height: auto;
+        height: 100%;
         min-height: 420px;
         position: relative;
         z-index: 5;
@@ -1413,6 +1416,7 @@ section {
         max-width: 100%;
         overflow: hidden;
         box-sizing: border-box;
+        align-items: stretch;
     }
     
     .plano-card {
@@ -1420,7 +1424,7 @@ section {
         max-width: 320px;
         width: 100%;
         margin: 0 auto;
-        height: auto;
+        height: 100%;
         min-height: 420px;
         position: relative;
         z-index: 5;
@@ -1451,6 +1455,7 @@ section {
     transform: translateY(0) scale(1);
     min-height: 280px;
     box-sizing: border-box;
+    height: 100%;
 }
 
 /* Wrapper para alinhar botões na parte inferior */
@@ -1655,6 +1660,7 @@ section {
     display: flex;
     flex-direction: column;
     gap: 0.375rem;
+    justify-content: flex-start;
 }
 
 .plano-card.expanded .plano-features {
@@ -1763,10 +1769,12 @@ section {
     background: var(--gradient-blue);
     color: white;
     border: none;
-    margin: var(--spacing-sm) var(--spacing-md) var(--spacing-md);
+    margin: 0 var(--spacing-md) var(--spacing-md);
+    margin-top: auto;
     padding: 0.75rem 1.25rem;
     font-weight: 700;
     font-size: 0.875rem;
+    flex-shrink: 0;
     box-shadow: 0 6px 20px rgba(0, 51, 153, 0.25), 0 0 0 1px rgba(0, 51, 153, 0.15);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     border-radius: var(--radius-md);
@@ -1834,6 +1842,21 @@ section {
     opacity: 0;
     margin: 0;
     flex-shrink: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Quando os detalhes estão sempre visíveis (página planos.html) */
+.plano-details[style*="max-height: none"] {
+    max-height: none !important;
+    opacity: 1 !important;
+    padding: var(--spacing-lg) var(--spacing-md) 0 !important;
+    margin-bottom: 0 !important;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
 }
 
 .plano-card.expanded .plano-details {
@@ -1972,10 +1995,11 @@ section {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
     color: #ffffff;
     transform: rotateY(180deg);
-    padding: 0.5rem 0.375rem;
+    padding: 0.5rem 0.375rem 0.375rem;
     overflow: hidden;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
+    gap: 0.25rem;
 }
 
 .app-flip-front img {
@@ -2016,7 +2040,7 @@ section {
     font-size: 0.625rem;
     color: rgba(255, 255, 255, 0.95);
     line-height: 1.25;
-    margin: 0;
+    margin: 0 0 0.375rem 0;
     text-align: center;
     overflow: hidden;
     display: -webkit-box;
@@ -2024,6 +2048,47 @@ section {
     -webkit-box-orient: vertical;
     width: 100%;
     word-break: break-word;
+}
+
+.app-whatsapp-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    min-width: auto;
+    width: auto;
+    height: 28px;
+    padding: 0.375rem 0.75rem;
+    background: #25D366;
+    color: #ffffff;
+    border-radius: 14px;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+    margin-top: auto;
+    box-shadow: 0 2px 8px rgba(37, 211, 102, 0.4);
+    position: relative;
+    z-index: 10;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.app-whatsapp-btn:hover {
+    background: #20BA5A;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.6);
+}
+
+.app-whatsapp-btn i {
+    font-size: 0.875rem;
+    flex-shrink: 0;
+}
+
+.app-whatsapp-btn span {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 1;
 }
 
 /* Responsividade para flip cards de apps */
@@ -2055,6 +2120,20 @@ section {
         font-size: 0.6875rem;
         -webkit-line-clamp: 4;
     }
+    
+    .app-whatsapp-btn {
+        height: 32px;
+        padding: 0.4375rem 0.875rem;
+        font-size: 0.75rem;
+    }
+    
+    .app-whatsapp-btn i {
+        font-size: 1rem;
+    }
+    
+    .app-whatsapp-btn span {
+        font-size: 0.75rem;
+    }
 }
 
 @media (min-width: 768px) and (max-width: 1199px) {
@@ -2074,6 +2153,20 @@ section {
     
     .app-flip-back p {
         -webkit-line-clamp: 4;
+    }
+    
+    .app-whatsapp-btn {
+        height: 30px;
+        padding: 0.4375rem 0.8125rem;
+        font-size: 0.6875rem;
+    }
+    
+    .app-whatsapp-btn i {
+        font-size: 0.9375rem;
+    }
+    
+    .app-whatsapp-btn span {
+        font-size: 0.6875rem;
     }
 }
 
@@ -2105,6 +2198,20 @@ section {
         font-size: 0.5625rem;
         -webkit-line-clamp: 3;
     }
+    
+    .app-whatsapp-btn {
+        height: 26px;
+        padding: 0.3125rem 0.625rem;
+        font-size: 0.625rem;
+    }
+    
+    .app-whatsapp-btn i {
+        font-size: 0.75rem;
+    }
+    
+    .app-whatsapp-btn span {
+        font-size: 0.625rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -2133,6 +2240,20 @@ section {
     .app-flip-back p {
         font-size: 0.5rem;
         -webkit-line-clamp: 2;
+    }
+    
+    .app-whatsapp-btn {
+        height: 24px;
+        padding: 0.3125rem 0.5625rem;
+        font-size: 0.5625rem;
+    }
+    
+    .app-whatsapp-btn i {
+        font-size: 0.6875rem;
+    }
+    
+    .app-whatsapp-btn span {
+        font-size: 0.5625rem;
     }
 }
 
