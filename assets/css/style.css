@@ -2837,6 +2837,8 @@ section {
    ======================================== */
 .outras-solucoes-section {
     background-color: var(--bg-white);
+    position: relative;
+    overflow: hidden;
 }
 
 .solucoes-grid {
@@ -2846,6 +2848,252 @@ section {
     width: 100%;
     box-sizing: border-box;
     min-height: 200px;
+}
+
+/* Grid lado a lado para seção outras-solucoes */
+.solucoes-grid-side-by-side {
+    grid-template-columns: 1fr;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+@media (min-width: 992px) {
+    .solucoes-grid-side-by-side {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-2xl);
+    }
+}
+
+/* Cards criativos com imagem de fundo ocupando todo o espaço */
+.solucao-card-creative {
+    position: relative;
+    min-height: 650px;
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+}
+
+.solucao-card-creative-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+.solucao-card-creative-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), filter 0.8s ease;
+    filter: brightness(0.5) contrast(1.15);
+}
+
+.solucao-card-creative-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(30, 58, 138, 0.6) 0%, rgba(59, 130, 246, 0.5) 50%, rgba(30, 58, 138, 0.6) 100%);
+    z-index: 1;
+    transition: opacity 0.6s ease;
+}
+
+.solucao-card-creative-corporativo .solucao-card-creative-overlay {
+    background: linear-gradient(135deg, rgba(30, 58, 138, 0.6) 0%, rgba(59, 130, 246, 0.5) 50%, rgba(15, 23, 42, 0.65) 100%);
+}
+
+.solucao-card-creative-condominio .solucao-card-creative-overlay {
+    background: linear-gradient(135deg, rgba(14, 116, 144, 0.6) 0%, rgba(59, 130, 246, 0.5) 50%, rgba(30, 58, 138, 0.6) 100%);
+}
+
+.solucao-card-creative-gradient {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.5) 70%, rgba(0, 0, 0, 0.8) 100%);
+    z-index: 2;
+    pointer-events: none;
+}
+
+.solucao-card-creative-content {
+    position: relative;
+    z-index: 3;
+    padding: var(--spacing-2xl);
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: flex-end;
+    color: #ffffff;
+    min-height: 100%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.4) 40%, transparent 100%);
+    border-radius: 0 0 var(--radius-2xl) var(--radius-2xl);
+}
+
+.solucao-card-creative-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-md);
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: var(--spacing-lg);
+    width: fit-content;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.solucao-card-creative-badge i {
+    font-size: 0.875rem;
+}
+
+.solucao-title-creative {
+    color: #ffffff;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: var(--spacing-md);
+    text-shadow: 0 3px 15px rgba(0, 0, 0, 0.8), 0 1px 3px rgba(0, 0, 0, 0.9);
+    text-align: left;
+    letter-spacing: -0.02em;
+}
+
+.solucao-text-creative {
+    color: #ffffff;
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: var(--spacing-lg);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7), 0 1px 2px rgba(0, 0, 0, 0.8);
+    text-align: left;
+    font-weight: 400;
+}
+
+.solucao-features-creative {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--spacing-xl) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.solucao-features-creative li {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    color: #ffffff;
+    font-size: 0.95rem;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7), 0 1px 2px rgba(0, 0, 0, 0.8);
+    transition: transform 0.2s ease, color 0.2s ease;
+    font-weight: 500;
+}
+
+.solucao-features-creative li i {
+    color: #60a5fa;
+    font-size: 1rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.solucao-features-creative li:hover {
+    transform: translateX(4px);
+    color: #ffffff;
+}
+
+.btn-creative {
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--primary-color);
+    border: none;
+    padding: var(--spacing-md) var(--spacing-xl);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.btn-creative:hover {
+    background: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    color: var(--primary-color);
+}
+
+.btn-creative i {
+    transition: transform 0.3s ease;
+}
+
+.btn-creative:hover i {
+    transform: translateX(4px);
+}
+
+/* Efeitos de hover */
+.solucao-card-creative:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.solucao-card-creative:hover .solucao-card-creative-bg img {
+    transform: scale(1.1);
+    filter: brightness(0.45) contrast(1.25);
+}
+
+.solucao-card-creative:hover .solucao-card-creative-overlay {
+    opacity: 0.9;
+}
+
+.solucao-card-creative:hover .solucao-card-creative-badge {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+/* Responsivo */
+@media (max-width: 991px) {
+    .solucao-card-creative {
+        min-height: 550px;
+    }
+    
+    .solucao-title-creative {
+        font-size: 1.75rem;
+    }
+    
+    .solucao-card-creative-content {
+        padding: var(--spacing-xl);
+    }
+}
+
+@media (max-width: 767px) {
+    .solucao-card-creative {
+        min-height: 500px;
+    }
+    
+    .solucao-title-creative {
+        font-size: 1.5rem;
+    }
+    
+    .solucao-text-creative {
+        font-size: 0.95rem;
+    }
 }
 
 .solucao-card {
