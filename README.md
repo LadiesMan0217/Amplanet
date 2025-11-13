@@ -9,14 +9,12 @@ Este é um site estático responsivo desenvolvido para a Amplanet, incluindo:
 - Página inicial com apresentação da empresa
 - Planos de internet fibra óptica
 - Serviços e aplicativos disponíveis
-- **Mapa de cobertura interativo** com GeoJSON
-- Integração com Google Maps (versão alternativa)
+- **Mapa de cobertura interativo** com Google Maps
 
 ## 🚀 Funcionalidades
 
 ### Mapa de Cobertura
-- **Versão Leaflet**: Mapa interativo com GeoJSON, busca de endereços e geolocalização
-- **Versão Google Maps**: Mapa integrado com busca customizada
+- Mapa integrado com Google Maps e busca customizada
 - Verificação de cobertura em tempo real
 - Busca de endereços com filtros para Teresina, PI
 - Botão de geolocalização para usar sua localização atual
@@ -26,10 +24,7 @@ Este é um site estático responsivo desenvolvido para a Amplanet, incluindo:
 - HTML5
 - CSS3 (Mobile-first, responsivo)
 - JavaScript (Vanilla JS)
-- [Leaflet.js](https://leafletjs.com/) - Biblioteca de mapas open-source
-- [Leaflet Control Geocoder](https://github.com/perliedman/leaflet-control-geocoder) - Plugin de busca
-- Google Maps (versão alternativa)
-- GeoJSON para áreas de cobertura
+- Google Maps - Mapa integrado com busca de endereços
 
 ## 📁 Estrutura do Projeto
 
@@ -40,9 +35,7 @@ Amplanet/
 │   │   └── style.css          # Estilos principais
 │   ├── js/
 │   │   ├── main.js            # Scripts globais
-│   │   ├── cobertura.js       # Mapa Leaflet
-│   │   ├── cobertura-google.js # Mapa Google
-│   │   └── cobertura-geojson.js # GeoJSON embutido
+│   │   └── cobertura-google.js # Mapa Google Maps
 │   ├── Map/
 │   │   └── map.geojson        # Dados das áreas de cobertura
 │   └── images/                # Imagens e ícones
@@ -51,8 +44,8 @@ Amplanet/
 ├── index.html                 # Página inicial
 ├── planos.html                # Planos de internet
 ├── servicos.html              # Serviços e apps
-├── cobertura.html             # Mapa Leaflet
-├── cobertura-google.html      # Mapa Google
+└── pages/
+    └── cobertura.html         # Mapa de cobertura (Google Maps)
 ├── README.md                  # Este arquivo
 └── .gitignore                 # Arquivos ignorados pelo Git
 ```
@@ -88,17 +81,13 @@ npm install -g http-server
 http-server
 ```
 
-### Importante sobre o GeoJSON
-
-O projeto inclui o GeoJSON embutido em `assets/js/cobertura-geojson.js` para evitar problemas de CORS ao abrir arquivos diretamente (`file://`). O código tenta carregar via fetch primeiro e usa o embutido como fallback.
 
 ## 📱 Páginas
 
 - **index.html** - Página inicial
-- **planos.html** - Planos de internet fibra óptica
-- **servicos.html** - Serviços e aplicativos extras
-- **cobertura.html** - Mapa de cobertura (Leaflet)
-- **cobertura-google.html** - Mapa de cobertura (Google Maps)
+- **pages/planos.html** - Planos de internet fibra óptica
+- **pages/servicos.html** - Serviços e aplicativos extras
+- **pages/cobertura.html** - Mapa de cobertura (Google Maps)
 
 ## 🗺️ Mapa de Cobertura
 
@@ -125,23 +114,15 @@ O projeto inclui o GeoJSON embutido em `assets/js/cobertura-geojson.js` para evi
 - **Área do Cliente**: `https://amplanet.com.br/central_assinante_web/login`
 - **WhatsApp**: Links configuráveis nos CTAs
 
-### GeoJSON
-
-O arquivo `assets/Map/map.geojson` contém as áreas de cobertura. Para atualizar:
-
-1. Edite o arquivo `map.geojson`
-2. Ou atualize `cobertura-geojson.js` se estiver usando a versão embutida
 
 ## 📝 Documentação
 
 - **PRD.md**: Documento completo de requisitos e especificações
-- **INSTRUCOES_BUSCA_MAPA.md**: Instruções sobre melhorias na busca
 
 ## 🌐 Compatibilidade
 
 - Navegadores modernos (Chrome, Firefox, Safari, Edge)
 - Responsivo (Mobile, Tablet, Desktop)
-- Funciona offline (com GeoJSON embutido)
 
 ## 📄 Licença
 
@@ -158,5 +139,5 @@ Desenvolvido para Amplanet LTDA - 04.812.045/0001-11
 
 ---
 
-**Nota**: Para ver os polígonos de cobertura funcionando corretamente, é recomendado usar um servidor HTTP local ao invés de abrir os arquivos diretamente.
+**Nota**: Para usar a busca de endereços no mapa, é recomendado usar um servidor HTTP local ao invés de abrir os arquivos diretamente.
 

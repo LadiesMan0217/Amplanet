@@ -1006,10 +1006,12 @@ ul {
 .page-title {
     font-size: clamp(2rem, 4vw, 3rem);
     font-weight: 800;
-    margin-bottom: var(--spacing-md);
+    margin: 0 auto var(--spacing-md);
     letter-spacing: -0.02em;
     position: relative;
     z-index: 1;
+    text-align: center;
+    width: 100%;
 }
 
 .page-subtitle {

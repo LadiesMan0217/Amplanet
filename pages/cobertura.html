@@ -6,8 +6,6 @@
     <meta name="description" content="Cobertura Amplanet - Verifique se sua região está coberta pela nossa rede de fibra óptica em Teresina (PI) e São Luís (MA).">
     <title>Cobertura - Amplanet</title>
     <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <!-- <link rel="icon" href="../assets/images/favicon.ico"> -->
 </head>
 <body>
@@ -16,7 +14,7 @@
         <nav class="navbar container">
             <div class="navbar-brand">
                 <a href="../index.html">
-                    <img src="../assets/images/apps-logos/logo_amplanet_sl32.png" alt="Amplanet Logo" class="logo">
+                    <img src="../assets/images/apps-logos/logoAmplanetSL3_branca.png" alt="Amplanet Logo" class="logo">
                 </a>
             </div>
             <button class="menu-toggle" aria-label="Abrir menu" id="menuToggle">
@@ -38,51 +36,55 @@
     <section class="page-hero">
         <div class="container">
             <h1 class="page-title">Verifique Nossa Cobertura</h1>
-            <p class="page-subtitle">Confira se sua região está coberta pela nossa rede de fibra óptica. Use o mapa interativo abaixo para pesquisar sua localização.</p>
         </div>
     </section>
 
     <!-- Cobertura Section -->
     <section class="cobertura-section">
         <div class="container">
-            <!-- Seletor de Versões do Mapa -->
-            <div class="map-version-selector">
-                <div class="version-selector-header">
-                    <h3 class="version-selector-title">Teste de Versão do Mapa</h3>
-                    <p class="version-selector-subtitle">Teste as duas versões disponíveis:</p>
-                </div>
-                <div class="version-buttons">
-                    <a href="cobertura.html" class="version-btn version-btn-active">
-                        <div class="version-btn-icon">🗺️</div>
-                        <div class="version-btn-content">
-                            <div class="version-btn-name">Versão Leaflet</div>
-                            <div class="version-btn-desc">Mapa interativo com GeoJSON</div>
-                        </div>
-                    </a>
-                    <a href="cobertura-google.html" class="version-btn">
-                        <div class="version-btn-icon">🌐</div>
-                        <div class="version-btn-content">
-                            <div class="version-btn-name">Versão Google Maps</div>
-                            <div class="version-btn-desc">Mapa Google My Maps integrado</div>
-                        </div>
-                    </a>
-                </div>
-            </div>
             <!-- Mapa Principal -->
             <div class="map-container-main">
                 <div class="map-header">
                     <h2 class="section-title">Mapa de Cobertura</h2>
                     <p class="map-description">As áreas em destaque no mapa representam nossa cobertura atual de fibra óptica. Use a busca no canto superior direito ou o botão 📍 para usar sua localização atual e verificar se está coberto.</p>
-                    <p class="map-note" style="margin-top: 1rem; padding: 0.75rem; background: #fef3c7; border-left: 3px solid #f59e0b; border-radius: var(--radius-md); color: #92400e; font-size: 0.9rem;">
-                        <strong>⚠️ Importante:</strong> Para ver os polígonos de cobertura, você precisa abrir este site através de um servidor HTTP (não file://). Use um servidor local como Live Server no VS Code ou hospede o site.
-                    </p>
-                </div>
-                <div class="map-wrapper">
-                    <div id="coberturaMap" class="leaflet-map"></div>
-                    <div class="map-loading" id="mapLoading">
-                        <div class="loading-spinner"></div>
-                        <p>Carregando mapa...</p>
+                    <!-- Aviso sobre servidor HTTP (será mostrado apenas se necessário) -->
+                    <div id="fileProtocolWarning" style="display: none; margin-top: 1rem; padding: 1rem; background: #fff3cd; border: 1px solid #ffc107; border-radius: 0.5rem; color: #856404;">
+                        <strong>⚠️ Importante:</strong> Para usar a busca de endereços, é necessário abrir esta página através de um servidor HTTP local. Abra o console do navegador (F12) para ver instruções detalhadas.
                     </div>
+                </div>
+                <div class="map-wrapper-google-integrated">
+                    <!-- Iframe do Google Maps - Primeiro para garantir que seja visível -->
+                    <iframe 
+                        id="googleMapFrame"
+                        src="https://www.google.com/maps/d/u/0/embed?mid=14iGHLTHtyeRc3mlZo8lNjbmouohSYA0&ehbc=2E312F&noprof=1" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade"
+                        title="Mapa de Cobertura Amplanet">
+                    </iframe>
+                    
+                    <!-- Overlay para esconder header do Google My Maps -->
+                    <div class="google-maps-header-overlay"></div>
+                    
+                    <!-- Barra de Busca Integrada -->
+                    <div class="map-search-overlay">
+                        <div class="search-box-integrated">
+                            <div class="search-icon-integrated">🔍</div>
+                            <input 
+                                type="text" 
+                                id="integratedSearchInput" 
+                                class="search-input-integrated" 
+                                placeholder="Buscar endereço, bairro ou ponto de referência..."
+                                autocomplete="off"
+                            >
+                            <button class="search-btn-integrated" id="integratedSearchBtn">
+                                <span>Pesquisar</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Container para marcadores visuais e overlays -->
+                    <div class="google-map-container" id="mapVisualLayer"></div>
                 </div>
                 <div class="map-legend">
                     <div class="legend-item">
@@ -118,18 +120,18 @@
                 <div class="instructions-grid">
                     <div class="instruction-item">
                         <div class="instruction-number">1</div>
-                        <h4 class="instruction-title">Pesquise sua localização</h4>
-                        <p class="instruction-text">Use o campo de busca acima ou navegue pelo mapa</p>
+                        <h4 class="instruction-title">Use a busca</h4>
+                        <p class="instruction-text">Digite um endereço, bairro ou ponto de referência no campo de busca acima do mapa</p>
                     </div>
                     <div class="instruction-item">
                         <div class="instruction-number">2</div>
-                        <h4 class="instruction-title">Identifique as áreas cobertas</h4>
-                        <p class="instruction-text">As áreas destacadas no mapa indicam onde temos cobertura</p>
+                        <h4 class="instruction-title">Verifique o resultado</h4>
+                        <p class="instruction-text">O mapa mostrará se o local está dentro da área de cobertura destacada</p>
                     </div>
                     <div class="instruction-item">
                         <div class="instruction-number">3</div>
                         <h4 class="instruction-title">Entre em contato</h4>
-                        <p class="instruction-text">Se sua região está coberta, fale conosco para contratar</p>
+                        <p class="instruction-text">Se sua região está coberta, fale conosco para contratar seu plano</p>
                     </div>
                 </div>
             </div>
@@ -214,49 +216,7 @@
         </div>
     </footer>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="../assets/js/cobertura-geojson.js"></script>
-    <script>
-        // Verificar se Leaflet carregou
-        if (typeof L !== 'undefined') {
-            console.log('✅ Leaflet carregado com sucesso');
-        } else {
-            console.error('❌ ERRO: Leaflet NÃO foi carregado!');
-        }
-    </script>
-    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-    <script>
-        // Verificar se Geocoder carregou
-        if (typeof L !== 'undefined' && L.Control && L.Control.Geocoder) {
-            console.log('✅ Leaflet Control Geocoder carregado com sucesso');
-        } else {
-            console.warn('⚠️ Leaflet Control Geocoder pode não estar disponível');
-        }
-    </script>
     <script src="../assets/js/main.js"></script>
-    <script>
-        console.log('Carregando cobertura.js...');
-    </script>
-    <script src="../assets/js/cobertura.js"></script>
-    <script>
-        console.log('Scripts carregados. Verificando inicialização...');
-        // Verificação final após todos os scripts
-        setTimeout(function() {
-            console.log('=== Verificação Final ===');
-            console.log('Leaflet disponível?', typeof L !== 'undefined');
-            console.log('Mapa criado?', typeof map !== 'undefined');
-            console.log('Elemento mapLoading existe?', document.getElementById('mapLoading') !== null);
-            
-            const mapLoading = document.getElementById('mapLoading');
-            if (mapLoading && mapLoading.style.display !== 'none') {
-                console.warn('⚠️ Loading ainda está visível após 3 segundos');
-                console.warn('Tentando forçar remoção...');
-                mapLoading.style.opacity = '0';
-                setTimeout(function() {
-                    mapLoading.style.display = 'none';
-                }, 300);
-            }
-        }, 3000);
-    </script>
+    <script src="../assets/js/cobertura-google.js"></script>
 </body>
 </html>
