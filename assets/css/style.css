@@ -2093,6 +2093,28 @@ section {
     line-height: 1;
 }
 
+/* Cards maiores para seção À La Carte - Retangulares */
+.apps-grid-la-carte {
+    max-width: 1200px !important;
+    gap: var(--spacing-xl) !important;
+}
+
+.app-flip-card-la-carte {
+    width: 240px !important;
+    height: 160px !important;
+}
+
+.app-flip-card-la-carte .app-flip-front img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 12px !important;
+}
+
+.app-flip-card-la-carte .app-flip-front span {
+    display: none !important;
+}
+
 /* Responsividade para flip cards de apps */
 @media (min-width: 1200px) {
     .apps-grid-main {
@@ -2103,6 +2125,11 @@ section {
     .app-flip-card {
         width: 140px;
         height: 140px;
+    }
+    
+    .app-flip-card-la-carte {
+        width: 280px !important;
+        height: 180px !important;
     }
     
     .app-flip-front img {
@@ -2183,6 +2210,11 @@ section {
         height: 110px;
     }
     
+    .app-flip-card-la-carte {
+        width: 200px !important;
+        height: 130px !important;
+    }
+    
     .app-flip-front img {
         width: 44px;
         height: 44px;
@@ -2216,7 +2248,7 @@ section {
     }
 }
 
-@media (max-width: 480px) {
+    @media (max-width: 480px) {
     .apps-grid-main {
         gap: var(--spacing-sm);
     }
@@ -2224,6 +2256,11 @@ section {
     .app-flip-card {
         width: 100px;
         height: 100px;
+    }
+    
+    .app-flip-card-la-carte {
+        width: 170px !important;
+        height: 110px !important;
     }
     
     .app-flip-front img {
