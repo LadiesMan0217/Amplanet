@@ -46,12 +46,34 @@
             <div class="map-container-main">
                 <div class="map-header">
                     <h2 class="section-title">Mapa de Cobertura</h2>
-                    <p class="map-description">As áreas em destaque no mapa representam nossa cobertura atual de fibra óptica. Use a busca no canto superior direito ou o botão 📍 para usar sua localização atual e verificar se está coberto.</p>
+                    <p class="map-description">As áreas em destaque no mapa representam nossa cobertura atual de fibra óptica. Use o campo de busca abaixo ou o botão de localização para verificar se sua região está coberta.</p>
                     <!-- Aviso sobre servidor HTTP (será mostrado apenas se necessário) -->
                     <div id="fileProtocolWarning" style="display: none; margin-top: 1rem; padding: 1rem; background: #fff3cd; border: 1px solid #ffc107; border-radius: 0.5rem; color: #856404;">
                         <strong>⚠️ Importante:</strong> Para usar a busca de endereços, é necessário abrir esta página através de um servidor HTTP local. Abra o console do navegador (F12) para ver instruções detalhadas.
                     </div>
                 </div>
+                
+                <!-- Barra de Busca Integrada - Reposicionada acima do mapa -->
+                <div class="map-search-overlay">
+                    <div class="search-box-integrated">
+                        <div class="search-icon-integrated">🔍</div>
+                        <div class="search-input-wrapper">
+                            <input 
+                                type="text" 
+                                id="integratedSearchInput" 
+                                class="search-input-integrated" 
+                                placeholder="Buscar endereço, bairro ou ponto de referência..."
+                                autocomplete="off"
+                            >
+                            <!-- Dropdown de sugestões -->
+                            <div id="autocompleteDropdown" class="autocomplete-dropdown"></div>
+                        </div>
+                        <button class="search-btn-integrated" id="integratedSearchBtn">
+                            <span>Pesquisar</span>
+                        </button>
+                    </div>
+                </div>
+                
                 <div class="map-wrapper-google-integrated">
                     <!-- Iframe do Google Maps - Primeiro para garantir que seja visível -->
                     <iframe 
@@ -65,23 +87,6 @@
                     
                     <!-- Overlay para esconder header do Google My Maps -->
                     <div class="google-maps-header-overlay"></div>
-                    
-                    <!-- Barra de Busca Integrada -->
-                    <div class="map-search-overlay">
-                        <div class="search-box-integrated">
-                            <div class="search-icon-integrated">🔍</div>
-                            <input 
-                                type="text" 
-                                id="integratedSearchInput" 
-                                class="search-input-integrated" 
-                                placeholder="Buscar endereço, bairro ou ponto de referência..."
-                                autocomplete="off"
-                            >
-                            <button class="search-btn-integrated" id="integratedSearchBtn">
-                                <span>Pesquisar</span>
-                            </button>
-                        </div>
-                    </div>
                     
                     <!-- Container para marcadores visuais e overlays -->
                     <div class="google-map-container" id="mapVisualLayer"></div>

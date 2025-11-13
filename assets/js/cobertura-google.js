@@ -31,6 +31,7 @@ const GOOGLE_COBERTURA_GEOJSON = {
 let searchMarkerData = null;
 let coveragePolygonsData = null;
 let coverageSVG = null;
+let currentPinCoordinates = null; // Armazenar coordenadas do pin para recalcular posição
 let mapBounds = {
     minLat: -5.6,
     maxLat: -4.6,
@@ -57,6 +58,7 @@ let mapBounds = {
     
     loadCoverageData();
     setupSearch();
+    setupAutocomplete();
     setupGeolocationButton();
     setupScrollReveal();
     // POLÍGONOS SVG PERMANENTEMENTE DESABILITADOS - causavam rabiscos verdes
@@ -77,6 +79,7 @@ function setupSearch() {
     searchBtn.addEventListener('click', function() {
         const query = searchInput.value.trim();
         if (query) {
+            hideAutocompleteDropdown();
             performGeocodeSearch(query);
         } else {
             showSearchMessage('Por favor, digite um endereço ou localização.', 'warning');
@@ -89,6 +92,7 @@ function setupSearch() {
             e.preventDefault();
             const query = searchInput.value.trim();
             if (query) {
+                hideAutocompleteDropdown();
                 performGeocodeSearch(query);
             }
         }
@@ -100,8 +104,234 @@ function setupSearch() {
             this.classList.add('has-content');
         } else {
             this.classList.remove('has-content');
+            hideAutocompleteDropdown();
         }
     });
+}
+
+// ========================================
+// AUTCOMPLETE DE ENDEREÇOS (NOMINATIM)
+// ========================================
+let autocompleteTimeout = null;
+let currentAutocompleteRequest = null;
+
+function setupAutocomplete() {
+    const searchInput = document.getElementById('integratedSearchInput');
+    const dropdown = document.getElementById('autocompleteDropdown');
+    
+    if (!searchInput || !dropdown) return;
+    
+    // Buscar sugestões conforme digita (com debounce)
+    searchInput.addEventListener('input', function() {
+        const query = this.value.trim();
+        
+        // Limpar timeout anterior
+        if (autocompleteTimeout) {
+            clearTimeout(autocompleteTimeout);
+        }
+        
+        // Limpar requisição anterior se ainda estiver pendente
+        if (currentAutocompleteRequest) {
+            currentAutocompleteRequest.abort();
+            currentAutocompleteRequest = null;
+        }
+        
+        if (query.length < 3) {
+            hideAutocompleteDropdown();
+            return;
+        }
+        
+        // Debounce de 300ms
+        autocompleteTimeout = setTimeout(() => {
+            fetchAutocompleteSuggestions(query);
+        }, 300);
+    });
+    
+    // Fechar dropdown ao clicar fora
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+            hideAutocompleteDropdown();
+        }
+    });
+    
+    // Fechar dropdown ao pressionar Escape
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            hideAutocompleteDropdown();
+        }
+    });
+}
+
+function fetchAutocompleteSuggestions(query) {
+    const dropdown = document.getElementById('autocompleteDropdown');
+    if (!dropdown) return;
+    
+    // Melhorar query para Teresina ou São Luís
+    let improvedQuery = improveSearchQuery(query);
+    
+    // Se a query não mencionar cidade explicitamente, fazer busca mais ampla
+    // O filtro depois vai garantir que só mostre Teresina e São Luís
+    if (!/teresina|são luís|sao luis|são luiz|sao luiz/i.test(improvedQuery)) {
+        // Adicionar contexto de busca para melhorar resultados
+        improvedQuery = `${improvedQuery}`;
+    }
+    
+    // Construir URL da API Nominatim
+    const params = new URLSearchParams({
+        q: improvedQuery,
+        format: 'json',
+        addressdetails: '1',
+        limit: '8',
+        countrycodes: 'br',
+        'accept-language': 'pt-BR,pt',
+        viewbox: '-43.5,-5.6,-42.0,-4.6', // Bounding box cobrindo Teresina e São Luís
+        bounded: '0'
+    });
+    
+    const url = `https://nominatim.openstreetmap.org/search?${params.toString()}`;
+    
+    // Mostrar loading
+    dropdown.innerHTML = '<div class="autocomplete-item autocomplete-loading">Buscando...</div>';
+    dropdown.classList.add('show');
+    
+    // Criar AbortController para cancelar requisição se necessário
+    const controller = new AbortController();
+    currentAutocompleteRequest = controller;
+    
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'User-Agent': 'AmplanetCobertura/1.0'
+        },
+        signal: controller.signal
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Erro na requisição');
+        return response.json();
+    })
+    .then(data => {
+        // Verificar se a requisição ainda é a atual
+        if (currentAutocompleteRequest !== controller) return;
+        
+        // Filtrar resultados para Teresina, PI e São Luís, MA
+        const filteredResults = data.filter(result => {
+            const address = result.address || {};
+            const city = (address.city || address.town || address.municipality || '').toLowerCase();
+            const state = (address.state || '').toLowerCase();
+            
+            // Verificar se é Teresina, PI
+            const isTeresina = (city.includes('teresina') && (state.includes('piauí') || state.includes('pi')));
+            
+            // Verificar se é São Luís, MA
+            const isSaoLuis = (
+                (city.includes('são luís') || city.includes('sao luis') || city.includes('são luiz') || city.includes('sao luiz')) &&
+                (state.includes('maranhão') || state.includes('ma'))
+            );
+            
+            return isTeresina || isSaoLuis;
+        });
+        
+        if (filteredResults.length === 0) {
+            dropdown.innerHTML = '<div class="autocomplete-item autocomplete-no-results">Nenhum resultado encontrado</div>';
+            return;
+        }
+        
+        // Renderizar sugestões
+        dropdown.innerHTML = '';
+        filteredResults.forEach((result, index) => {
+            const item = createAutocompleteItem(result, index);
+            dropdown.appendChild(item);
+        });
+    })
+    .catch(error => {
+        if (error.name === 'AbortError') {
+            // Requisição foi cancelada, ignorar
+            return;
+        }
+        console.error('Erro ao buscar sugestões:', error);
+        dropdown.innerHTML = '<div class="autocomplete-item autocomplete-error">Erro ao buscar sugestões</div>';
+    });
+}
+
+function createAutocompleteItem(result, index) {
+    const item = document.createElement('div');
+    item.className = 'autocomplete-item';
+    item.setAttribute('data-index', index);
+    item.setAttribute('tabindex', '0');
+    
+    const address = result.address || {};
+    const displayName = result.display_name || '';
+    
+    // Construir endereço formatado
+    let formattedAddress = '';
+    
+    // Tentar construir endereço completo
+    const parts = [];
+    if (address.house_number) parts.push(address.house_number);
+    if (address.road) parts.push(address.road);
+    if (address.neighbourhood || address.suburb) parts.push(address.neighbourhood || address.suburb);
+    if (address.city || address.town) parts.push(address.city || address.town);
+    if (address.state) parts.push(address.state);
+    
+    formattedAddress = parts.length > 0 ? parts.join(', ') : displayName;
+    
+    // Limitar tamanho do endereço
+    if (formattedAddress.length > 80) {
+        formattedAddress = formattedAddress.substring(0, 77) + '...';
+    }
+    
+    item.innerHTML = `
+        <div class="autocomplete-item-icon">📍</div>
+        <div class="autocomplete-item-content">
+            <div class="autocomplete-item-main">${formattedAddress}</div>
+        </div>
+    `;
+    
+    // Adicionar evento de clique
+    item.addEventListener('click', function() {
+        selectAutocompleteItem(result);
+    });
+    
+    // Adicionar evento de teclado
+    item.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            selectAutocompleteItem(result);
+        } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            const next = dropdown.querySelector(`[data-index="${index + 1}"]`);
+            if (next) next.focus();
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            const prev = dropdown.querySelector(`[data-index="${index - 1}"]`);
+            if (prev) prev.focus();
+        }
+    });
+    
+    return item;
+}
+
+function selectAutocompleteItem(result) {
+    const searchInput = document.getElementById('integratedSearchInput');
+    if (!searchInput) return;
+    
+    // Preencher campo com o endereço selecionado
+    const displayName = result.display_name || '';
+    searchInput.value = displayName;
+    
+    // Fechar dropdown
+    hideAutocompleteDropdown();
+    
+    // Executar busca
+    performGeocodeSearch(displayName);
+}
+
+function hideAutocompleteDropdown() {
+    const dropdown = document.getElementById('autocompleteDropdown');
+    if (dropdown) {
+        dropdown.classList.remove('show');
+        dropdown.innerHTML = '';
+    }
 }
 
 // ========================================
@@ -330,26 +560,19 @@ Opções rápidas:
                 return;
             }
             
-            // Verificar se está em Teresina (aproximado)
-            if (lat < -5.5 || lat > -4.8 || lng < -43.3 || lng > -42.2) {
-                showSearchMessage('⚠️ Localização fora de Teresina. Verifique se o endereço está correto.', 'warning');
-            }
+            // Verificar se está em Teresina, PI ou São Luís, MA (aproximado)
+            const isTeresina = (lat >= -5.5 && lat <= -4.8 && lng >= -43.3 && lng <= -42.2);
+            const isSaoLuis = (lat >= -2.7 && lat <= -2.4 && lng >= -44.4 && lng <= -44.1);
             
-            // Verificar cobertura PRECISAMENTE
-            const coverageResult = checkCoverage(lat, lng);
-            console.log('🔍 Verificação de cobertura:', {
-                lat,
-                lng,
-                isCovered: coverageResult.isCovered,
-                address: formatAddress(bestResult)
-            });
+            if (!isTeresina && !isSaoLuis) {
+                showSearchMessage('⚠️ Localização fora de Teresina, PI ou São Luís, MA. Verifique se o endereço está correto.', 'warning');
+            }
             
             // Salvar dados do marcador
             searchMarkerData = {
                 lat: lat,
                 lng: lng,
                 address: formatAddress(bestResult),
-                coverage: coverageResult,
                 displayName: bestResult.display_name || ''
             };
             
@@ -359,13 +582,9 @@ Opções rápidas:
             // Atualizar mapa e mostrar marcador
             updateGoogleMapFrame(lat, lng);
             
-            // Mostrar resultado
-            showSearchResult(searchMarkerData);
-            
-            // Mensagem de sucesso com status de cobertura
+            // Mensagem de sucesso
             const addressPreview = searchMarkerData.address.split(',')[0];
-            const coverageStatus = coverageResult.isCovered ? '✓ Área Coberta' : '⚠ Fora da Cobertura';
-            showSearchMessage(`${coverageStatus}: ${addressPreview}`, coverageResult.isCovered ? 'success' : 'warning');
+            showSearchMessage(`✓ Endereço encontrado: ${addressPreview}`, 'success');
             
         } else {
             showSearchMessage('❌ Localização não encontrada. Tente uma busca mais específica. Ex: "Av. Ininga, 1234"', 'error');
@@ -418,8 +637,13 @@ function tryUpdateIframeWithLocation(lat, lng) {
     
     // Google My Maps Embed suporta parâmetros ll (lat,lng) e z (zoom) para centralizar
     // O parâmetro mid (map ID) deve ser mantido para preservar os polígonos
+    // Adicionar marcador usando parâmetro q (query) ou marker
     const baseUrl = 'https://www.google.com/maps/d/u/0/embed';
     const mapId = '14iGHLTHtyeRc3mlZo8lNjbmouohSYA0';
+    
+    // Tentar adicionar marcador na URL usando diferentes formatos
+    // Formato 1: Usar ll para centralizar e tentar adicionar marcador
+    // Nota: Google My Maps pode não suportar marcadores customizados via URL
     const embedUrl = `${baseUrl}?mid=${mapId}&ehbc=2E312F&noprof=1&ll=${lat},${lng}&z=16`;
     
     try {
@@ -448,82 +672,59 @@ function updateGoogleMapFrame(lat, lng) {
     // Atualizar iframe para centralizar na localização (mantendo polígonos com mid)
     tryUpdateIframeWithLocation(lat, lng);
     
-    // Mostrar marcador visual sobre o iframe
-    showMarkerOverlay(lat, lng);
-    
-    // Posicionar marcador visual preciso
-    positionVisualMarker(lat, lng);
+    // Aguardar o iframe carregar antes de posicionar o pin
+    const iframe = document.getElementById('googleMapFrame');
+    if (iframe) {
+        const positionPinAfterLoad = function() {
+            // Posicionar marcador visual preciso (apenas pin, sem overlay)
+            positionVisualMarker(lat, lng);
+            // Remover listener após usar
+            iframe.removeEventListener('load', positionPinAfterLoad);
+        };
+        
+        iframe.addEventListener('load', positionPinAfterLoad, { once: true });
+        
+        // Se o iframe já carregou, posicionar após um pequeno delay
+        setTimeout(() => {
+            if (document.getElementById('visualMarker')) {
+                // Se já existe um marker, apenas atualizar posição
+                const marker = document.getElementById('visualMarker');
+                if (marker.updatePosition) {
+                    marker.updatePosition();
+                }
+            } else {
+                // Se não existe, criar novo
+                positionVisualMarker(lat, lng);
+            }
+        }, 500);
+    } else {
+        // Fallback: aguardar um tempo antes de posicionar
+        setTimeout(() => {
+            positionVisualMarker(lat, lng);
+        }, 500);
+    }
 }
 
 // ========================================
-// MOSTRAR OVERLAY DO MARCADOR
+// MOSTRAR OVERLAY DO MARCADOR (REMOVIDO)
 // ========================================
-function showMarkerOverlay(lat, lng) {
-    // Remover overlay anterior se existir
-    const existingOverlay = document.getElementById('markerOverlay');
-    if (existingOverlay) {
-        existingOverlay.remove();
-    }
-    
-    // Criar overlay
-    const overlay = document.createElement('div');
-    overlay.id = 'markerOverlay';
-    overlay.className = 'marker-overlay';
-    
-    const data = searchMarkerData || {
-        lat: lat,
-        lng: lng,
-        address: 'Localização encontrada',
-        coverage: checkCoverage(lat, lng)
-    };
-    
-    overlay.innerHTML = `
-        <div class="marker-overlay-content">
-            <button class="marker-overlay-close" onclick="this.closest('#markerOverlay').remove()">&times;</button>
-            <div class="marker-overlay-header">
-                <div class="marker-icon-large">📍</div>
-                <div>
-                    <h3 class="marker-overlay-title">${data.address}</h3>
-                    <p class="marker-overlay-subtitle">Teresina, PI</p>
-                </div>
-            </div>
-            <div class="marker-overlay-body">
-                ${data.coverage.isCovered 
-                    ? `<div class="coverage-status coverage-covered">
-                        <div class="coverage-icon">✓</div>
-                        <div>
-                            <div class="coverage-title">Área Coberta</div>
-                            <div class="coverage-text">Você pode contratar nossos planos de internet fibra óptica!</div>
-                        </div>
-                    </div>` 
-                    : `<div class="coverage-status coverage-none">
-                        <div class="coverage-icon">⚠</div>
-                        <div>
-                            <div class="coverage-title">Fora da Cobertura</div>
-                            <div class="coverage-text">Entre em contato para verificar disponibilidade.</div>
-                        </div>
-                    </div>`}
-            </div>
-            <div class="marker-overlay-footer">
-                <a href="https://wa.me/55869988230492?text=Olá!%20Gostaria%20de%20verificar%20cobertura%20em%20${encodeURIComponent(data.address)}" 
-                   class="btn btn-primary btn-small" target="_blank">Verificar pelo WhatsApp</a>
-            </div>
-        </div>
-    `;
-    
-    document.querySelector('.map-wrapper-google-integrated').appendChild(overlay);
-    
-    // Posicionar o marcador visual no mapa (aproximado)
-    positionVisualMarker(lat, lng);
-}
+// Função removida - agora usamos apenas o pin visual
+// A verificação de cobertura é feita visualmente pelo usuário no mapa
 
 // ========================================
 // POSICIONAR MARCADOR VISUAL PRECISO
 // ========================================
 function positionVisualMarker(lat, lng) {
-    // Remover marcador anterior
+    // Armazenar coordenadas para recalcular quando necessário
+    currentPinCoordinates = { lat, lng };
+    
+    // Remover marcador anterior e limpar recursos
     const existingMarker = document.getElementById('visualMarker');
     if (existingMarker) {
+        // Limpar intervalos e observers antes de remover
+        if (existingMarker.cleanup) {
+            existingMarker.cleanup();
+        }
         existingMarker.remove();
     }
     
@@ -542,38 +743,32 @@ function positionVisualMarker(lat, lng) {
     `;
     marker.title = 'Localização encontrada';
     
-    // Calcular posição do marcador baseado nas coordenadas geográficas
-    // Teresina bounds: lat: -5.6 a -4.6, lng: -43.5 a -42.0
-    // Centro aproximado: lat: -5.09, lng: -42.8
+    // Função para calcular posição do pin - simplificada
+    // Como o pin só aparece quando o mapa está centralizado no endereço,
+    // podemos posicioná-lo sempre no centro do container
+    const updatePinPosition = () => {
+        const mapWidth = mapContainer.offsetWidth || 1000;
+        const mapHeight = mapContainer.offsetHeight || 650;
+        
+        // Posicionar pin no centro do mapa (já que o mapa está centralizado no endereço)
+        const centerX = mapWidth / 2;
+        const centerY = mapHeight / 2;
+        
+        // Aplicar posição no centro
+        marker.style.top = `${centerY}px`;
+        marker.style.left = `${centerX}px`;
+    };
     
-    const mapWidth = mapContainer.offsetWidth || 1000;
-    const mapHeight = mapContainer.offsetHeight || 650;
-    
-    // Bounds do mapa do Google My Maps (ajustar conforme necessário)
-    const mapLatMin = -5.6;
-    const mapLatMax = -4.6;
-    const mapLngMin = -43.5;
-    const mapLngMax = -42.0;
-    
-    // Converter coordenadas geográficas para pixels
-    const latRange = mapLatMax - mapLatMin;
-    const lngRange = mapLngMax - mapLngMin;
-    
-    // Normalizar coordenadas (0 a 1)
-    const normalizedLng = (lng - mapLngMin) / lngRange;
-    const normalizedLat = (mapLatMax - lat) / latRange; // Invertido porque Y começa no topo
-    
-    // Converter para pixels
-    const left = normalizedLng * mapWidth;
-    const top = normalizedLat * mapHeight;
-    
+    // Posicionar pin fixo no endereço (centro do mapa)
     marker.style.position = 'absolute';
-    marker.style.top = `${Math.max(0, Math.min(mapHeight, top))}px`;
-    marker.style.left = `${Math.max(0, Math.min(mapWidth, left))}px`;
     marker.style.transform = 'translate(-50%, -100%)';
-    marker.style.zIndex = '1000';
+    marker.style.zIndex = '10000'; // Z-index alto para ficar acima de tudo
     marker.style.cursor = 'pointer';
     marker.style.pointerEvents = 'all';
+    marker.style.willChange = 'transform'; // Otimização de performance
+    
+    // Calcular e aplicar posição inicial (centro do mapa)
+    updatePinPosition();
     
     // Animação de entrada
     marker.style.opacity = '0';
@@ -588,13 +783,10 @@ function positionVisualMarker(lat, lng) {
         marker.style.transform = 'translate(-50%, -100%) scale(1)';
     }, 100);
     
-    // Clique no marcador
-    marker.addEventListener('click', function() {
-        const overlay = document.getElementById('markerOverlay');
-        if (overlay) {
-            overlay.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-    });
+    // Tooltip com endereço ao passar o mouse
+    if (searchMarkerData && searchMarkerData.address) {
+        marker.title = searchMarkerData.address;
+    }
     
     // Adicionar pulso animado
     marker.addEventListener('mouseenter', function() {
@@ -604,20 +796,146 @@ function positionVisualMarker(lat, lng) {
     marker.addEventListener('mouseleave', function() {
         this.style.transform = 'translate(-50%, -100%) scale(1)';
     });
+    
+    // Observar redimensionamento do container (atualizar posição do pin no centro)
+    const resizeObserver = new ResizeObserver(() => {
+        if (currentPinCoordinates && document.getElementById('visualMarker')) {
+            updatePinPosition();
+        }
+    });
+    resizeObserver.observe(mapContainer);
+    
+    // Detectar quando o usuário move o mapa e remover o pin
+    const mapWrapper = mapContainer.closest('.map-wrapper-google-integrated');
+    let hasMoved = false;
+    let startX = 0;
+    let startY = 0;
+    
+    // Função para remover o pin quando o mapa é movido
+    const removePinOnMapMove = () => {
+        if (hasMoved) {
+            const existingMarker = document.getElementById('visualMarker');
+            if (existingMarker) {
+                // Animação de saída suave
+                existingMarker.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                existingMarker.style.opacity = '0';
+                existingMarker.style.transform = 'translate(-50%, -100%) scale(0)';
+                
+                setTimeout(() => {
+                    if (existingMarker.cleanup) {
+                        existingMarker.cleanup();
+                    }
+                    existingMarker.remove();
+                    currentPinCoordinates = null;
+                }, 300);
+            }
+        }
+    };
+    
+    if (mapWrapper) {
+        // Detectar início de interação
+        const handleInteractionStart = (e) => {
+            hasMoved = false;
+            // Capturar posição inicial do mouse/touch
+            if (e.type === 'mousedown') {
+                startX = e.clientX;
+                startY = e.clientY;
+            } else if (e.type === 'touchstart' && e.touches.length > 0) {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+            }
+        };
+        
+        // Detectar movimento do mapa
+        const handleInteractionMove = (e) => {
+            let currentX, currentY;
+            
+            if (e.type === 'mousemove') {
+                currentX = e.clientX;
+                currentY = e.clientY;
+            } else if (e.type === 'touchmove' && e.touches.length > 0) {
+                currentX = e.touches[0].clientX;
+                currentY = e.touches[0].clientY;
+            }
+            
+            // Calcular distância movida
+            if (currentX !== undefined && currentY !== undefined) {
+                const deltaX = Math.abs(currentX - startX);
+                const deltaY = Math.abs(currentY - startY);
+                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                
+                // Se moveu mais de 5 pixels, considerar que o mapa foi movido
+                if (distance > 5) {
+                    hasMoved = true;
+                    removePinOnMapMove();
+                }
+            }
+        };
+        
+        // Detectar zoom (scroll)
+        const handleZoom = () => {
+            hasMoved = true;
+            removePinOnMapMove();
+        };
+        
+        // Eventos de mouse
+        mapWrapper.addEventListener('mousedown', handleInteractionStart);
+        mapWrapper.addEventListener('mousemove', handleInteractionMove);
+        
+        // Eventos de touch
+        mapWrapper.addEventListener('touchstart', handleInteractionStart, { passive: true });
+        mapWrapper.addEventListener('touchmove', handleInteractionMove, { passive: true });
+        
+        // Detectar zoom (scroll do mouse)
+        mapWrapper.addEventListener('wheel', handleZoom, { passive: true });
+        
+        // Detectar zoom por gestos (pinch)
+        let lastTouchDistance = 0;
+        mapWrapper.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                const touch1 = e.touches[0];
+                const touch2 = e.touches[1];
+                lastTouchDistance = Math.sqrt(
+                    Math.pow(touch2.clientX - touch1.clientX, 2) +
+                    Math.pow(touch2.clientY - touch1.clientY, 2)
+                );
+            }
+        }, { passive: true });
+        
+        mapWrapper.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2) {
+                const touch1 = e.touches[0];
+                const touch2 = e.touches[1];
+                const currentDistance = Math.sqrt(
+                    Math.pow(touch2.clientX - touch1.clientX, 2) +
+                    Math.pow(touch2.clientY - touch1.clientY, 2)
+                );
+                
+                // Se a distância entre os toques mudou significativamente, é zoom
+                if (Math.abs(currentDistance - lastTouchDistance) > 10) {
+                    hasMoved = true;
+                    removePinOnMapMove();
+                    lastTouchDistance = currentDistance;
+                }
+            }
+        }, { passive: true });
+    }
+    
+    // Limpar recursos quando o marker for removido
+    const cleanup = () => {
+        if (resizeObserver) resizeObserver.disconnect();
+    };
+    
+    // Armazenar função de atualização e limpeza no marker
+    marker.updatePosition = updatePinPosition;
+    marker.resizeObserver = resizeObserver;
+    marker.cleanup = cleanup;
 }
 
 // ========================================
-// MOSTRAR RESULTADO DA BUSCA
+// MOSTRAR RESULTADO DA BUSCA (REMOVIDO)
 // ========================================
-function showSearchResult(data) {
-    // Scroll suave para o overlay
-    setTimeout(() => {
-        const overlay = document.getElementById('markerOverlay');
-        if (overlay) {
-            overlay.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-    }, 100);
-}
+// Função removida - não há mais overlay para mostrar
 
 // ========================================
 // FORMATAR ENDEREÇO
@@ -780,18 +1098,27 @@ function latLngToPixelY(lat, lng, width, height) {
 }
 
 // ========================================
-// VERIFICAR COBERTURA (ALGORITMO RAY CASTING CORRIGIDO)
+// VERIFICAR COBERTURA (ALGORITMO WINDING NUMBER + RAY CASTING)
 // ========================================
 function checkCoverage(lat, lng) {
+    // Validar entrada
+    const pointLat = parseFloat(lat);
+    const pointLng = parseFloat(lng);
+    
+    if (isNaN(pointLat) || isNaN(pointLng)) {
+        console.error('❌ Coordenadas inválidas:', lat, lng);
+        return { isCovered: false };
+    }
+    
     if (!coveragePolygonsData || !coveragePolygonsData.features) {
         console.log('⚠️ GeoJSON não carregado para verificação');
         return { isCovered: false };
     }
     
-    console.log('🔍 Verificando cobertura para:', lat, lng);
+    console.log('🔍 Verificando cobertura para:', pointLat, pointLng);
     console.log('📊 Total de polígonos:', coveragePolygonsData.features.length);
     
-    // Algoritmo Ray Casting para verificar se ponto está dentro do polígono
+    // Verificar cada polígono
     for (let i = 0; i < coveragePolygonsData.features.length; i++) {
         const feature = coveragePolygonsData.features[i];
         if (feature.geometry.type !== 'Polygon') {
@@ -800,70 +1127,274 @@ function checkCoverage(lat, lng) {
         }
         
         const coordinates = feature.geometry.coordinates[0];
-        if (!coordinates || coordinates.length === 0) {
-            console.log(`⚠️ Feature ${i} não tem coordenadas`);
+        if (!coordinates || coordinates.length < 3) {
+            console.log(`⚠️ Feature ${i} não tem coordenadas suficientes`);
+            continue;
+        }
+        
+        // 1. Verificar Bounding Box primeiro (otimização)
+        const bbox = calculateBoundingBox(coordinates);
+        if (!isPointInBoundingBox(pointLat, pointLng, bbox)) {
+            console.log(`📦 Polígono ${i}: ponto fora do bounding box`);
             continue;
         }
         
         console.log(`🔍 Verificando polígono ${i} com ${coordinates.length} pontos`);
-        console.log(`📐 Primeiro ponto: [${coordinates[0][0]}, ${coordinates[0][1]}]`);
         
-        // Ray casting algorithm corrigido - baseado no algoritmo do Leaflet
-        // GeoJSON formato: [lng, lat] = [x, y]
-        let inside = false;
+        // 2. Normalizar polígono (garantir que está fechado)
+        const normalizedCoords = normalizePolygon(coordinates);
         
-        for (let j = 0, k = coordinates.length - 1; j < coordinates.length; k = j++) {
-            const point1 = coordinates[k]; // Ponto anterior [lng, lat]
-            const point2 = coordinates[j]; // Ponto atual [lng, lat]
-            
-            // Extrair coordenadas - GeoJSON é [lng, lat]
-            const xi = point1[0]; // longitude do ponto anterior
-            const yi = point1[1]; // latitude do ponto anterior
-            const xj = point2[0]; // longitude do ponto atual
-            const yj = point2[1]; // latitude do ponto atual
-            
-            // Algoritmo Ray Casting (mesmo usado no Leaflet)
-            // Verificar se a aresta cruza o raio horizontal do ponto
-            // O raio vai da posição (lng, lat) para a direita (lng +∞)
-            const rayY = lat; // Latitude do ponto que queremos verificar
-            const rayX = lng; // Longitude do ponto
-            
-            // A aresta cruza se:
-            // 1. Um ponto está acima do raio E o outro está abaixo (ou vice-versa)
-            // 2. A interseção X está à direita do ponto do raio
-            const yiAboveRay = yi > rayY;
-            const yjAboveRay = yj > rayY;
-            
-            // Verificar se cruza o raio horizontal
-            if (yiAboveRay !== yjAboveRay) {
-                // Calcular X da interseção usando interpolação linear
-                // x = (y - yi) * (xj - xi) / (yj - yi) + xi
-                const dy = yj - yi;
-                
-                // Evitar divisão por zero (aresta horizontal)
-                if (Math.abs(dy) > 0.000001) {
-                    const intersectX = (rayY - yi) * (xj - xi) / dy + xi;
-                    
-                    // Se a interseção está à direita do ponto do raio
-                    if (rayX < intersectX) {
-                        inside = !inside; // Alternar estado (dentro/fora)
-                        console.log(`  ✓ Interseção encontrada: X=${intersectX.toFixed(6)}, estado: ${inside ? 'DENTRO' : 'FORA'}`);
-                    }
-                }
-            }
+        // 3. Usar Winding Number Algorithm (mais robusto)
+        const windingResult = checkPointInPolygonWinding(pointLat, pointLng, normalizedCoords);
+        
+        // 4. Opcionalmente verificar com Ray Casting para comparação
+        const rayCastingResult = checkPointInPolygonRayCasting(pointLat, pointLng, normalizedCoords);
+        
+        // 5. Comparar resultados
+        if (windingResult !== rayCastingResult) {
+            console.warn(`⚠️ Divergência entre algoritmos no polígono ${i}: Winding=${windingResult}, RayCasting=${rayCastingResult}`);
+            console.warn(`   Usando Winding Number como autoritativo`);
         }
         
-        // O algoritmo alterna inside a cada interseção, então inside já é o resultado final
-        console.log(`📊 Polígono ${i}: resultado final: ${inside ? 'DENTRO' : 'FORA'}`);
-        
-        if (inside) {
-            console.log(`✅ Ponto está DENTRO do polígono ${i}`);
+        // Usar Winding Number como resultado final (mais confiável)
+        if (windingResult) {
+            console.log(`✅ Ponto está DENTRO do polígono ${i} (Winding Number)`);
             return { isCovered: true };
         }
     }
     
     console.log('❌ Ponto está FORA de todos os polígonos');
     return { isCovered: false };
+}
+
+// ========================================
+// CALCULAR BOUNDING BOX DO POLÍGONO
+// ========================================
+function calculateBoundingBox(coordinates) {
+    let minLat = Infinity;
+    let maxLat = -Infinity;
+    let minLng = Infinity;
+    let maxLng = -Infinity;
+    
+    for (const coord of coordinates) {
+        const lng = parseFloat(coord[0]);
+        const lat = parseFloat(coord[1]);
+        
+        if (!isNaN(lat) && !isNaN(lng)) {
+            minLat = Math.min(minLat, lat);
+            maxLat = Math.max(maxLat, lat);
+            minLng = Math.min(minLng, lng);
+            maxLng = Math.max(maxLng, lng);
+        }
+    }
+    
+    return { minLat, maxLat, minLng, maxLng };
+}
+
+// ========================================
+// VERIFICAR SE PONTO ESTÁ NO BOUNDING BOX
+// ========================================
+function isPointInBoundingBox(lat, lng, bbox) {
+    return lat >= bbox.minLat && lat <= bbox.maxLat && 
+           lng >= bbox.minLng && lng <= bbox.maxLng;
+}
+
+// ========================================
+// NORMALIZAR POLÍGONO (GARANTIR QUE ESTÁ FECHADO)
+// ========================================
+function normalizePolygon(coordinates) {
+    // Garantir que o polígono está fechado (primeiro ponto = último ponto)
+    const first = coordinates[0];
+    const last = coordinates[coordinates.length - 1];
+    
+    if (first[0] === last[0] && first[1] === last[1]) {
+        return coordinates;
+    }
+    
+    return [...coordinates, first];
+}
+
+// ========================================
+// WINDING NUMBER ALGORITHM (SOMA DE ÂNGULOS)
+// ========================================
+// Este algoritmo é mais robusto que Ray Casting e funciona independente da direção do polígono
+// Calcula o número de voltas que o polígono dá ao redor do ponto
+function checkPointInPolygonWinding(lat, lng, coordinates) {
+    let windingNumber = 0;
+    
+    for (let i = 0; i < coordinates.length - 1; i++) {
+        const p1 = coordinates[i];
+        const p2 = coordinates[i + 1];
+        
+        const x1 = parseFloat(p1[0]) - parseFloat(lng);
+        const y1 = parseFloat(p1[1]) - parseFloat(lat);
+        const x2 = parseFloat(p2[0]) - parseFloat(lng);
+        const y2 = parseFloat(p2[1]) - parseFloat(lat);
+        
+        // Validar coordenadas
+        if (isNaN(x1) || isNaN(y1) || isNaN(x2) || isNaN(y2)) {
+            continue;
+        }
+        
+        // Calcular ângulo de cada vértice em relação ao ponto
+        const angle1 = Math.atan2(y1, x1);
+        const angle2 = Math.atan2(y2, x2);
+        
+        // Calcular diferença de ângulo
+        let deltaAngle = angle2 - angle1;
+        
+        // Normalizar para [-π, π] mantendo a direção
+        if (deltaAngle > Math.PI) {
+            deltaAngle -= 2 * Math.PI;
+        } else if (deltaAngle < -Math.PI) {
+            deltaAngle += 2 * Math.PI;
+        }
+        
+        windingNumber += deltaAngle;
+    }
+    
+    // O winding number deve ser próximo de 2π (ou -2π) se o ponto está dentro
+    // Converter para número de voltas: windingNumber / (2π)
+    const turns = Math.abs(windingNumber) / (2 * Math.PI);
+    
+    // Se o número de voltas é próximo de 1 (ou múltiplo inteiro), o ponto está dentro
+    // Tolerância para erros de precisão numérica
+    const tolerance = 0.1; // permitir até 0.1 voltas de diferença
+    const isInside = Math.abs(turns - Math.round(turns)) < tolerance && turns > 0.5;
+    
+    console.log(`  📐 Winding Number: soma=${windingNumber.toFixed(4)} rad (${(windingNumber * 180 / Math.PI).toFixed(2)}°), voltas=${turns.toFixed(3)}, dentro=${isInside}`);
+    
+    return isInside;
+}
+
+// ========================================
+// RAY CASTING ALGORITHM (PARA COMPARAÇÃO)
+// ========================================
+function checkPointInPolygonRayCasting(lat, lng, coordinates) {
+    let inside = false;
+    const rayY = parseFloat(lat);
+    const rayX = parseFloat(lng);
+    
+    for (let j = 0, k = coordinates.length - 2; j < coordinates.length - 1; k = j++) {
+        const point1 = coordinates[k];
+        const point2 = coordinates[j];
+        
+        const xi = parseFloat(point1[0]);
+        const yi = parseFloat(point1[1]);
+        const xj = parseFloat(point2[0]);
+        const yj = parseFloat(point2[1]);
+        
+        if (isNaN(xi) || isNaN(yi) || isNaN(xj) || isNaN(yj)) {
+            continue;
+        }
+        
+        const yiAboveRay = yi > rayY;
+        const yjAboveRay = yj > rayY;
+        
+        if (yiAboveRay !== yjAboveRay) {
+            const dy = yj - yi;
+            
+            if (Math.abs(dy) > 0.0000001) {
+                const intersectX = (rayY - yi) * (xj - xi) / dy + xi;
+                const tolerance = 0.000001;
+                
+                if (rayX < intersectX - tolerance) {
+                    inside = !inside;
+                }
+            }
+        }
+    }
+    
+    return inside;
+}
+
+// ========================================
+// FUNÇÃO DE TESTE PARA COORDENADAS ESPECÍFICAS
+// ========================================
+// Esta função pode ser chamada do console do navegador para testar coordenadas
+// Exemplo: testCoverageCheck(-5.085, -42.808)
+function testCoverageCheck(lat, lng, label = 'Ponto de teste') {
+    console.log('═══════════════════════════════════════════════════════');
+    console.log(`🧪 TESTE DE COBERTURA: ${label}`);
+    console.log(`📍 Coordenadas: lat=${lat}, lng=${lng}`);
+    console.log('═══════════════════════════════════════════════════════');
+    
+    if (!coveragePolygonsData || !coveragePolygonsData.features) {
+        console.error('❌ GeoJSON não carregado!');
+        return;
+    }
+    
+    console.log(`📊 Total de polígonos: ${coveragePolygonsData.features.length}`);
+    console.log('');
+    
+    // Testar cada polígono individualmente
+    for (let i = 0; i < coveragePolygonsData.features.length; i++) {
+        const feature = coveragePolygonsData.features[i];
+        if (feature.geometry.type !== 'Polygon') {
+            continue;
+        }
+        
+        const coordinates = feature.geometry.coordinates[0];
+        if (!coordinates || coordinates.length < 3) {
+            continue;
+        }
+        
+        console.log(`\n🔷 POLÍGONO ${i}:`);
+        console.log(`   Pontos: ${coordinates.length}`);
+        
+        // Bounding box
+        const bbox = calculateBoundingBox(coordinates);
+        console.log(`   📦 Bounding Box: lat[${bbox.minLat.toFixed(6)}, ${bbox.maxLat.toFixed(6)}], lng[${bbox.minLng.toFixed(6)}, ${bbox.maxLng.toFixed(6)}]`);
+        
+        const inBbox = isPointInBoundingBox(lat, lng, bbox);
+        console.log(`   ${inBbox ? '✅' : '❌'} Dentro do Bounding Box: ${inBbox}`);
+        
+        if (!inBbox) {
+            console.log(`   ⏭️  Pulando verificação (fora do bounding box)`);
+            continue;
+        }
+        
+        // Normalizar
+        const normalizedCoords = normalizePolygon(coordinates);
+        console.log(`   🔄 Polígono normalizado: ${normalizedCoords.length} pontos`);
+        
+        // Winding Number
+        console.log(`   📐 Testando com Winding Number Algorithm...`);
+        const windingResult = checkPointInPolygonWinding(lat, lng, normalizedCoords);
+        console.log(`   ${windingResult ? '✅' : '❌'} Winding Number: ${windingResult ? 'DENTRO' : 'FORA'}`);
+        
+        // Ray Casting
+        console.log(`   🎯 Testando com Ray Casting Algorithm...`);
+        const rayCastingResult = checkPointInPolygonRayCasting(lat, lng, normalizedCoords);
+        console.log(`   ${rayCastingResult ? '✅' : '❌'} Ray Casting: ${rayCastingResult ? 'DENTRO' : 'FORA'}`);
+        
+        // Comparação
+        if (windingResult !== rayCastingResult) {
+            console.warn(`   ⚠️  DIVERGÊNCIA: Winding=${windingResult}, RayCasting=${rayCastingResult}`);
+        }
+        
+        if (windingResult) {
+            console.log(`\n✅ RESULTADO FINAL: Ponto está DENTRO do polígono ${i}`);
+            console.log('═══════════════════════════════════════════════════════');
+            return { isCovered: true, polygonIndex: i };
+        }
+    }
+    
+    console.log(`\n❌ RESULTADO FINAL: Ponto está FORA de todos os polígonos`);
+    console.log('═══════════════════════════════════════════════════════');
+    return { isCovered: false };
+}
+
+// Expor função globalmente para testes no console
+if (typeof window !== 'undefined') {
+    window.testCoverageCheck = testCoverageCheck;
+    
+    // Teste automático para "Avenida Ininga, nº 1201" (coordenadas aproximadas)
+    // Descomente para testar automaticamente ao carregar a página
+    // setTimeout(() => {
+    //     console.log('🧪 Executando teste automático para Avenida Ininga, nº 1201...');
+    //     testCoverageCheck(-5.085, -42.808, 'Avenida Ininga, nº 1201');
+    // }, 2000);
 }
 
 // ========================================
@@ -900,6 +1431,17 @@ function clearSearchMessage() {
 }
 
 // ========================================
+// GERAR SVG DO ÍCONE DE LOCALIZAÇÃO
+// ========================================
+function getLocationIconSVG() {
+    return `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor"/>
+        </svg>
+    `;
+}
+
+// ========================================
 // GEOLOCALIZAÇÃO - OBTER LOCALIZAÇÃO ATUAL
 // ========================================
 function setupGeolocationButton() {
@@ -911,26 +1453,19 @@ function setupGeolocationButton() {
     
     console.log('✅ Geolocalização disponível');
     
-    // Criar botão de geolocalização no overlay da busca
-    const searchOverlay = document.querySelector('.map-search-overlay');
-    if (!searchOverlay) return;
+    // Criar botão de geolocalização dentro do search-box-integrated
+    const searchBox = document.querySelector('.search-box-integrated');
+    if (!searchBox) return;
     
-    // Criar container para o botão - posicionar no canto superior direito, acima da busca
+    // Criar container para o botão - posicionar dentro do search-box
     const geoButtonContainer = document.createElement('div');
     geoButtonContainer.className = 'geo-button-container-google';
-    // Posicionar bem acima da barra de busca
-    geoButtonContainer.style.cssText = `
-        position: absolute;
-        top: -10px;
-        right: 20px;
-        z-index: 302;
-    `;
     
     const button = document.createElement('button');
     button.className = 'geo-location-btn-google';
     button.setAttribute('title', 'Usar minha localização atual');
     button.setAttribute('aria-label', 'Usar localização atual');
-    button.innerHTML = '<span style="font-size: 1.25rem;">📍</span>';
+    button.innerHTML = getLocationIconSVG();
     
     // Adicionar indicador de loading
     const loadingIndicator = document.createElement('span');
@@ -956,7 +1491,13 @@ function setupGeolocationButton() {
     });
     
     geoButtonContainer.appendChild(button);
-    searchOverlay.appendChild(geoButtonContainer);
+    // Inserir o botão antes do botão de pesquisar
+    const searchBtn = document.getElementById('integratedSearchBtn');
+    if (searchBtn && searchBtn.parentNode) {
+        searchBtn.parentNode.insertBefore(geoButtonContainer, searchBtn);
+    } else {
+        searchBox.appendChild(geoButtonContainer);
+    }
 }
 
 function getCurrentLocationGoogle(onComplete) {
@@ -1018,18 +1559,16 @@ function handleLocationSuccessGoogle(position) {
     
     console.log('✅ Localização obtida:', lat, lng);
     
-    // Verificar se está em Teresina (aproximado)
-    if (lat >= -5.5 && lat <= -4.8 && lng >= -43.3 && lng <= -42.2) {
-        // Verificar cobertura
-        const coverageResult = checkCoverage(lat, lng);
-        console.log('🔍 Verificação de cobertura (geolocalização):', coverageResult);
-        
+    // Verificar se está em Teresina, PI ou São Luís, MA (aproximado)
+    const isTeresina = (lat >= -5.5 && lat <= -4.8 && lng >= -43.3 && lng <= -42.2);
+    const isSaoLuis = (lat >= -2.7 && lat <= -2.4 && lng >= -44.4 && lng <= -44.1);
+    
+    if (isTeresina || isSaoLuis) {
         // Salvar dados
         searchMarkerData = {
             lat: lat,
             lng: lng,
             address: 'Sua localização atual',
-            coverage: coverageResult,
             displayName: 'Sua localização atual'
         };
         
@@ -1072,22 +1611,20 @@ function handleLocationSuccessGoogle(position) {
                 // Atualizar dados do marcador
                 searchMarkerData.address = address;
                 
-                // Mostrar resultado (sem atualizar iframe)
+                // Mostrar resultado
                 updateGoogleMapFrame(lat, lng);
-                showSearchResult(searchMarkerData);
                 
                 // Mensagem de sucesso
-                const coverageStatus = coverageResult.isCovered ? '✓ Área Coberta' : '⚠ Fora da Cobertura';
-                showSearchMessage(`${coverageStatus}: ${address.split(',')[0]}`, coverageResult.isCovered ? 'success' : 'warning');
+                showSearchMessage(`✓ Localização encontrada: ${address.split(',')[0]}`, 'success');
             })
             .catch(error => {
                 console.error('Erro ao buscar endereço:', error);
-                // Mostrar mesmo sem endereço (sem atualizar iframe)
+                // Mostrar mesmo sem endereço
                 updateGoogleMapFrame(lat, lng);
-                showSearchResult(searchMarkerData);
+                showSearchMessage('✓ Localização encontrada', 'success');
             });
     } else {
-        showSearchMessage('⚠️ Você não está em Teresina, PI. Esta ferramenta verifica cobertura apenas em Teresina.', 'warning');
+        showSearchMessage('⚠️ Você não está em Teresina, PI ou São Luís, MA. Esta ferramenta funciona apenas nessas cidades.', 'warning');
     }
 }
 
@@ -1105,7 +1642,22 @@ function handleLocationErrorGoogle(error) {
         case error.TIMEOUT:
             message += 'Tempo esgotado ao buscar localização.';
             break;
+        default:
+            message += 'Erro desconhecido.';
     }
+    
+    // Limpar estado de loading do botão
+    const button = document.querySelector('.geo-location-btn-google');
+    if (button) {
+        button.disabled = false;
+        button.style.opacity = '1';
+        button.style.cursor = 'pointer';
+        const loadingIndicator = button.querySelector('.geo-loading-indicator-google');
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'none';
+        }
+    }
+    
     showSearchMessage(message, 'error');
 }
 

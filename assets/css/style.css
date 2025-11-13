@@ -2652,6 +2652,28 @@ section {
     }
 }
 
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideDownFade {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .modal-close {
     position: absolute;
     top: var(--spacing-md);
@@ -3381,6 +3403,9 @@ section {
 
 /* Botão de Geolocalização - Google Maps */
 .geo-button-container-google {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
     pointer-events: all;
 }
 
@@ -3394,21 +3419,33 @@ section {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: var(--transition-base);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     color: white;
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
     position: relative;
     z-index: 302;
+    flex-shrink: 0;
+}
+
+.geo-location-btn-google svg {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.3s ease;
 }
 
 .geo-location-btn-google:hover:not(:disabled) {
     background: var(--primary-dark);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-colored);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+}
+
+.geo-location-btn-google:hover:not(:disabled) svg {
+    transform: scale(1.1);
 }
 
 .geo-location-btn-google:active:not(:disabled) {
-    transform: translateY(0);
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
 }
 
 .geo-location-btn-google:disabled {
@@ -3658,6 +3695,45 @@ section {
     pointer-events: all;
 }
 
+.visual-marker-precise {
+    position: absolute;
+    z-index: 10000 !important;
+    pointer-events: all;
+    cursor: pointer;
+}
+
+.marker-pin {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.marker-pin-inner {
+    font-size: 2.5rem;
+    line-height: 1;
+    z-index: 10001;
+    position: relative;
+    transition: transform 0.3s ease;
+}
+
+.marker-pin-shadow {
+    position: absolute;
+    width: 20px;
+    height: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 50%;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10000;
+}
+
+.visual-marker-precise:hover .marker-pin-inner {
+    transform: scale(1.2);
+}
+
 @keyframes markerPulse {
     0%, 100% {
         transform: translate(-50%, -50%) scale(1);
@@ -3860,14 +3936,12 @@ section {
 
 /* Barra de Busca Integrada no Mapa */
 .map-search-overlay {
-    position: absolute;
-    top: var(--spacing-lg);
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 300;
-    width: 90%;
-    max-width: 750px;
-    pointer-events: none;
+    position: relative;
+    margin: var(--spacing-xl) auto var(--spacing-lg);
+    width: 100%;
+    max-width: 900px;
+    pointer-events: all;
+    animation: fadeInDown 0.5s ease-out;
 }
 
 .search-box-integrated {
@@ -3876,20 +3950,21 @@ section {
     gap: var(--spacing-sm);
     background: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(20px);
-    padding: var(--spacing-sm) var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
     border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-xl);
-    border: 2px solid rgba(37, 99, 235, 0.2);
-    transition: var(--transition-base);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(37, 99, 235, 0.1);
+    border: 2px solid rgba(37, 99, 235, 0.15);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     pointer-events: all;
-    max-width: 800px;
-    margin: 0 auto;
+    width: 100%;
+    position: relative;
 }
 
 .search-box-integrated:focus-within {
     border-color: var(--primary-color);
-    box-shadow: var(--shadow-colored);
-    transform: translateY(-2px);
+    box-shadow: 0 15px 50px rgba(37, 99, 235, 0.25), 0 0 0 3px rgba(37, 99, 235, 0.1);
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 1);
 }
 
 .search-icon-integrated {
@@ -3898,16 +3973,28 @@ section {
     flex-shrink: 0;
 }
 
+.search-input-wrapper {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
 .search-input-integrated {
     flex: 1;
     border: none;
     outline: none;
-    font-size: 0.95rem;
+    font-size: 1rem;
     font-family: 'Inter', sans-serif;
     font-weight: 500;
     color: var(--text-dark);
     background: transparent;
     padding: var(--spacing-xs) 0;
+    transition: all 0.2s ease;
+}
+
+.search-input-integrated:focus {
+    color: var(--text-dark);
 }
 
 .search-input-integrated::placeholder {
@@ -3934,13 +4021,98 @@ section {
 
 .search-btn-integrated:hover:not(:disabled) {
     background: var(--primary-dark);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
 }
 
 .search-btn-integrated:disabled {
     opacity: 0.7;
     cursor: not-allowed;
+}
+
+/* Dropdown de Autocomplete */
+.autocomplete-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: var(--spacing-xs);
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(37, 99, 235, 0.1);
+}
+
+.autocomplete-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    animation: slideDownFade 0.3s ease-out;
+}
+
+.autocomplete-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-lg);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.autocomplete-item:last-child {
+    border-bottom: none;
+}
+
+.autocomplete-item:hover,
+.autocomplete-item:focus {
+    background: linear-gradient(90deg, rgba(37, 99, 235, 0.05), rgba(37, 99, 235, 0.02));
+    outline: none;
+}
+
+.autocomplete-item:active {
+    background: rgba(37, 99, 235, 0.1);
+    transform: scale(0.98);
+}
+
+.autocomplete-item-icon {
+    font-size: 1.1rem;
+    color: var(--primary-color);
+    flex-shrink: 0;
+}
+
+.autocomplete-item-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.autocomplete-item-main {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-dark);
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.autocomplete-item-loading,
+.autocomplete-item-no-results,
+.autocomplete-item-error {
+    padding: var(--spacing-lg);
+    text-align: center;
+    color: var(--text-light);
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+.autocomplete-item-error {
+    color: #ef4444;
 }
 
 .search-message-google {
@@ -3979,29 +4151,62 @@ section {
     }
     
     .map-search-overlay {
-        top: var(--spacing-sm);
-        left: var(--spacing-sm);
-        right: var(--spacing-sm);
+        margin: var(--spacing-md) auto var(--spacing-md);
+        padding: 0 var(--spacing-sm);
     }
     
     .search-box-integrated {
-        flex-direction: column;
-        padding: var(--spacing-sm);
+        padding: var(--spacing-sm) var(--spacing-md);
         gap: var(--spacing-xs);
+        flex-wrap: wrap;
+    }
+    
+    .search-input-wrapper {
+        width: 100%;
+        order: 1;
     }
     
     .search-input-integrated {
         width: 100%;
         padding: var(--spacing-xs);
+        font-size: 0.95rem;
     }
     
     .search-btn-integrated {
-        width: 100%;
+        flex: 1;
+        min-width: 120px;
         padding: 0.75rem;
+        order: 2;
+    }
+    
+    .geo-button-container-google {
+        order: 3;
+    }
+    
+    .geo-location-btn-google {
+        width: 44px;
+        height: 44px;
+    }
+    
+    .geo-location-btn-google svg {
+        width: 18px;
+        height: 18px;
     }
     
     .search-icon-integrated {
         display: none;
+    }
+    
+    .autocomplete-dropdown {
+        max-height: 300px;
+    }
+    
+    .autocomplete-item {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+    
+    .autocomplete-item-main {
+        font-size: 0.9rem;
     }
 }
 
