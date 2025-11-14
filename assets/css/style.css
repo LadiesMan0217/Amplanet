@@ -320,8 +320,9 @@ ul {
     width: 100%;
 }
 
-/* Header com fundo azul apenas na página de planos */
-.page-planos .header {
+/* Header com fundo azul nas páginas de planos e cobertura */
+.page-planos .header,
+.page-cobertura .header {
     background: var(--gradient-blue);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
@@ -1261,6 +1262,11 @@ section + section {
 
 /* Ajuste para primeira seção de planos após o header */
 .header + .planos-section {
+    padding-top: calc(80px + var(--spacing-lg));
+}
+
+/* Ajuste para primeira seção de cobertura após o header */
+.header + .cobertura-section {
     padding-top: calc(80px + var(--spacing-lg));
 }
 
@@ -4150,6 +4156,8 @@ section + section {
     position: relative;
     z-index: 302;
     flex-shrink: 0;
+    pointer-events: all;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .geo-location-btn-google svg {
@@ -4295,14 +4303,18 @@ section + section {
 }
 
 .search-message-google {
-    margin-top: var(--spacing-sm);
-    padding: var(--spacing-sm) var(--spacing-md);
-    border-radius: var(--radius-md);
-    font-size: 0.9rem;
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    font-size: 0.95rem;
     font-weight: 500;
-    text-align: center;
+    text-align: left;
+    line-height: 1.6;
     animation: slideDown 0.3s ease;
     transition: opacity var(--transition-base);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    max-width: 100%;
+    word-wrap: break-word;
 }
 
 .search-message-google-success {
@@ -4325,11 +4337,11 @@ section + section {
 
 /* Mapa Principal */
 .map-container-main {
-    background: var(--bg-white);
-    padding: var(--spacing-xl);
-    border-radius: var(--radius-2xl);
-    box-shadow: var(--shadow-xl);
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
     margin-bottom: var(--spacing-3xl);
     position: relative;
 }
@@ -4337,6 +4349,7 @@ section + section {
 .map-header {
     text-align: center;
     margin-bottom: var(--spacing-xl);
+    padding-top: var(--spacing-lg);
 }
 
 .map-description {
@@ -4361,11 +4374,12 @@ section + section {
     position: relative;
     width: 100%;
     height: 650px;
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     overflow: hidden;
-    box-shadow: var(--shadow-lg);
+    box-shadow: none;
     margin-bottom: var(--spacing-lg);
-    background: var(--bg-lighter);
+    background: #ffffff;
+    isolation: isolate;
 }
 
 /* Overlay profissional para esconder header do Google My Maps */
@@ -4375,11 +4389,11 @@ section + section {
     left: 0;
     right: 0;
     height: 60px; /* Altura do header do Google My Maps */
-    background: linear-gradient(180deg, var(--bg-white) 0%, var(--bg-white) 90%, rgba(255,255,255,0.95) 100%);
+    background: linear-gradient(180deg, #ffffff 0%, #ffffff 90%, rgba(255,255,255,0.95) 100%);
     z-index: 200;
     pointer-events: none;
-    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    box-shadow: none;
 }
 
 /* Ajuste do iframe para esconder header - VERSÃO CORRIGIDA */
@@ -4392,6 +4406,10 @@ section + section {
     z-index: 10;
     border: none;
     display: block;
+    border-radius: var(--radius-lg);
+    background: #ffffff;
+    overflow: hidden;
+    clip-path: inset(0 round var(--radius-lg));
 }
 
 .google-map-container {
@@ -4672,30 +4690,45 @@ section + section {
 .search-box-integrated {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(20px);
-    padding: var(--spacing-md) var(--spacing-lg);
-    border-radius: var(--radius-xl);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(37, 99, 235, 0.1);
-    border: 2px solid rgba(37, 99, 235, 0.15);
+    gap: var(--spacing-md);
+    background: #ffffff;
+    padding: 0.875rem 1.25rem;
+    border-radius: var(--radius-2xl);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(37, 99, 235, 0.2);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     pointer-events: all;
     width: 100%;
     position: relative;
+    max-width: 900px;
+    margin: 0 auto;
 }
 
 .search-box-integrated:focus-within {
     border-color: var(--primary-color);
-    box-shadow: 0 15px 50px rgba(37, 99, 235, 0.25), 0 0 0 3px rgba(37, 99, 235, 0.1);
-    transform: translateY(-3px);
-    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 8px 30px rgba(37, 99, 235, 0.2), 0 0 0 3px rgba(37, 99, 235, 0.1);
+    transform: translateY(-2px);
+    background: #ffffff;
 }
 
 .search-icon-integrated {
-    font-size: 1.25rem;
-    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    color: var(--text-medium);
     flex-shrink: 0;
+    transition: color 0.2s ease;
+}
+
+.search-box-integrated:focus-within .search-icon-integrated {
+    color: var(--primary-color);
+}
+
+.search-icon-integrated svg {
+    width: 100%;
+    height: 100%;
 }
 
 .search-input-wrapper {
@@ -4714,8 +4747,9 @@ section + section {
     font-weight: 500;
     color: var(--text-dark);
     background: transparent;
-    padding: var(--spacing-xs) 0;
+    padding: 0.5rem 0;
     transition: all 0.2s ease;
+    min-width: 0;
 }
 
 .search-input-integrated:focus {
@@ -4725,23 +4759,43 @@ section + section {
 .search-input-integrated::placeholder {
     color: var(--text-lighter);
     font-weight: 400;
+    opacity: 0.7;
 }
 
 .search-btn-integrated {
-    padding: 0.625rem 1.5rem;
+    padding: 0.75rem 1.75rem;
     background: var(--gradient-blue);
     color: white;
     border: none;
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-xl);
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     cursor: pointer;
-    transition: var(--transition-base);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     white-space: nowrap;
     font-family: 'Inter', sans-serif;
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 0.5rem;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+.search-btn-integrated:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+}
+
+.search-btn-integrated:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+}
+
+.search-btn-integrated svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
 }
 
 .search-btn-integrated:hover:not(:disabled) {
@@ -5103,9 +5157,17 @@ section + section {
 }
 
 .info-icon {
-    font-size: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin-bottom: var(--spacing-md);
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+    color: var(--primary-color);
+}
+
+.info-icon svg {
+    width: 48px;
+    height: 48px;
 }
 
 .info-title {
@@ -5862,6 +5924,11 @@ section + section {
         padding-top: calc(70px + var(--spacing-md));
     }
     
+    /* Ajuste para primeira seção de cobertura após o header no mobile */
+    .header + .cobertura-section {
+        padding-top: calc(70px + var(--spacing-md));
+    }
+    
     .planos-section .container {
         overflow: hidden;
         padding: 0 var(--spacing-md);
@@ -6065,6 +6132,11 @@ section + section {
     
     /* Ajuste para primeira seção de planos após o header no mobile pequeno */
     .header + .planos-section {
+        padding-top: calc(65px + var(--spacing-sm));
+    }
+    
+    /* Ajuste para primeira seção de cobertura após o header no mobile pequeno */
+    .header + .cobertura-section {
         padding-top: calc(65px + var(--spacing-sm));
     }
     

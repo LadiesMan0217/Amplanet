@@ -1448,56 +1448,84 @@ function setupGeolocationButton() {
     // Verificar se o navegador suporta geolocalização
     if (!navigator.geolocation) {
         console.warn('⚠️ Geolocalização não suportada pelo navegador');
+        // Mostrar mensagem informativa
+        const searchBox = document.querySelector('.search-box-integrated');
+        if (searchBox) {
+            showSearchMessage('⚠️ Seu navegador não suporta geolocalização. Use a busca manual de endereço acima.', 'warning');
+        }
         return;
     }
     
     console.log('✅ Geolocalização disponível');
     
-    // Criar botão de geolocalização dentro do search-box-integrated
-    const searchBox = document.querySelector('.search-box-integrated');
-    if (!searchBox) return;
-    
-    // Criar container para o botão - posicionar dentro do search-box
-    const geoButtonContainer = document.createElement('div');
-    geoButtonContainer.className = 'geo-button-container-google';
-    
-    const button = document.createElement('button');
-    button.className = 'geo-location-btn-google';
-    button.setAttribute('title', 'Usar minha localização atual');
-    button.setAttribute('aria-label', 'Usar localização atual');
-    button.innerHTML = getLocationIconSVG();
-    
-    // Adicionar indicador de loading
-    const loadingIndicator = document.createElement('span');
-    loadingIndicator.className = 'geo-loading-indicator-google';
-    loadingIndicator.innerHTML = '⏳';
-    loadingIndicator.style.cssText = 'display: none; margin-left: 4px;';
-    button.appendChild(loadingIndicator);
-    
-    button.addEventListener('click', function() {
-        // Mostrar loading
-        loadingIndicator.style.display = 'inline';
-        button.disabled = true;
-        button.style.opacity = '0.6';
-        button.style.cursor = 'wait';
+    // Aguardar um pouco para garantir que o DOM está pronto
+    setTimeout(() => {
+        // Criar botão de geolocalização dentro do search-box-integrated
+        const searchBox = document.querySelector('.search-box-integrated');
+        if (!searchBox) {
+            console.warn('⚠️ .search-box-integrated não encontrado');
+            return;
+        }
         
-        getCurrentLocationGoogle(function() {
-            // Esconder loading quando terminar
-            loadingIndicator.style.display = 'none';
-            button.disabled = false;
-            button.style.opacity = '1';
-            button.style.cursor = 'pointer';
+        // Verificar se o botão já existe
+        const existingButton = document.querySelector('.geo-location-btn-google');
+        if (existingButton) {
+            console.log('✅ Botão de geolocalização já existe');
+            return;
+        }
+        
+        // Criar container para o botão - posicionar dentro do search-box
+        const geoButtonContainer = document.createElement('div');
+        geoButtonContainer.className = 'geo-button-container-google';
+        
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'geo-location-btn-google';
+        button.setAttribute('title', 'Usar minha localização atual');
+        button.setAttribute('aria-label', 'Usar localização atual');
+        button.innerHTML = getLocationIconSVG();
+        
+        // Adicionar indicador de loading
+        const loadingIndicator = document.createElement('span');
+        loadingIndicator.className = 'geo-loading-indicator-google';
+        loadingIndicator.innerHTML = '⏳';
+        loadingIndicator.style.cssText = 'display: none; margin-left: 4px;';
+        button.appendChild(loadingIndicator);
+        
+        // Event listener com prevenção de propagação
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log('📍 Botão de geolocalização clicado');
+            
+            // Mostrar loading
+            loadingIndicator.style.display = 'inline';
+            button.disabled = true;
+            button.style.opacity = '0.6';
+            button.style.cursor = 'wait';
+            
+            getCurrentLocationGoogle(function() {
+                // Esconder loading quando terminar
+                loadingIndicator.style.display = 'none';
+                button.disabled = false;
+                button.style.opacity = '1';
+                button.style.cursor = 'pointer';
+            });
         });
-    });
-    
-    geoButtonContainer.appendChild(button);
-    // Inserir o botão antes do botão de pesquisar
-    const searchBtn = document.getElementById('integratedSearchBtn');
-    if (searchBtn && searchBtn.parentNode) {
-        searchBtn.parentNode.insertBefore(geoButtonContainer, searchBtn);
-    } else {
-        searchBox.appendChild(geoButtonContainer);
-    }
+        
+        geoButtonContainer.appendChild(button);
+        
+        // Inserir o botão antes do botão de pesquisar
+        const searchBtn = document.getElementById('integratedSearchBtn');
+        if (searchBtn && searchBtn.parentNode) {
+            searchBtn.parentNode.insertBefore(geoButtonContainer, searchBtn);
+            console.log('✅ Botão de geolocalização inserido antes do botão de pesquisar');
+        } else {
+            searchBox.appendChild(geoButtonContainer);
+            console.log('✅ Botão de geolocalização adicionado ao search-box');
+        }
+    }, 100);
 }
 
 function getCurrentLocationGoogle(onComplete) {
@@ -1508,7 +1536,7 @@ function getCurrentLocationGoogle(onComplete) {
     
     const options = {
         enableHighAccuracy: true,
-        timeout: 10000,
+        timeout: 15000, // Aumentado para 15 segundos
         maximumAge: 60000
     };
     
@@ -1518,39 +1546,37 @@ function getCurrentLocationGoogle(onComplete) {
         }
     };
     
-    // Se já tiver permissão, buscar automaticamente
-    if (hasPermission === 'true') {
-        console.log('✅ Permissão já concedida, buscando localização...');
+    // Função para fazer a requisição
+    const requestLocation = function() {
         navigator.geolocation.getCurrentPosition(
             function(position) {
+                console.log('✅ Localização obtida com sucesso:', position.coords);
+                sessionStorage.setItem('geolocation_permission_granted_google', 'true');
                 handleLocationSuccessGoogle(position);
                 complete();
             },
             function(error) {
+                console.error('❌ Erro na requisição de geolocalização:', error);
+                if (error.code === error.PERMISSION_DENIED) {
+                    sessionStorage.setItem('geolocation_permission_granted_google', 'false');
+                }
                 handleLocationErrorGoogle(error);
                 complete();
             },
             options
         );
+    };
+    
+    // Se já tiver permissão, buscar automaticamente
+    if (hasPermission === 'true') {
+        console.log('✅ Permissão já concedida, buscando localização...');
+        requestLocation();
         return;
     }
     
     // Se não tiver permissão ainda, pedir uma vez
-    navigator.geolocation.getCurrentPosition(
-        function(position) {
-            sessionStorage.setItem('geolocation_permission_granted_google', 'true');
-            handleLocationSuccessGoogle(position);
-            complete();
-        },
-        function(error) {
-            if (error.code === error.PERMISSION_DENIED) {
-                sessionStorage.setItem('geolocation_permission_granted_google', 'false');
-            }
-            handleLocationErrorGoogle(error);
-            complete();
-        },
-        options
-    );
+    console.log('🔐 Solicitando permissão de localização...');
+    requestLocation();
 }
 
 function handleLocationSuccessGoogle(position) {
@@ -1630,20 +1656,37 @@ function handleLocationSuccessGoogle(position) {
 
 function handleLocationErrorGoogle(error) {
     console.error('❌ Erro ao obter localização:', error);
+    console.error('❌ Código do erro:', error.code);
+    console.error('❌ Mensagem do erro:', error.message);
+    
     let message = 'Não foi possível obter sua localização. ';
+    let detailedMessage = '';
+    
     switch(error.code) {
         case error.PERMISSION_DENIED:
-            message += 'Permissão negada. Por favor, permita acesso à localização no navegador.';
+            message += 'Permissão negada.';
+            detailedMessage = 'Por favor, permita acesso à localização nas configurações do navegador.';
             sessionStorage.setItem('geolocation_permission_granted_google', 'false');
+            console.warn('💡 Dica: Vá em Configurações do Site → Localização → Permitir');
+            console.warn('💡 Chrome: ícone de cadeado na barra de endereços → Localização → Permitir');
+            console.warn('💡 Firefox: ícone de cadeado → Permissões → Localização → Permitir');
             break;
         case error.POSITION_UNAVAILABLE:
-            message += 'Localização indisponível.';
+            message = 'Não foi possível obter sua localização.';
+            detailedMessage = '';
+            console.warn('💡 Localização indisponível (código 2)');
+            console.warn('💡 Possíveis causas:');
+            console.warn('   - GPS desativado no dispositivo');
+            console.warn('   - Dispositivo sem GPS (alguns computadores desktop)');
+            console.warn('   - Navegador não tem acesso ao GPS');
             break;
         case error.TIMEOUT:
-            message += 'Tempo esgotado ao buscar localização.';
+            message += 'Tempo esgotado.';
+            detailedMessage = 'A busca de localização demorou muito. Verifique sua conexão e tente novamente.';
             break;
         default:
-            message += 'Erro desconhecido.';
+            message += `Erro desconhecido.`;
+            detailedMessage = error.message || 'Tente usar a busca manual de endereço acima.';
     }
     
     // Limpar estado de loading do botão
@@ -1658,7 +1701,11 @@ function handleLocationErrorGoogle(error) {
         }
     }
     
-    showSearchMessage(message, 'error');
+    // Mostrar mensagem completa apenas se houver mensagem
+    if (message || detailedMessage) {
+        const fullMessage = detailedMessage ? `${message} ${detailedMessage}` : message;
+        showSearchMessage(fullMessage, 'error');
+    }
 }
 
 // ========================================
