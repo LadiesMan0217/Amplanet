@@ -2855,6 +2855,7 @@ section {
     grid-template-columns: 1fr;
     max-width: 1400px;
     margin: 0 auto;
+    overflow: hidden; /* Previne scroll no hover */
 }
 
 @media (min-width: 992px) {
@@ -2887,6 +2888,7 @@ section {
     width: 100%;
     height: 100%;
     z-index: 0;
+    overflow: hidden; /* Contém o zoom da imagem */
 }
 
 .solucao-card-creative-bg img {
@@ -2896,34 +2898,57 @@ section {
     object-position: center;
     transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), filter 0.8s ease;
     filter: brightness(0.5) contrast(1.15);
+    transform-origin: center; /* Zoom centralizado */
 }
 
+/* Overlay com gradiente: ESCURO na parte INFERIOR (onde está o texto) para mais claro no topo */
+/* Variação 2: Mesclando com a marca - Azul escuro opaco embaixo (onde está o texto), azul da marca mais claro no topo */
 .solucao-card-creative-overlay {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(30, 58, 138, 0.6) 0%, rgba(59, 130, 246, 0.5) 50%, rgba(30, 58, 138, 0.6) 100%);
+    /* Gradiente INVERTIDO: claro no topo, escuro embaixo (onde o texto está devido ao justify-content: flex-end) */
+    background: linear-gradient(
+        180deg,
+        rgba(0, 102, 204, 0.4) 0%,  /* Azul da marca mais claro e transparente no topo */
+        rgba(0, 51, 153, 0.6) 50%,  /* Azul intermediário */
+        rgba(0, 40, 80, 0.85) 90%   /* Azul-marinho escuro e opaco embaixo - garante legibilidade do texto */
+    );
     z-index: 1;
     transition: opacity 0.6s ease;
 }
 
+/* Overlay específico para card corporativo - mantém identidade azul */
 .solucao-card-creative-corporativo .solucao-card-creative-overlay {
-    background: linear-gradient(135deg, rgba(30, 58, 138, 0.6) 0%, rgba(59, 130, 246, 0.5) 50%, rgba(15, 23, 42, 0.65) 100%);
+    background: linear-gradient(
+        180deg,
+        rgba(0, 102, 204, 0.45) 0%,
+        rgba(0, 51, 153, 0.65) 50%,
+        rgba(0, 30, 60, 0.9) 90%  /* Azul muito escuro embaixo para máximo contraste do texto */
+    );
 }
 
+/* Overlay específico para card condomínio - tom azul ligeiramente diferente */
 .solucao-card-creative-condominio .solucao-card-creative-overlay {
-    background: linear-gradient(135deg, rgba(14, 116, 144, 0.6) 0%, rgba(59, 130, 246, 0.5) 50%, rgba(30, 58, 138, 0.6) 100%);
+    background: linear-gradient(
+        180deg,
+        rgba(59, 130, 246, 0.4) 0%,  /* Azul mais claro no topo */
+        rgba(0, 102, 204, 0.6) 50%,
+        rgba(0, 50, 100, 0.85) 90%   /* Azul escuro embaixo onde está o texto */
+    );
 }
 
+/* Gradiente adicional removido - o overlay principal já faz o trabalho com gradiente invertido */
+/* Mantido apenas para compatibilidade, mas com transparência total */
 .solucao-card-creative-gradient {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.5) 70%, rgba(0, 0, 0, 0.8) 100%);
+    background: transparent; /* Removido - overlay principal já cuida do gradiente */
     z-index: 2;
     pointer-events: none;
 }
@@ -2936,28 +2961,50 @@ section {
     flex-direction: column;
     flex: 1;
     justify-content: flex-end;
-    color: #ffffff;
+    color: #ffffff !important; /* Branco explícito para todo o conteúdo */
     min-height: 100%;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.4) 40%, transparent 100%);
+    /* Gradiente removido - overlay principal já garante contraste suficiente */
     border-radius: 0 0 var(--radius-2xl) var(--radius-2xl);
+    align-items: center; /* Centraliza os elementos filhos horizontalmente */
+    text-align: center; /* Centraliza o texto */
+}
+
+/* Garantir que todos os elementos dentro do conteúdo sejam brancos */
+.solucao-card-creative-content * {
+    color: #ffffff !important;
 }
 
 .solucao-card-creative-badge {
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    justify-content: center;
     gap: var(--spacing-xs);
-    padding: var(--spacing-xs) var(--spacing-md);
-    background: rgba(255, 255, 255, 0.2);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    background: rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(10px);
     border-radius: 50px;
-    font-size: 0.875rem;
-    font-weight: 600;
+    font-size: 0.9375rem;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: var(--spacing-lg);
+    letter-spacing: 1px;
+    margin: 0 auto var(--spacing-lg) auto; /* Centralizado horizontalmente */
     width: fit-content;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.4);
     transition: all 0.3s ease;
+    /* Text-shadow para legibilidade do badge */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+    color: #ffffff !important; /* Branco explícito */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Garantir que o span dentro do badge também seja branco */
+.solucao-card-creative-badge span {
+    color: #ffffff !important;
+}
+
+/* Ícone do badge também branco */
+.solucao-card-creative-badge i {
+    color: #ffffff !important;
 }
 
 .solucao-card-creative-badge i {
@@ -2965,51 +3012,74 @@ section {
 }
 
 .solucao-title-creative {
-    color: #ffffff;
+    color: #ffffff !important; /* Branco explícito */
     font-size: 2rem;
     font-weight: 700;
     line-height: 1.3;
     margin-bottom: var(--spacing-md);
-    text-shadow: 0 3px 15px rgba(0, 0, 0, 0.8), 0 1px 3px rgba(0, 0, 0, 0.9);
-    text-align: left;
+    /* Text-shadow leve mas efetivo para legibilidade extra */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
+    text-align: center; /* Centralizado */
     letter-spacing: -0.02em;
+    max-width: 100%;
 }
 
 .solucao-text-creative {
-    color: #ffffff;
+    color: #ffffff !important; /* Branco explícito */
     font-size: 1rem;
     line-height: 1.7;
     margin-bottom: var(--spacing-lg);
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7), 0 1px 2px rgba(0, 0, 0, 0.8);
-    text-align: left;
+    /* Text-shadow leve mas efetivo para legibilidade extra */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
+    text-align: center; /* Centralizado */
     font-weight: 400;
+    max-width: 100%;
 }
 
 .solucao-features-creative {
     list-style: none;
     padding: 0;
-    margin: 0 0 var(--spacing-xl) 0;
+    margin: 0 auto var(--spacing-xl) auto; /* Centralizado */
     display: flex;
     flex-direction: column;
     gap: var(--spacing-sm);
+    align-items: flex-start; /* Alinha itens à esquerda dentro do container centralizado */
+    max-width: 100%;
 }
 
 .solucao-features-creative li {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
-    color: #ffffff;
+    color: #ffffff !important; /* Branco explícito */
     font-size: 0.95rem;
-    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7), 0 1px 2px rgba(0, 0, 0, 0.8);
-    transition: transform 0.2s ease, color 0.2s ease;
+    /* Text-shadow leve mas efetivo para legibilidade extra */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease;
     font-weight: 500;
 }
 
+/* Desabilitar pseudo-elemento ::before que causa duplicação de ícones - especificidade alta */
+.solucao-features.solucao-features-creative li::before,
+.solucao-features-creative li::before {
+    display: none !important; /* Remove ícone duplicado do pseudo-elemento */
+    content: none !important; /* Remove conteúdo do pseudo-elemento */
+}
+
+/* Ícone único e consistente - verde para check, padronizado */
 .solucao-features-creative li i {
-    color: #60a5fa;
-    font-size: 1rem;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    color: #10b981;
+    font-size: 1.1rem;
+    /* Text-shadow para legibilidade do ícone também */
+    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
+    flex-shrink: 0;
+    width: 1.2rem;
+    min-width: 1.2rem; /* Garante largura mínima */
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
 }
 
 .solucao-features-creative li:hover {
@@ -3017,26 +3087,30 @@ section {
     color: #ffffff;
 }
 
+/* Botão com gradiente azul seguindo identidade visual do site */
 .btn-creative {
-    background: rgba(255, 255, 255, 0.95);
-    color: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+    color: #ffffff;
     border: none;
     padding: var(--spacing-md) var(--spacing-xl);
     font-weight: 600;
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: var(--spacing-sm);
     justify-content: center;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 51, 153, 0.3);
+    border-radius: 8px;
+    margin: 0 auto; /* Centralizado */
+    width: fit-content;
+    min-width: 180px; /* Largura mínima para consistência */
 }
 
 .btn-creative:hover {
-    background: #ffffff;
+    background: linear-gradient(135deg, var(--primary-light) 0%, #0080ff 100%);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-    color: var(--primary-color);
+    box-shadow: 0 6px 20px rgba(0, 51, 153, 0.4);
+    color: #ffffff;
 }
 
 .btn-creative i {
@@ -3047,12 +3121,12 @@ section {
     transform: translateX(4px);
 }
 
-/* Efeitos de hover */
+/* Efeitos de hover - zoom apenas na imagem, sem translateY que causa scroll */
 .solucao-card-creative:hover {
-    transform: translateY(-12px);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
 }
 
+/* Zoom da imagem contido pelo overflow:hidden do wrapper */
 .solucao-card-creative:hover .solucao-card-creative-bg img {
     transform: scale(1.1);
     filter: brightness(0.45) contrast(1.25);
@@ -3063,14 +3137,16 @@ section {
 }
 
 .solucao-card-creative:hover .solucao-card-creative-badge {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.35);
     transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* Responsivo */
-@media (max-width: 991px) {
+/* Responsivo - Breakpoints otimizados */
+/* Tablet: 768px - 991px */
+@media (min-width: 768px) and (max-width: 991px) {
     .solucao-card-creative {
-        min-height: 550px;
+        min-height: 580px;
     }
     
     .solucao-title-creative {
@@ -3080,8 +3156,13 @@ section {
     .solucao-card-creative-content {
         padding: var(--spacing-xl);
     }
+    
+    .solucao-text-creative {
+        font-size: 0.95rem;
+    }
 }
 
+/* Mobile: até 767px */
 @media (max-width: 767px) {
     .solucao-card-creative {
         min-height: 500px;
@@ -3089,10 +3170,37 @@ section {
     
     .solucao-title-creative {
         font-size: 1.5rem;
+        line-height: 1.2;
     }
     
     .solucao-text-creative {
         font-size: 0.95rem;
+        line-height: 1.6;
+    }
+    
+    .solucao-card-creative-content {
+        padding: var(--spacing-lg);
+    }
+    
+    .solucao-features-creative {
+        gap: var(--spacing-xs);
+    }
+    
+    .solucao-features-creative li {
+        font-size: 0.9rem;
+    }
+    
+    .btn-creative {
+        padding: var(--spacing-sm) var(--spacing-lg);
+        font-size: 0.9rem;
+        width: 100%;
+    }
+}
+
+/* Desktop: 992px+ - já definido acima com grid de 2 colunas */
+@media (min-width: 992px) {
+    .solucao-card-creative {
+        min-height: 650px;
     }
 }
 
