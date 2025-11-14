@@ -311,9 +311,8 @@ ul {
     top: 0;
     left: 0;
     right: 0;
-    background: transparent;
-    background: rgba(255, 255, 255, 0);
-    box-shadow: none;
+    background: var(--gradient-blue);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     border-bottom: none;
     transition: box-shadow 0.3s var(--timing-ease-out), background 0.3s var(--timing-ease-out);
@@ -1253,6 +1252,10 @@ section + section {
     max-width: 100%;
 }
 
+/* Ajuste para primeira seção de planos após o header */
+.header + .planos-section {
+    padding-top: calc(80px + var(--spacing-lg));
+}
 
 .planos-section::before {
     content: '';
@@ -1357,7 +1360,8 @@ section + section {
     max-width: 100%;
     box-sizing: border-box;
     min-height: 300px;
-    align-items: start; /* Alterado de stretch para start - evita esticamento dos cards */
+    align-items: stretch;
+    justify-items: stretch;
     overflow: hidden;
     position: relative;
 }
@@ -1369,18 +1373,19 @@ section + section {
         grid-template-columns: repeat(2, 1fr);
         gap: var(--spacing-lg);
         padding: var(--spacing-md) var(--spacing-md);
-        align-items: start; /* Alterado de stretch para start - evita esticamento dos cards */
+        align-items: stretch;
+        justify-items: stretch;
     }
     
     .plano-card {
-        min-height: 420px;
+        min-height: 500px;
         position: relative;
         z-index: 5;
-        /* height: 100% removido - permite altura automática baseada no conteúdo */
+        height: 100%;
     }
     
     .plano-card:not(.expanded) {
-        min-height: 420px;
+        min-height: 500px;
     }
     
     .planos-disclaimer-content {
@@ -1413,7 +1418,8 @@ section + section {
         width: 100%;
         max-width: 100%;
         overflow: hidden;
-        align-items: start; /* Alterado de stretch para start - evita esticamento dos cards */
+        align-items: stretch;
+        justify-items: stretch;
         box-sizing: border-box;
     }
     
@@ -1421,15 +1427,15 @@ section + section {
         min-width: 0;
         max-width: 320px;
         width: 100%;
-        margin: 0 auto;
-        /* height: 100% removido - permite altura automática baseada no conteúdo */
-        min-height: 420px;
+        margin: 0;
+        height: 100%;
+        min-height: 500px;
         position: relative;
         z-index: 5;
     }
     
     .plano-card:not(.expanded) {
-        min-height: 420px;
+        min-height: 500px;
     }
 }
 
@@ -1444,22 +1450,23 @@ section + section {
         padding: var(--spacing-md) var(--spacing-lg);
         overflow: hidden;
         box-sizing: border-box;
-        align-items: start; /* Alterado de stretch para start - evita esticamento dos cards */
+        align-items: stretch;
+        justify-items: stretch;
     }
     
     .plano-card {
         min-width: 0;
         max-width: 320px;
         width: 100%;
-        margin: 0 auto;
-        /* height: 100% removido - permite altura automática baseada no conteúdo */
-        min-height: 420px;
+        margin: 0;
+        height: 100%;
+        min-height: 500px;
         position: relative;
         z-index: 5;
     }
     
     .plano-card:not(.expanded) {
-        min-height: 420px;
+        min-height: 500px;
     }
 }
 
@@ -1474,22 +1481,23 @@ section + section {
         max-width: 100%;
         overflow: hidden;
         box-sizing: border-box;
-        align-items: start; /* Alterado de stretch para start - evita esticamento dos cards */
+        align-items: stretch;
+        justify-items: stretch;
     }
     
     .plano-card {
         min-width: 0;
         max-width: 320px;
         width: 100%;
-        margin: 0 auto;
-        /* height: 100% removido - permite altura automática baseada no conteúdo */
-        min-height: 420px;
+        margin: 0;
+        height: 100%;
+        min-height: 500px;
         position: relative;
         z-index: 5;
     }
     
     .plano-card:not(.expanded) {
-        min-height: 420px;
+        min-height: 500px;
     }
 }
 
@@ -1529,7 +1537,7 @@ section + section {
 
 /* Garantir que o conteúdo acima dos botões tenha altura consistente */
 .plano-card:not(.expanded) {
-    min-height: 420px;
+    min-height: 500px;
 }
 
 .plano-card:not(.expanded) .plano-header,
@@ -1663,6 +1671,7 @@ section + section {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 .plano-card:has(.plano-badge) .plano-header {
@@ -1714,7 +1723,7 @@ section + section {
     margin-bottom: 0;
     padding: 0;
     flex: 1;
-    min-height: auto;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     gap: 0.375rem;
@@ -1794,6 +1803,7 @@ section + section {
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    flex-shrink: 0;
 }
 
 .preco-valor {
@@ -1839,6 +1849,7 @@ section + section {
     position: relative;
     overflow: hidden;
     width: calc(100% - 2 * var(--spacing-md));
+    align-self: stretch;
     box-sizing: border-box;
     flex-shrink: 0;
 }
@@ -1903,6 +1914,7 @@ section + section {
     flex: 1;
     display: flex;
     flex-direction: column;
+    min-height: 0;
 }
 
 /* Quando os detalhes estão sempre visíveis (página planos.html) */
@@ -5762,6 +5774,11 @@ section + section {
         max-width: 100%;
     }
     
+    /* Ajuste para primeira seção de planos após o header no mobile */
+    .header + .planos-section {
+        padding-top: calc(70px + var(--spacing-md));
+    }
+    
     .planos-section .container {
         overflow: hidden;
         padding: 0 var(--spacing-md);
@@ -5961,6 +5978,11 @@ section + section {
         padding: var(--spacing-lg) 0;
         overflow: hidden;
         max-width: 100%;
+    }
+    
+    /* Ajuste para primeira seção de planos após o header no mobile pequeno */
+    .header + .planos-section {
+        padding-top: calc(65px + var(--spacing-sm));
     }
     
     .planos-section .container {
