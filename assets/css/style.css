@@ -4952,10 +4952,27 @@ section + section {
     }
     
     .search-btn-integrated {
-        flex: 1;
-        min-width: 120px;
-        padding: 0.75rem;
+        flex: 0 0 auto;
+        min-width: 44px;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        font-size: 0;
         order: 2;
+        gap: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .search-btn-integrated span {
+        display: none;
+    }
+    
+    .search-btn-integrated svg {
+        width: 20px;
+        height: 20px;
+        margin: 0;
     }
     
     .geo-button-container-google {
@@ -4986,6 +5003,142 @@ section + section {
     
     .autocomplete-item-main {
         font-size: 0.9rem;
+    }
+    
+    /* Ajustes gerais da página de cobertura em mobile */
+    .map-header {
+        padding-top: var(--spacing-md);
+    }
+    
+    .map-header .section-title {
+        font-size: 1.75rem;
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .map-description {
+        font-size: 0.95rem;
+        padding: 0 var(--spacing-sm);
+    }
+    
+    .cobertura-info-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-lg);
+    }
+    
+    .info-card {
+        padding: var(--spacing-lg);
+    }
+    
+    .info-title {
+        font-size: 1.25rem;
+    }
+    
+    .info-text {
+        font-size: 1rem;
+    }
+    
+    .cobertura-instructions {
+        padding: var(--spacing-xl);
+    }
+    
+    .instructions-title {
+        font-size: 1.5rem;
+    }
+    
+    .instructions-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-lg);
+    }
+    
+    .cobertura-cta {
+        padding: var(--spacing-xl);
+    }
+    
+    .cta-title {
+        font-size: 1.5rem;
+    }
+    
+    .cta-text {
+        font-size: 1rem;
+    }
+    
+    .cta-buttons {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+    
+    .cta-buttons .btn {
+        width: 100%;
+    }
+}
+
+/* Ajustes para telas muito pequenas (480px ou menos) */
+@media (max-width: 480px) {
+    .search-box-integrated {
+        padding: 0.75rem var(--spacing-sm);
+        gap: var(--spacing-xs);
+    }
+    
+    .search-btn-integrated {
+        min-width: 40px;
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        font-size: 0;
+    }
+    
+    .search-btn-integrated svg {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .search-input-integrated {
+        font-size: 0.875rem;
+    }
+    
+    .map-wrapper-google-integrated {
+        min-height: 400px;
+    }
+    
+    .google-map-container {
+        height: 400px;
+    }
+    
+    .map-header .section-title {
+        font-size: 1.5rem;
+    }
+    
+    .map-description {
+        font-size: 0.875rem;
+    }
+    
+    .info-card {
+        padding: var(--spacing-md);
+    }
+    
+    .info-icon svg {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .cobertura-instructions {
+        padding: var(--spacing-lg);
+    }
+    
+    .instructions-title {
+        font-size: 1.25rem;
+    }
+    
+    .cobertura-cta {
+        padding: var(--spacing-lg);
+    }
+    
+    .cta-title {
+        font-size: 1.25rem;
+    }
+    
+    .cta-text {
+        font-size: 0.9375rem;
     }
 }
 
