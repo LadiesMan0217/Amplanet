@@ -311,12 +311,19 @@ ul {
     top: 0;
     left: 0;
     right: 0;
-    background: var(--gradient-blue);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background: transparent;
+    background: rgba(255, 255, 255, 0);
+    box-shadow: none;
     z-index: 1000;
     border-bottom: none;
     transition: box-shadow 0.3s var(--timing-ease-out), background 0.3s var(--timing-ease-out);
     width: 100%;
+}
+
+/* Header com fundo azul apenas na página de planos */
+.page-planos .header {
+    background: var(--gradient-blue);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* backdrop-filter apenas em navegadores que suportam */
@@ -1360,7 +1367,7 @@ section + section {
     max-width: 100%;
     box-sizing: border-box;
     min-height: 300px;
-    align-items: stretch;
+    align-items: start;
     justify-items: stretch;
     overflow: hidden;
     position: relative;
@@ -1373,19 +1380,19 @@ section + section {
         grid-template-columns: repeat(2, 1fr);
         gap: var(--spacing-lg);
         padding: var(--spacing-md) var(--spacing-md);
-        align-items: stretch;
+        align-items: start;
         justify-items: stretch;
     }
     
     .plano-card {
-        min-height: 500px;
+        min-height: 420px;
         position: relative;
         z-index: 5;
-        height: 100%;
+        /* height: 100% removido - permite altura automática baseada no conteúdo */
     }
     
     .plano-card:not(.expanded) {
-        min-height: 500px;
+        min-height: 420px;
     }
     
     .planos-disclaimer-content {
@@ -1418,7 +1425,7 @@ section + section {
         width: 100%;
         max-width: 100%;
         overflow: hidden;
-        align-items: stretch;
+        align-items: start;
         justify-items: stretch;
         box-sizing: border-box;
     }
@@ -1427,15 +1434,15 @@ section + section {
         min-width: 0;
         max-width: 320px;
         width: 100%;
-        margin: 0;
-        height: 100%;
-        min-height: 500px;
+        margin: 0 auto;
+        /* height: 100% removido - permite altura automática baseada no conteúdo */
+        min-height: 420px;
         position: relative;
         z-index: 5;
     }
     
     .plano-card:not(.expanded) {
-        min-height: 500px;
+        min-height: 420px;
     }
 }
 
@@ -1450,7 +1457,7 @@ section + section {
         padding: var(--spacing-md) var(--spacing-lg);
         overflow: hidden;
         box-sizing: border-box;
-        align-items: stretch;
+        align-items: start;
         justify-items: stretch;
     }
     
@@ -1458,15 +1465,15 @@ section + section {
         min-width: 0;
         max-width: 320px;
         width: 100%;
-        margin: 0;
-        height: 100%;
-        min-height: 500px;
+        margin: 0 auto;
+        /* height: 100% removido - permite altura automática baseada no conteúdo */
+        min-height: 420px;
         position: relative;
         z-index: 5;
     }
     
     .plano-card:not(.expanded) {
-        min-height: 500px;
+        min-height: 420px;
     }
 }
 
@@ -1481,7 +1488,7 @@ section + section {
         max-width: 100%;
         overflow: hidden;
         box-sizing: border-box;
-        align-items: stretch;
+        align-items: start;
         justify-items: stretch;
     }
     
@@ -1489,15 +1496,15 @@ section + section {
         min-width: 0;
         max-width: 320px;
         width: 100%;
-        margin: 0;
-        height: 100%;
-        min-height: 500px;
+        margin: 0 auto;
+        /* height: 100% removido - permite altura automática baseada no conteúdo */
+        min-height: 420px;
         position: relative;
         z-index: 5;
     }
     
     .plano-card:not(.expanded) {
-        min-height: 500px;
+        min-height: 420px;
     }
 }
 
@@ -1524,6 +1531,82 @@ section + section {
     /* height: 100% removido - permite altura automática baseada no conteúdo */
 }
 
+/* ========================================
+   ESTILOS ESPECÍFICOS PARA PÁGINA DE PLANOS
+   ======================================== */
+
+/* Alinhamento dos cards na página de planos */
+.page-planos .planos-grid {
+    align-items: stretch;
+}
+
+/* Tablet: 2 colunas - página de planos */
+@media (min-width: 768px) {
+    .page-planos .planos-grid {
+        align-items: stretch;
+    }
+    
+    .page-planos .plano-card {
+        height: 100%;
+        min-height: 500px;
+    }
+    
+    .page-planos .plano-card:not(.expanded) {
+        min-height: 500px;
+    }
+}
+
+/* Desktop: página de planos */
+@media (min-width: 1200px) {
+    .page-planos .planos-grid {
+        align-items: stretch;
+    }
+    
+    .page-planos .plano-card {
+        height: 100%;
+        margin: 0;
+        min-height: 500px;
+    }
+    
+    .page-planos .plano-card:not(.expanded) {
+        min-height: 500px;
+    }
+}
+
+/* Telas grandes: página de planos */
+@media (min-width: 1400px) {
+    .page-planos .planos-grid {
+        align-items: stretch;
+    }
+    
+    .page-planos .plano-card {
+        height: 100%;
+        margin: 0;
+        min-height: 500px;
+    }
+    
+    .page-planos .plano-card:not(.expanded) {
+        min-height: 500px;
+    }
+}
+
+/* Telas muito grandes: página de planos */
+@media (min-width: 1600px) {
+    .page-planos .planos-grid {
+        align-items: stretch;
+    }
+    
+    .page-planos .plano-card {
+        height: 100%;
+        margin: 0;
+        min-height: 500px;
+    }
+    
+    .page-planos .plano-card:not(.expanded) {
+        min-height: 500px;
+    }
+}
+
 /* Wrapper para alinhar botões na parte inferior */
 .plano-card > .btn-mais-info {
     margin-top: auto;
@@ -1537,7 +1620,7 @@ section + section {
 
 /* Garantir que o conteúdo acima dos botões tenha altura consistente */
 .plano-card:not(.expanded) {
-    min-height: 500px;
+    min-height: 420px;
 }
 
 .plano-card:not(.expanded) .plano-header,
