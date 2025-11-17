@@ -18,6 +18,45 @@ const header = document.querySelector('.header');
 // window.addEventListener('scroll', handleHeaderScroll, { passive: true });
 
 // ========================================
+// AJUSTAR PADDING-TOP DO BODY BASEADO NA ALTURA DO HEADER
+// ========================================
+function adjustBodyPaddingForHeader() {
+    const headerElement = document.querySelector('.header');
+    const bodyElement = document.body;
+    
+    if (headerElement && bodyElement) {
+        // Calcular altura real do header (incluindo padding, margin, etc)
+        const headerHeight = headerElement.offsetHeight;
+        
+        // Aplicar padding-top no body igual à altura do header
+        // Isso garante que todo o conteúdo comece após o header
+        bodyElement.style.paddingTop = headerHeight + 'px';
+    }
+}
+
+// Executar quando o DOM estiver pronto
+document.addEventListener('DOMContentLoaded', function() {
+    // Ajustar imediatamente
+    adjustBodyPaddingForHeader();
+    
+    // Ajustar após um pequeno delay para garantir que imagens/logos carregaram
+    setTimeout(adjustBodyPaddingForHeader, 100);
+    setTimeout(adjustBodyPaddingForHeader, 500);
+});
+
+// Ajustar ao redimensionar a janela
+let resizeTimeout;
+window.addEventListener('resize', function() {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(adjustBodyPaddingForHeader, 100);
+});
+
+// Ajustar quando a página terminar de carregar (incluindo imagens)
+window.addEventListener('load', function() {
+    adjustBodyPaddingForHeader();
+});
+
+// ========================================
 // MENU MOBILE TOGGLE
 // ========================================
 document.addEventListener('DOMContentLoaded', function() {
@@ -169,134 +208,16 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ========================================
-    // CARROSSEL DE BANNERS - DESKTOP
+    // CARROSSEL DE BANNERS - REMOVIDO
+    // Banner único implementado - código do carrossel removido
     // ========================================
-    const carouselTrack = document.getElementById('carouselTrack');
-    const carouselPrev = document.getElementById('carouselPrev');
-    const carouselNext = document.getElementById('carouselNext');
-    const carouselIndicators = document.getElementById('carouselIndicators');
-    
-    if (carouselTrack && carouselPrev && carouselNext) {
-        const slides = carouselTrack.querySelectorAll('.carousel-slide');
-        let currentIndex = 0;
-        let autoplayInterval = null;
-        const autoplayDelay = 5000; // 5 segundos
-        
-        // Criar indicadores
-        if (carouselIndicators && slides.length > 0) {
-            slides.forEach((slide, index) => {
-                const indicator = document.createElement('button');
-                indicator.classList.add('carousel-indicator');
-                if (index === 0) indicator.classList.add('active');
-                indicator.setAttribute('aria-label', `Ir para banner ${index + 1}`);
-                indicator.addEventListener('click', () => goToSlide(index));
-                carouselIndicators.appendChild(indicator);
-            });
-        }
-        
-        // Função para atualizar o carrossel
-        function updateCarousel() {
-            carouselTrack.style.transform = `translateX(-${currentIndex * 100}%)`;
-            
-            // Atualizar indicadores
-            if (carouselIndicators) {
-                const indicators = carouselIndicators.querySelectorAll('.carousel-indicator');
-                indicators.forEach((indicator, index) => {
-                    if (index === currentIndex) {
-                        indicator.classList.add('active');
-                    } else {
-                        indicator.classList.remove('active');
-                    }
-                });
-            }
-        }
-        
-        // Função para ir para um slide específico
-        function goToSlide(index) {
-            currentIndex = index;
-            if (currentIndex < 0) {
-                currentIndex = slides.length - 1;
-            } else if (currentIndex >= slides.length) {
-                currentIndex = 0;
-            }
-            updateCarousel();
-            resetAutoplay();
-        }
-        
-        // Função para próximo slide
-        function nextSlide() {
-            currentIndex = (currentIndex + 1) % slides.length;
-            updateCarousel();
-            resetAutoplay();
-        }
-        
-        // Função para slide anterior
-        function prevSlide() {
-            currentIndex = (currentIndex - 1 + slides.length) % slides.length;
-            updateCarousel();
-            resetAutoplay();
-        }
-        
-        // Função para resetar autoplay
-        function resetAutoplay() {
-            clearInterval(autoplayInterval);
-            startAutoplay();
-        }
-        
-        // Função para iniciar autoplay
-        function startAutoplay() {
-            // Só funciona em desktop
-            if (window.innerWidth >= 768) {
-                autoplayInterval = setInterval(nextSlide, autoplayDelay);
-            }
-        }
-        
-        // Event listeners
-        carouselNext.addEventListener('click', nextSlide);
-        carouselPrev.addEventListener('click', prevSlide);
-        
-        // Pausar autoplay ao passar o mouse
-        const carouselContainer = document.querySelector('.hero-carousel-desktop');
-        if (carouselContainer) {
-            carouselContainer.addEventListener('mouseenter', () => {
-                clearInterval(autoplayInterval);
-            });
-            
-            carouselContainer.addEventListener('mouseleave', () => {
-                startAutoplay();
-            });
-        }
-        
-        // Iniciar autoplay
-        startAutoplay();
-        
-        // Reiniciar autoplay ao redimensionar (para mudanças mobile/desktop)
-        let resizeTimeout;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                clearInterval(autoplayInterval);
-                if (window.innerWidth >= 768) {
-                    startAutoplay();
-                }
-            }, 250);
-        });
-        
-        // Navegação por teclado
-        document.addEventListener('keydown', (e) => {
-            if (window.innerWidth >= 768 && carouselContainer && carouselContainer.offsetParent !== null) {
-                if (e.key === 'ArrowLeft') {
-                    prevSlide();
-                } else if (e.key === 'ArrowRight') {
-                    nextSlide();
-                }
-            }
-        });
-    }
 
     // ========================================
-    // PARALLAX EFFECT FOR HERO BANNER MOBILE (Suave)
+    // PARALLAX EFFECT FOR HERO BANNER MOBILE (Preparado para futura adaptação)
     // ========================================
+    // Código preparado para quando houver banner mobile específico
+    // Descomente e ajuste quando o banner mobile estiver pronto
+    /*
     let ticking = false;
     const heroImageMobile = document.querySelector('.hero-image-mobile');
     
@@ -332,6 +253,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Initial call
         updateParallax();
     }
+    */
 
     // ========================================
     // ENHANCED SCROLL REVEAL ANIMATION
