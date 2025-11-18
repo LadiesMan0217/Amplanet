@@ -798,15 +798,19 @@ ul {
         border-radius: 50px; /* Formato pílula perfeita */
         box-shadow: 0 10px 25px rgba(0, 51, 153, 0.3);
         grid-template-columns: 1fr 1fr;
-        overflow: hidden;
+        overflow: hidden; /* Hidden para manter arredondamento, mas permitir animação */
         z-index: 1000;
-        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.5s ease;
         padding: 0;
+        gap: 0; /* Sem gap para manter unidos */
     }
     
+    /* Quando em split-mode, permitir overflow para animação */
     .mobile-pill-container.split-mode {
+        overflow: visible;
         background: transparent;
         box-shadow: none;
+        pointer-events: none; /* Não clicável enquanto "explodido" */
     }
     
     .pill-button {
@@ -821,7 +825,7 @@ ul {
         font-size: 0.875rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: transform 0.5s ease, opacity 0.3s ease;
         position: relative;
         border: none;
         cursor: pointer;
@@ -834,11 +838,13 @@ ul {
         background: #ffffff;
         color: #003399;
         border-right: 1px solid #f0f0f0;
+        border-radius: 50px 0 0 50px; /* Arredondado à esquerda */
     }
     
     .pill-button-right {
         background: #003399;
         color: #ffffff;
+        border-radius: 0 50px 50px 0; /* Arredondado à direita */
     }
     
     .pill-button i {
@@ -893,27 +899,42 @@ ul {
         background: rgba(255, 255, 255, 0.2);
     }
     
-    /* Split Mode Animation */
+    /* Split Mode Animation - Explosão Lateral */
     .mobile-pill-container.split-mode {
-        transform: translateY(calc(100% + 40px));
+        background: transparent;
+        box-shadow: none;
+        pointer-events: none;
+    }
+    
+    /* Botão Esquerdo - Desliza para a esquerda */
+    .mobile-pill-container.split-mode .pill-button-left {
+        transform: translateX(-50px) scale(0.9);
         opacity: 0;
     }
     
-    .mobile-pill-container.split-mode .pill-button-left,
+    /* Botão Direito - Desliza para a direita */
     .mobile-pill-container.split-mode .pill-button-right {
-        transform: none;
-        opacity: 1;
+        transform: translateX(50px) scale(0.9);
+        opacity: 0;
     }
     
     /* Controle do Botão WhatsApp Flutuante no Mobile */
     .whatsapp-float {
-        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
+    /* Estado inicial (no topo) - Escondido */
     .whatsapp-float.hidden-top {
         opacity: 0;
         pointer-events: none;
-        transform: translateY(100px);
+        transform: translateY(20px);
+    }
+    
+    /* Estado visível (sem classe hidden-top) - Visível */
+    .whatsapp-float:not(.hidden-top) {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0);
     }
     
     /* Garantir que a primeira seção após hero tenha espaçamento adequado */

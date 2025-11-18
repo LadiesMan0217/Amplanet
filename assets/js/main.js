@@ -383,13 +383,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         const scrollY = window.pageYOffset || window.scrollY;
-        const scrollThreshold = 100; // Aumentado para dar mais espaço antes de ativar
-        const heroHeight = heroSection.offsetHeight;
-        const viewportHeight = window.innerHeight;
+        const scrollThreshold = 50; // Gatilho quando rolar mais de 50px
         
-        // Verificar se passou do threshold de scroll (saiu da área do hero)
-        if (scrollY > scrollThreshold || scrollY > (heroHeight - viewportHeight * 0.2)) {
-            // Scroll para baixo: esconder hint, esconder cápsula (split-mode), mostrar WhatsApp
+        // Verificar se passou do threshold de scroll
+        if (scrollY > scrollThreshold) {
+            // Scroll para baixo: esconder hint, ativar split-mode na cápsula, mostrar WhatsApp
             if (scrollHint && !scrollHint.classList.contains('hidden')) {
                 scrollHint.classList.add('hidden');
             }
@@ -400,7 +398,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 whatsappFloat.classList.remove('hidden-top');
             }
         } else {
-            // Voltar ao topo: mostrar hint, mostrar cápsula, esconder WhatsApp
+            // Voltar ao topo: mostrar hint, remover split-mode da cápsula, esconder WhatsApp
             if (scrollHint && scrollHint.classList.contains('hidden')) {
                 scrollHint.classList.remove('hidden');
             }
