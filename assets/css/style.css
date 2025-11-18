@@ -769,8 +769,9 @@ ul {
     }
     
     .scroll-hint.hidden {
-        opacity: 0;
-        pointer-events: none;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        visibility: hidden !important;
     }
     
     @keyframes bounce-hint {
@@ -784,32 +785,24 @@ ul {
         }
     }
     
-    /* Mobile Pill Container - Fixo no bottom da tela */
-    .mobile-pill-container {
-        display: grid;
+    /* Mobile Pill Wrapper - Container para os botões independentes */
+    .mobile-pill-wrapper {
         position: fixed;
         bottom: 40px; /* Margem inferior aumentada significativamente para subir os botões */
         left: 50%;
         transform: translateX(-50%);
+        display: flex;
+        align-items: stretch; /* Estica os botões para mesma altura */
+        justify-content: center;
+        gap: 0; /* Sem gap entre os botões */
         width: 90%;
         max-width: 400px;
-        margin: 0;
-        background: #ffffff;
-        border-radius: 50px; /* Formato pílula perfeita */
-        box-shadow: 0 10px 25px rgba(0, 51, 153, 0.3);
-        grid-template-columns: 1fr 1fr;
-        overflow: hidden; /* Hidden para manter arredondamento, mas permitir animação */
         z-index: 1000;
-        transition: all 0.5s ease;
-        padding: 0;
-        gap: 0; /* Sem gap para manter unidos */
+        pointer-events: none; /* Container não clicável, apenas os botões */
     }
     
-    /* Quando em split-mode, permitir overflow para animação */
-    .mobile-pill-container.split-mode {
-        overflow: visible;
-        background: transparent;
-        box-shadow: none;
+    /* Quando em split-mode, permitir animação */
+    .mobile-pill-wrapper.split-mode {
         pointer-events: none; /* Não clicável enquanto "explodido" */
     }
     
@@ -830,21 +823,29 @@ ul {
         border: none;
         cursor: pointer;
         min-height: 50px;
+        height: 50px; /* Altura fixa igual para ambos */
         -webkit-tap-highlight-color: transparent;
         user-select: none;
+        pointer-events: auto; /* Botões são clicáveis */
+        flex: 1; /* Ambos ocupam espaço igual */
+        min-width: 0; /* Permite que o texto seja cortado se necessário */
+        white-space: nowrap; /* Evita quebra de linha */
     }
     
     .pill-button-left {
         background: #ffffff;
         color: #003399;
-        border-right: 1px solid #f0f0f0;
         border-radius: 50px 0 0 50px; /* Arredondado à esquerda */
+        box-shadow: 0 10px 25px rgba(0, 51, 153, 0.3);
+        margin-right: -1px; /* Sobreposição mínima para unir visualmente */
     }
     
     .pill-button-right {
         background: #003399;
         color: #ffffff;
         border-radius: 0 50px 50px 0; /* Arredondado à direita */
+        box-shadow: 0 10px 25px rgba(0, 51, 153, 0.3);
+        margin-left: -1px; /* Sobreposição mínima para unir visualmente */
     }
     
     .pill-button i {
@@ -900,22 +901,22 @@ ul {
     }
     
     /* Split Mode Animation - Explosão Lateral */
-    .mobile-pill-container.split-mode {
-        background: transparent;
-        box-shadow: none;
+    .mobile-pill-wrapper.split-mode {
         pointer-events: none;
     }
     
     /* Botão Esquerdo - Desliza para a esquerda */
-    .mobile-pill-container.split-mode .pill-button-left {
+    .mobile-pill-wrapper.split-mode .pill-button-left {
         transform: translateX(-50px) scale(0.9);
         opacity: 0;
+        pointer-events: none;
     }
     
     /* Botão Direito - Desliza para a direita */
-    .mobile-pill-container.split-mode .pill-button-right {
+    .mobile-pill-wrapper.split-mode .pill-button-right {
         transform: translateX(50px) scale(0.9);
         opacity: 0;
+        pointer-events: none;
     }
     
     /* Controle do Botão WhatsApp Flutuante no Mobile */

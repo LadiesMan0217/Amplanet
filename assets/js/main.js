@@ -368,7 +368,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // MOBILE PILL CONTAINER E SCROLL HINT
     // ========================================
     const scrollHint = document.getElementById('scrollHint');
-    const mobilePillContainer = document.getElementById('mobilePillContainer');
+    const mobilePillWrapper = document.getElementById('mobilePillContainer'); // ID mantido, mas agora é wrapper
     const whatsappFloat = document.querySelector('.whatsapp-float');
     const heroSection = document.querySelector('.hero');
     
@@ -378,7 +378,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function handleMobileScroll() {
-        if (!isMobile() || !scrollHint || !mobilePillContainer || !whatsappFloat || !heroSection) {
+        // Verificar se estamos em mobile primeiro
+        if (!isMobile()) {
             return;
         }
         
@@ -388,13 +389,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // Verificar se passou do threshold de scroll
         if (scrollY > scrollThreshold) {
             // Scroll para baixo: esconder hint, ativar split-mode na cápsula, mostrar WhatsApp
-            if (scrollHint && !scrollHint.classList.contains('hidden')) {
+            if (scrollHint) {
                 scrollHint.classList.add('hidden');
             }
-            if (mobilePillContainer && !mobilePillContainer.classList.contains('split-mode')) {
-                mobilePillContainer.classList.add('split-mode');
+            if (mobilePillWrapper) {
+                mobilePillWrapper.classList.add('split-mode');
             }
-            if (whatsappFloat && whatsappFloat.classList.contains('hidden-top')) {
+            if (whatsappFloat) {
                 whatsappFloat.classList.remove('hidden-top');
                 // Remover estilos inline para permitir CSS
                 whatsappFloat.style.opacity = '';
@@ -403,13 +404,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } else {
             // Voltar ao topo: mostrar hint, remover split-mode da cápsula, esconder WhatsApp
-            if (scrollHint && scrollHint.classList.contains('hidden')) {
+            if (scrollHint) {
                 scrollHint.classList.remove('hidden');
             }
-            if (mobilePillContainer && mobilePillContainer.classList.contains('split-mode')) {
-                mobilePillContainer.classList.remove('split-mode');
+            if (mobilePillWrapper) {
+                mobilePillWrapper.classList.remove('split-mode');
             }
-            if (whatsappFloat && !whatsappFloat.classList.contains('hidden-top')) {
+            if (whatsappFloat) {
                 whatsappFloat.classList.add('hidden-top');
                 // Forçar estilo inline para garantir que fique escondido
                 whatsappFloat.style.opacity = '0';
@@ -417,6 +418,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 whatsappFloat.style.transform = 'translateY(20px)';
             }
         }
+    }
+    
+    // Chamar a função imediatamente ao carregar para verificar estado inicial
+    if (isMobile()) {
+        handleMobileScroll();
     }
     
     // Inicializar estado no carregamento - ANTES de qualquer renderização
