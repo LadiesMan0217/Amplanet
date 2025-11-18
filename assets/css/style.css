@@ -2436,13 +2436,18 @@ section + section {
     line-height: 1.6;
 }
 
+/* Espaçamento entre o grid de apps e o título "+ CONTEÚDO À LA CARTE" */
+.apps-grid-main + .section-title {
+    margin-top: var(--spacing-3xl);
+}
+
 .apps-grid-main {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: var(--spacing-lg);
-    margin-top: var(--spacing-2xl);
+    gap: var(--spacing-xl);
+    margin-top: var(--spacing-3xl);
     max-width: 1000px;
     margin-left: auto;
     margin-right: auto;
@@ -2601,6 +2606,7 @@ section + section {
 .apps-grid-la-carte {
     max-width: 1200px !important;
     gap: var(--spacing-xl) !important;
+    margin-top: var(--spacing-lg) !important;
 }
 
 .app-flip-card-la-carte {
@@ -2818,8 +2824,8 @@ section + section {
 
 /* Manual de Acesso Card - Design Criativo */
 .apps-cta-wrapper {
-    margin-top: var(--spacing-3xl);
-    margin-bottom: var(--spacing-2xl);
+    margin-top: var(--spacing-xl);
+    margin-bottom: var(--spacing-md);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -3010,8 +3016,8 @@ section + section {
 /* Botão final da seção de apps */
 .apps-footer-cta {
     text-align: center;
-    margin-top: var(--spacing-2xl);
-    padding-top: var(--spacing-xl);
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-md);
 }
 
 /* ========================================
@@ -5840,7 +5846,7 @@ section + section {
 .footer {
     background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%);
     color: #1e293b;
-    padding: var(--spacing-3xl) 0 var(--spacing-lg);
+    padding: var(--spacing-md) 0 var(--spacing-lg);
     position: relative;
     overflow: hidden;
     border-top: 1px solid #e2e8f0;
