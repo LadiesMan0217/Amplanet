@@ -921,20 +921,26 @@ ul {
     /* Controle do Botão WhatsApp Flutuante no Mobile */
     .whatsapp-float {
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        opacity: 0 !important; /* Forçar escondido por padrão em mobile */
+        pointer-events: none !important;
+        transform: translateY(20px) !important;
+        animation: none !important; /* Desabilitar animação inicial */
     }
     
     /* Estado inicial (no topo) - Escondido */
     .whatsapp-float.hidden-top {
-        opacity: 0;
-        pointer-events: none;
-        transform: translateY(20px);
+        opacity: 0 !important;
+        pointer-events: none !important;
+        transform: translateY(20px) !important;
+        animation: none !important;
     }
     
-    /* Estado visível (sem classe hidden-top) - Visível */
+    /* Estado visível (sem classe hidden-top e após scroll) - Visível */
     .whatsapp-float:not(.hidden-top) {
-        opacity: 1;
-        pointer-events: auto;
-        transform: translateY(0);
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        transform: translateY(0) !important;
+        animation: float-pulse 2s ease-in-out infinite !important;
     }
     
     /* Garantir que a primeira seção após hero tenha espaçamento adequado */
@@ -5942,6 +5948,24 @@ section + section {
     color: white;
     text-decoration: none;
     animation: float-pulse 2s ease-in-out infinite;
+}
+
+/* Em mobile, esconder por padrão até ser ativado */
+@media (max-width: 768px) {
+    .whatsapp-float {
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(20px);
+        animation: none; /* Desabilitar animação inicial em mobile */
+    }
+    
+    /* Só mostrar quando não tiver classe hidden-top e estiver em scroll */
+    .whatsapp-float:not(.hidden-top) {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0);
+        animation: float-pulse 2s ease-in-out infinite;
+    }
 }
 
 .whatsapp-float::before {

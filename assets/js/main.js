@@ -396,6 +396,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             if (whatsappFloat && whatsappFloat.classList.contains('hidden-top')) {
                 whatsappFloat.classList.remove('hidden-top');
+                // Remover estilos inline para permitir CSS
+                whatsappFloat.style.opacity = '';
+                whatsappFloat.style.pointerEvents = '';
+                whatsappFloat.style.transform = '';
             }
         } else {
             // Voltar ao topo: mostrar hint, remover split-mode da cápsula, esconder WhatsApp
@@ -407,22 +411,41 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             if (whatsappFloat && !whatsappFloat.classList.contains('hidden-top')) {
                 whatsappFloat.classList.add('hidden-top');
+                // Forçar estilo inline para garantir que fique escondido
+                whatsappFloat.style.opacity = '0';
+                whatsappFloat.style.pointerEvents = 'none';
+                whatsappFloat.style.transform = 'translateY(20px)';
             }
         }
     }
     
-    // Inicializar estado no carregamento
+    // Inicializar estado no carregamento - ANTES de qualquer renderização
+    if (isMobile() && whatsappFloat) {
+        // Garantir que o botão comece escondido IMEDIATAMENTE
+        whatsappFloat.classList.add('hidden-top');
+        // Forçar estilo inline para evitar flash
+        whatsappFloat.style.opacity = '0';
+        whatsappFloat.style.pointerEvents = 'none';
+        whatsappFloat.style.transform = 'translateY(20px)';
+    }
+    
+    // Garantir que a página comece no topo
     if (isMobile()) {
-        // Esconder WhatsApp flutuante no topo
-        if (whatsappFloat) {
-            whatsappFloat.classList.add('hidden-top');
-        }
-        // Garantir que a página comece no topo
         window.scrollTo(0, 0);
         // Forçar scroll para o topo após um pequeno delay (para garantir que o layout esteja pronto)
         setTimeout(() => {
             window.scrollTo(0, 0);
-        }, 100);
+            // Verificar novamente o estado do WhatsApp após layout
+            if (whatsappFloat && isMobile()) {
+                const scrollY = window.pageYOffset || window.scrollY;
+                if (scrollY <= 50) {
+                    whatsappFloat.classList.add('hidden-top');
+                    whatsappFloat.style.opacity = '0';
+                    whatsappFloat.style.pointerEvents = 'none';
+                    whatsappFloat.style.transform = 'translateY(20px)';
+                }
+            }
+        }, 50);
     }
     
     // ========================================
