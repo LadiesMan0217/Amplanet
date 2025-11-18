@@ -379,38 +379,99 @@ document.addEventListener('DOMContentLoaded', function() {
         return window.innerWidth <= 768;
     }
     
-    // Garantir visibilidade dos botões - FUNÇÃO CRÍTICA
+    // Garantir visibilidade dos botões - FUNÇÃO CRÍTICA (APENAS MOBILE)
     function ensureButtonsVisible() {
-        if (isMobile()) {
+        // Só executar se for mobile
+        if (!isMobile()) {
+            return;
+        }
+        
+        if (pillButtonLeft) {
+            pillButtonLeft.style.display = 'flex';
+            pillButtonLeft.style.opacity = '1';
+            pillButtonLeft.style.visibility = 'visible';
+            pillButtonLeft.style.transform = 'translateX(0) scale(1)';
+        }
+        if (pillButtonRight) {
+            pillButtonRight.style.display = 'flex';
+            pillButtonRight.style.opacity = '1';
+            pillButtonRight.style.visibility = 'visible';
+            pillButtonRight.style.transform = 'translateX(0) scale(1)';
+        }
+    }
+    
+    // Esconder elementos mobile quando detectar desktop
+    function hideMobileElements() {
+        if (!isMobile()) {
+            // Esconder scroll hint - FORÇAR OCULTAÇÃO TOTAL
+            if (scrollHint) {
+                scrollHint.style.display = 'none';
+                scrollHint.style.visibility = 'hidden';
+                scrollHint.style.opacity = '0';
+                scrollHint.style.position = 'absolute';
+                scrollHint.style.left = '-9999px';
+                scrollHint.style.top = '-9999px';
+            }
+            
+            // Esconder wrapper de botões - FORÇAR OCULTAÇÃO TOTAL
+            if (mobilePillWrapper) {
+                mobilePillWrapper.style.display = 'none';
+                mobilePillWrapper.style.visibility = 'hidden';
+                mobilePillWrapper.style.opacity = '0';
+                mobilePillWrapper.style.position = 'absolute';
+                mobilePillWrapper.style.left = '-9999px';
+                mobilePillWrapper.style.top = '-9999px';
+            }
+            
+            // Esconder botões individuais - FORÇAR OCULTAÇÃO TOTAL
             if (pillButtonLeft) {
-                pillButtonLeft.style.display = 'flex';
-                pillButtonLeft.style.opacity = '1';
-                pillButtonLeft.style.visibility = 'visible';
-                pillButtonLeft.style.transform = 'translateX(0) scale(1)';
+                pillButtonLeft.style.display = 'none';
+                pillButtonLeft.style.visibility = 'hidden';
+                pillButtonLeft.style.opacity = '0';
+                pillButtonLeft.style.position = 'absolute';
+                pillButtonLeft.style.left = '-9999px';
+                pillButtonLeft.style.top = '-9999px';
             }
             if (pillButtonRight) {
-                pillButtonRight.style.display = 'flex';
-                pillButtonRight.style.opacity = '1';
-                pillButtonRight.style.visibility = 'visible';
-                pillButtonRight.style.transform = 'translateX(0) scale(1)';
+                pillButtonRight.style.display = 'none';
+                pillButtonRight.style.visibility = 'hidden';
+                pillButtonRight.style.opacity = '0';
+                pillButtonRight.style.position = 'absolute';
+                pillButtonRight.style.left = '-9999px';
+                pillButtonRight.style.top = '-9999px';
+            }
+            
+            // Garantir WhatsApp visível em desktop
+            if (whatsappFloat) {
+                whatsappFloat.classList.remove('hidden-top');
+                whatsappFloat.style.opacity = '';
+                whatsappFloat.style.pointerEvents = '';
+                whatsappFloat.style.transform = '';
+                whatsappFloat.style.display = '';
+                whatsappFloat.style.visibility = '';
             }
         }
     }
     
-    // Executar imediatamente para garantir visibilidade
-    ensureButtonsVisible();
-    
-    // Executar após DOM estar pronto
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', ensureButtonsVisible);
-    } else {
+    // Executar verificações apenas se for mobile
+    if (isMobile()) {
         ensureButtonsVisible();
+        
+        // Executar após DOM estar pronto
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', ensureButtonsVisible);
+        } else {
+            ensureButtonsVisible();
+        }
+        
+        // Executar após delays para garantir (múltiplas verificações)
+        setTimeout(ensureButtonsVisible, 100);
+        setTimeout(ensureButtonsVisible, 500);
+        setTimeout(ensureButtonsVisible, 1000);
+    } else {
+        // Se não for mobile, esconder elementos mobile imediatamente
+        hideMobileElements();
     }
-    
-    // Executar após delays para garantir (múltiplas verificações)
-    setTimeout(ensureButtonsVisible, 100);
-    setTimeout(ensureButtonsVisible, 500);
-    setTimeout(ensureButtonsVisible, 1000);
     
     function handleMobileScroll() {
         // Verificar se estamos em mobile primeiro
@@ -430,7 +491,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (mobilePillWrapper) {
                 mobilePillWrapper.classList.add('split-mode');
             }
-            if (whatsappFloat) {
+            if (whatsappFloat && isMobile()) {
                 whatsappFloat.classList.remove('hidden-top');
                 // Remover estilos inline para permitir CSS
                 whatsappFloat.style.opacity = '';
@@ -447,7 +508,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Garantir que ambos os botões sejam visíveis ao remover split-mode
                 ensureButtonsVisible();
             }
-            if (whatsappFloat) {
+            if (whatsappFloat && isMobile()) {
                 whatsappFloat.classList.add('hidden-top');
                 // Forçar estilo inline para garantir que fique escondido
                 whatsappFloat.style.opacity = '0';
@@ -464,12 +525,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Inicializar estado no carregamento - ANTES de qualquer renderização
     if (isMobile() && whatsappFloat) {
-        // Garantir que o botão comece escondido IMEDIATAMENTE
+        // Garantir que o botão comece escondido IMEDIATAMENTE (apenas mobile)
         whatsappFloat.classList.add('hidden-top');
         // Forçar estilo inline para evitar flash
         whatsappFloat.style.opacity = '0';
         whatsappFloat.style.pointerEvents = 'none';
         whatsappFloat.style.transform = 'translateY(20px)';
+    } else if (!isMobile() && whatsappFloat) {
+        // Em desktop, garantir que WhatsApp esteja sempre visível
+        whatsappFloat.classList.remove('hidden-top');
+        whatsappFloat.style.opacity = '';
+        whatsappFloat.style.pointerEvents = '';
+        whatsappFloat.style.transform = '';
     }
     
     // Garantir que a página comece no topo
@@ -512,17 +579,60 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('scroll', requestScrollTick, { passive: true });
     
     // Verificar ao redimensionar a janela
+    let resizeTimeout;
     window.addEventListener('resize', function() {
-        // Atualizar visibilidade do WhatsApp
-        if (isMobile() && whatsappFloat) {
-            const scrollY = window.pageYOffset || window.scrollY;
-            if (scrollY <= 50) {
-                whatsappFloat.classList.add('hidden-top');
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(function() {
+            if (isMobile()) {
+                // Comportamento mobile
+                if (whatsappFloat) {
+                    const scrollY = window.pageYOffset || window.scrollY;
+                    if (scrollY <= 50) {
+                        whatsappFloat.classList.add('hidden-top');
+                        whatsappFloat.style.opacity = '0';
+                        whatsappFloat.style.pointerEvents = 'none';
+                        whatsappFloat.style.transform = 'translateY(20px)';
+                    }
+                }
+                // Garantir visibilidade dos botões mobile
+                ensureButtonsVisible();
+            } else {
+                // Comportamento desktop - esconder elementos mobile e mostrar WhatsApp
+                hideMobileElements();
+                
+                // Garantir WhatsApp visível em desktop
+                if (whatsappFloat) {
+                    whatsappFloat.classList.remove('hidden-top');
+                    whatsappFloat.style.opacity = '';
+                    whatsappFloat.style.pointerEvents = '';
+                    whatsappFloat.style.transform = '';
+                    whatsappFloat.style.display = '';
+                    whatsappFloat.style.visibility = '';
+                }
+                
+                // Garantir que elementos mobile estejam completamente escondidos (dupla verificação)
+                if (scrollHint) {
+                    scrollHint.style.display = 'none';
+                    scrollHint.style.visibility = 'hidden';
+                    scrollHint.style.opacity = '0';
+                }
+                if (mobilePillWrapper) {
+                    mobilePillWrapper.style.display = 'none';
+                    mobilePillWrapper.style.visibility = 'hidden';
+                    mobilePillWrapper.style.opacity = '0';
+                }
+                if (pillButtonLeft) {
+                    pillButtonLeft.style.display = 'none';
+                    pillButtonLeft.style.visibility = 'hidden';
+                    pillButtonLeft.style.opacity = '0';
+                }
+                if (pillButtonRight) {
+                    pillButtonRight.style.display = 'none';
+                    pillButtonRight.style.visibility = 'hidden';
+                    pillButtonRight.style.opacity = '0';
+                }
             }
-        } else if (whatsappFloat) {
-            whatsappFloat.classList.remove('hidden-top');
-        }
-        // Nota: A tag <picture> gerencia automaticamente a troca de banner
+        }, 150);
     });
 });
 

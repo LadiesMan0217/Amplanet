@@ -641,8 +641,13 @@ ul {
    MOBILE ELEMENTS - HIDDEN BY DEFAULT
    ======================================== */
 .scroll-hint,
-.mobile-pill-container {
+.mobile-pill-container,
+.mobile-pill-wrapper,
+.mobile-pill-wrapper .pill-button-left,
+.mobile-pill-wrapper .pill-button-right,
+.mobile-pill-wrapper .pill-button {
     display: none;
+    visibility: hidden;
 }
 
 /* ========================================
@@ -657,7 +662,7 @@ ul {
     display: block;
 }
 
-/* Mobile: Banner único responsivo */
+/* Mobile: Banner único responsivo - APENAS MOBILE */
 @media (max-width: 767px) {
     .header {
         min-height: 70px; /* Altura menor em mobile: padding + logo 45px + padding */
@@ -1132,6 +1137,63 @@ ul {
     
     .hero-image-desktop {
         display: block !important;
+    }
+    
+    /* ========================================
+       GARANTIR QUE ELEMENTOS MOBILE ESTEJAM ESCONDIDOS EM DESKTOP
+       ======================================== */
+    .scroll-hint,
+    .mobile-pill-wrapper,
+    .mobile-pill-container {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        position: absolute !important;
+        left: -9999px !important;
+        top: -9999px !important;
+    }
+    
+    /* Garantir que botões mobile não apareçam - REGRAS MAIS ESPECÍFICAS */
+    .pill-button-left,
+    .pill-button-right,
+    .mobile-pill-wrapper .pill-button-left,
+    .mobile-pill-wrapper .pill-button-right,
+    .mobile-pill-wrapper .pill-button,
+    .hero .pill-button-left,
+    .hero .pill-button-right,
+    .hero .mobile-pill-wrapper,
+    .hero .scroll-hint {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        position: absolute !important;
+        left: -9999px !important;
+        top: -9999px !important;
+        width: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+    }
+}
+
+/* REGRA ADICIONAL: Garantir ocultação em qualquer tela >= 768px */
+@media (min-width: 768px) {
+    .scroll-hint,
+    .mobile-pill-wrapper,
+    .mobile-pill-container,
+    .pill-button-left,
+    .pill-button-right {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        position: absolute !important;
+        left: -9999px !important;
+        top: -9999px !important;
+        width: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
     }
 }
 
@@ -6047,6 +6109,29 @@ section + section {
     color: white;
     text-decoration: none;
     animation: float-pulse 2s ease-in-out infinite;
+}
+
+/* ========================================
+   WHATSAPP FLOAT - DESKTOP (SEMPRE VISÍVEL)
+   ======================================== */
+@media (min-width: 769px) {
+    .whatsapp-float {
+        display: flex !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        transform: translateY(0) !important;
+        visibility: visible !important;
+        animation: float-pulse 2s ease-in-out infinite !important;
+    }
+    
+    /* Remover classe hidden-top em desktop - sempre visível */
+    .whatsapp-float.hidden-top {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        transform: translateY(0) !important;
+        visibility: visible !important;
+        animation: float-pulse 2s ease-in-out infinite !important;
+    }
 }
 
 /* Em mobile, esconder por padrão até ser ativado */
