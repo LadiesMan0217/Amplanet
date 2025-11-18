@@ -20,49 +20,8 @@ const header = document.querySelector('.header');
 // ========================================
 // AJUSTAR PADDING-TOP DO BODY BASEADO NA ALTURA DO HEADER
 // ========================================
-function adjustBodyPaddingForHeader() {
-    const headerElement = document.querySelector('.header');
-    const bodyElement = document.body;
-    
-    if (headerElement && bodyElement) {
-        // Calcular altura real do header (incluindo padding, margin, etc)
-        const headerHeight = headerElement.offsetHeight;
-        
-        // Aplicar padding-top no body igual à altura do header
-        // Isso garante que todo o conteúdo comece após o header
-        bodyElement.style.paddingTop = headerHeight + 'px';
-    }
-}
-
-// Debounce otimizado para evitar múltiplas chamadas
-let adjustTimeout = null;
-function debouncedAdjustBodyPadding() {
-    if (adjustTimeout) {
-        clearTimeout(adjustTimeout);
-    }
-    adjustTimeout = setTimeout(adjustBodyPaddingForHeader, 100);
-}
-
-// Executar quando o DOM estiver pronto
-document.addEventListener('DOMContentLoaded', function() {
-    // Ajustar imediatamente
-    adjustBodyPaddingForHeader();
-    
-    // Ajustar após um delay para garantir que imagens/logos carregaram (consolidado)
-    adjustTimeout = setTimeout(adjustBodyPaddingForHeader, 300);
-});
-
-// Ajustar ao redimensionar a janela (com debounce)
-let resizeTimeout;
-window.addEventListener('resize', function() {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(adjustBodyPaddingForHeader, 100);
-}, { passive: true });
-
-// Ajustar quando a página terminar de carregar (incluindo imagens)
-window.addEventListener('load', function() {
-    adjustBodyPaddingForHeader();
-});
+// REMOVIDO: Header não é mais fixo, então não precisa de padding-top no body
+// O header agora é estático e faz parte do fluxo normal do documento
 
 // ========================================
 // MENU MOBILE TOGGLE
