@@ -755,7 +755,7 @@ ul {
     .scroll-hint {
         display: block;
         position: fixed;
-        bottom: 120px; /* Acima dos botões fixos (ajustado considerando a nova posição dos botões) */
+        bottom: 150px; /* Acima dos botões fixos (ajustado considerando a nova posição dos botões) */
         left: 50%;
         transform: translateX(-50%);
         z-index: 999;
@@ -788,7 +788,7 @@ ul {
     .mobile-pill-container {
         display: grid;
         position: fixed;
-        bottom: 12px; /* Margem inferior para subir os botões */
+        bottom: 40px; /* Margem inferior aumentada significativamente para subir os botões */
         left: 50%;
         transform: translateX(-50%);
         width: 90%;
@@ -895,7 +895,7 @@ ul {
     
     /* Split Mode Animation */
     .mobile-pill-container.split-mode {
-        transform: translateY(calc(100% + 12px));
+        transform: translateY(calc(100% + 40px));
         opacity: 0;
     }
     
