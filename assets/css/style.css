@@ -2309,6 +2309,22 @@ section + section {
     min-height: 0;
 }
 
+/* Cards featured (azuis) com detalhes sempre visíveis mantêm fundo azul */
+.plano-card.featured .plano-details[style*="max-height: none"] {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #4a6cf7 100%) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Cards featured com detalhes sempre visíveis - texto branco */
+.plano-card.featured .plano-details[style*="max-height: none"] .plano-feature span {
+    color: #ffffff !important;
+}
+
+.plano-card.featured .plano-details[style*="max-height: none"] .plano-feature .icon-pro {
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+
 .plano-card.expanded .plano-details {
     opacity: 1 !important;
     padding: var(--spacing-md) !important;
