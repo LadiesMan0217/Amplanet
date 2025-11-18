@@ -861,7 +861,8 @@ ul {
         bottom: 40px; /* Margem inferior aumentada significativamente para subir os botões */
         left: 50%;
         transform: translateX(-50%);
-        display: flex;
+        display: flex !important; /* Forçar display flex */
+        flex-direction: row !important; /* Garantir direção horizontal */
         align-items: stretch; /* Estica os botões para mesma altura */
         justify-content: center;
         gap: 0; /* Sem gap entre os botões */
@@ -871,13 +872,22 @@ ul {
         pointer-events: none; /* Container não clicável, apenas os botões */
     }
     
+    /* Garantir que ambos os botões sejam sempre visíveis */
+    .mobile-pill-wrapper .pill-button-left,
+    .mobile-pill-wrapper .pill-button-right {
+        display: flex !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        position: relative !important;
+    }
+    
     /* Quando em split-mode, permitir animação */
     .mobile-pill-wrapper.split-mode {
         pointer-events: none; /* Não clicável enquanto "explodido" */
     }
     
     .pill-button {
-        display: flex;
+        display: flex !important;
         align-items: center;
         justify-content: center;
         gap: 0.5rem;
@@ -896,26 +906,34 @@ ul {
         height: 50px; /* Altura fixa igual para ambos */
         -webkit-tap-highlight-color: transparent;
         user-select: none;
-        pointer-events: auto; /* Botões são clicáveis */
-        flex: 1; /* Ambos ocupam espaço igual */
+        pointer-events: auto !important; /* Botões são clicáveis */
+        flex: 1 1 50% !important; /* Ambos ocupam espaço igual - garantido */
         min-width: 0; /* Permite que o texto seja cortado se necessário */
         white-space: nowrap; /* Evita quebra de linha */
+        opacity: 1 !important; /* Garantir visibilidade */
+        visibility: visible !important; /* Garantir visibilidade */
     }
     
     .pill-button-left {
-        background: #ffffff;
-        color: #003399;
+        background: #ffffff !important;
+        color: #003399 !important;
         border-radius: 50px 0 0 50px; /* Arredondado à esquerda */
         box-shadow: 0 10px 25px rgba(0, 51, 153, 0.3);
         margin-right: -1px; /* Sobreposição mínima para unir visualmente */
+        display: flex !important; /* Forçar display */
+        opacity: 1 !important; /* Garantir visibilidade */
+        visibility: visible !important; /* Garantir visibilidade */
     }
     
     .pill-button-right {
-        background: #003399;
-        color: #ffffff;
+        background: #003399 !important;
+        color: #ffffff !important;
         border-radius: 0 50px 50px 0; /* Arredondado à direita */
         box-shadow: 0 10px 25px rgba(0, 51, 153, 0.3);
         margin-left: -1px; /* Sobreposição mínima para unir visualmente */
+        display: flex !important; /* Forçar display */
+        opacity: 1 !important; /* Garantir visibilidade */
+        visibility: visible !important; /* Garantir visibilidade */
     }
     
     .pill-button i {
@@ -975,18 +993,28 @@ ul {
         pointer-events: none;
     }
     
-    /* Botão Esquerdo - Desliza para a esquerda */
+    /* Botão Esquerdo - Desliza para a esquerda (apenas quando em split-mode) */
     .mobile-pill-wrapper.split-mode .pill-button-left {
-        transform: translateX(-50px) scale(0.9);
-        opacity: 0;
-        pointer-events: none;
+        transform: translateX(-50px) scale(0.9) !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
     }
     
-    /* Botão Direito - Desliza para a direita */
+    /* Botão Direito - Desliza para a direita (apenas quando em split-mode) */
     .mobile-pill-wrapper.split-mode .pill-button-right {
-        transform: translateX(50px) scale(0.9);
-        opacity: 0;
-        pointer-events: none;
+        transform: translateX(50px) scale(0.9) !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+    
+    /* Garantir que quando NÃO está em split-mode, ambos sejam visíveis */
+    .mobile-pill-wrapper:not(.split-mode) .pill-button-left,
+    .mobile-pill-wrapper:not(.split-mode) .pill-button-right {
+        display: flex !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: translateX(0) scale(1) !important;
+        pointer-events: auto !important;
     }
     
     /* Controle do Botão WhatsApp Flutuante no Mobile */

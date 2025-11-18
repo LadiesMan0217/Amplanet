@@ -371,11 +371,46 @@ document.addEventListener('DOMContentLoaded', function() {
     const mobilePillWrapper = document.getElementById('mobilePillContainer'); // ID mantido, mas agora é wrapper
     const whatsappFloat = document.querySelector('.whatsapp-float');
     const heroSection = document.querySelector('.hero');
+    const pillButtonLeft = document.getElementById('pillButtonLeft');
+    const pillButtonRight = document.getElementById('pillButtonRight');
     
     // Verificar se estamos em mobile e se os elementos existem
     function isMobile() {
         return window.innerWidth <= 768;
     }
+    
+    // Garantir visibilidade dos botões - FUNÇÃO CRÍTICA
+    function ensureButtonsVisible() {
+        if (isMobile()) {
+            if (pillButtonLeft) {
+                pillButtonLeft.style.display = 'flex';
+                pillButtonLeft.style.opacity = '1';
+                pillButtonLeft.style.visibility = 'visible';
+                pillButtonLeft.style.transform = 'translateX(0) scale(1)';
+            }
+            if (pillButtonRight) {
+                pillButtonRight.style.display = 'flex';
+                pillButtonRight.style.opacity = '1';
+                pillButtonRight.style.visibility = 'visible';
+                pillButtonRight.style.transform = 'translateX(0) scale(1)';
+            }
+        }
+    }
+    
+    // Executar imediatamente para garantir visibilidade
+    ensureButtonsVisible();
+    
+    // Executar após DOM estar pronto
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', ensureButtonsVisible);
+    } else {
+        ensureButtonsVisible();
+    }
+    
+    // Executar após delays para garantir (múltiplas verificações)
+    setTimeout(ensureButtonsVisible, 100);
+    setTimeout(ensureButtonsVisible, 500);
+    setTimeout(ensureButtonsVisible, 1000);
     
     function handleMobileScroll() {
         // Verificar se estamos em mobile primeiro
@@ -409,6 +444,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             if (mobilePillWrapper) {
                 mobilePillWrapper.classList.remove('split-mode');
+                // Garantir que ambos os botões sejam visíveis ao remover split-mode
+                ensureButtonsVisible();
             }
             if (whatsappFloat) {
                 whatsappFloat.classList.add('hidden-top');
