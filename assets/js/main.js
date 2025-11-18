@@ -363,5 +363,102 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // ========================================
+    // MOBILE PILL CONTAINER E SCROLL HINT
+    // ========================================
+    const scrollHint = document.getElementById('scrollHint');
+    const mobilePillContainer = document.getElementById('mobilePillContainer');
+    const whatsappFloat = document.querySelector('.whatsapp-float');
+    const heroSection = document.querySelector('.hero');
+    
+    // Verificar se estamos em mobile e se os elementos existem
+    function isMobile() {
+        return window.innerWidth <= 768;
+    }
+    
+    function handleMobileScroll() {
+        if (!isMobile() || !scrollHint || !mobilePillContainer || !whatsappFloat || !heroSection) {
+            return;
+        }
+        
+        const scrollY = window.pageYOffset || window.scrollY;
+        const scrollThreshold = 100; // Aumentado para dar mais espaço antes de ativar
+        const heroHeight = heroSection.offsetHeight;
+        const viewportHeight = window.innerHeight;
+        
+        // Verificar se passou do threshold de scroll (saiu da área do hero)
+        if (scrollY > scrollThreshold || scrollY > (heroHeight - viewportHeight * 0.2)) {
+            // Scroll para baixo: esconder hint, esconder cápsula (split-mode), mostrar WhatsApp
+            if (scrollHint && !scrollHint.classList.contains('hidden')) {
+                scrollHint.classList.add('hidden');
+            }
+            if (mobilePillContainer && !mobilePillContainer.classList.contains('split-mode')) {
+                mobilePillContainer.classList.add('split-mode');
+            }
+            if (whatsappFloat && whatsappFloat.classList.contains('hidden-top')) {
+                whatsappFloat.classList.remove('hidden-top');
+            }
+        } else {
+            // Voltar ao topo: mostrar hint, mostrar cápsula, esconder WhatsApp
+            if (scrollHint && scrollHint.classList.contains('hidden')) {
+                scrollHint.classList.remove('hidden');
+            }
+            if (mobilePillContainer && mobilePillContainer.classList.contains('split-mode')) {
+                mobilePillContainer.classList.remove('split-mode');
+            }
+            if (whatsappFloat && !whatsappFloat.classList.contains('hidden-top')) {
+                whatsappFloat.classList.add('hidden-top');
+            }
+        }
+    }
+    
+    // Inicializar estado no carregamento
+    if (isMobile()) {
+        // Esconder WhatsApp flutuante no topo
+        if (whatsappFloat) {
+            whatsappFloat.classList.add('hidden-top');
+        }
+        // Garantir que a página comece no topo
+        window.scrollTo(0, 0);
+        // Forçar scroll para o topo após um pequeno delay (para garantir que o layout esteja pronto)
+        setTimeout(() => {
+            window.scrollTo(0, 0);
+        }, 100);
+    }
+    
+    // ========================================
+    // BANNER MOBILE - REMOVIDO
+    // A tag <picture> nativa do HTML já gerencia isso automaticamente
+    // Não precisamos de JavaScript para isso, evitando carregamento duplo
+    // ========================================
+    
+    // Listener de scroll com throttling
+    let ticking = false;
+    function requestScrollTick() {
+        if (!ticking) {
+            window.requestAnimationFrame(() => {
+                handleMobileScroll();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    }
+    
+    window.addEventListener('scroll', requestScrollTick, { passive: true });
+    
+    // Verificar ao redimensionar a janela
+    window.addEventListener('resize', function() {
+        // Atualizar visibilidade do WhatsApp
+        if (isMobile() && whatsappFloat) {
+            const scrollY = window.pageYOffset || window.scrollY;
+            if (scrollY <= 50) {
+                whatsappFloat.classList.add('hidden-top');
+            }
+        } else if (whatsappFloat) {
+            whatsappFloat.classList.remove('hidden-top');
+        }
+        // Nota: A tag <picture> gerencia automaticamente a troca de banner
+    });
 });
 
