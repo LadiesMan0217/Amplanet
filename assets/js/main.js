@@ -655,75 +655,79 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // ========================================
-    // BANNER RESPONSIVO - FALLBACK JAVASCRIPT
-    // Garantir que o banner correto seja carregado mesmo se o picture element falhar
+    // BANNER RESPONSIVO - FALLBACK JAVASCRIPT OTIMIZADO
+    // Verificar apenas se necessário, evitando carregamento duplo
     // ========================================
+    let lastBannerCheck = {
+        width: window.innerWidth,
+        src: null
+    };
+    
     function updateHeroBanner() {
         const heroBannerImage = document.getElementById('heroBannerImage');
         if (!heroBannerImage) {
-            // Tentar novamente após um pequeno delay se o elemento não existir
-            setTimeout(updateHeroBanner, 50);
-            return;
+            return; // Não tentar novamente, o script inline já definiu
         }
         
-        const isMobileDevice = window.innerWidth <= 768;
+        const currentWidth = window.innerWidth;
+        const isMobileDevice = currentWidth <= 768;
         const mobileSrc = heroBannerImage.getAttribute('data-mobile');
         const desktopSrc = heroBannerImage.getAttribute('data-desktop');
         
         if (!mobileSrc || !desktopSrc) return;
         
-        // Obter o caminho relativo da imagem atual (remover protocolo e domínio)
+        // Obter o caminho relativo da imagem atual
         const currentSrc = heroBannerImage.src;
-        let currentPath = currentSrc;
+        let currentPath = '';
         try {
             const url = new URL(currentSrc);
             currentPath = url.pathname;
         } catch (e) {
-            // Se não for uma URL completa, usar o caminho relativo
             currentPath = currentSrc.split(window.location.origin)[1] || currentSrc;
         }
         
+        // Verificar se já está com a imagem correta
         const isCurrentlyMobile = currentPath.includes('mobile') || currentPath.includes('Banner mobile');
         const isCurrentlyDesktop = currentPath.includes('web') || currentPath.includes('Banner web');
         
-        if (isMobileDevice) {
-            // Deve mostrar banner mobile
-            if (!isCurrentlyMobile) {
-                heroBannerImage.src = mobileSrc;
-                console.log('📱 Banner mobile carregado via JavaScript fallback');
+        // Só atualizar se necessário e se a largura mudou significativamente
+        const widthChanged = Math.abs(currentWidth - lastBannerCheck.width) > 50;
+        const needsUpdate = (isMobileDevice && !isCurrentlyMobile) || (!isMobileDevice && !isCurrentlyDesktop);
+        
+        if (needsUpdate && (widthChanged || !lastBannerCheck.src)) {
+            const newSrc = isMobileDevice ? mobileSrc : desktopSrc;
+            heroBannerImage.src = newSrc;
+            lastBannerCheck = {
+                width: currentWidth,
+                src: newSrc
+            };
+            // Log apenas em desenvolvimento
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                console.log(isMobileDevice ? '📱 Banner mobile atualizado' : '🖥️ Banner desktop atualizado');
             }
         } else {
-            // Deve mostrar banner desktop
-            if (!isCurrentlyDesktop) {
-                heroBannerImage.src = desktopSrc;
-                console.log('🖥️ Banner desktop carregado via JavaScript fallback');
-            }
+            // Atualizar cache mesmo se não mudou
+            lastBannerCheck.width = currentWidth;
+            lastBannerCheck.src = currentSrc;
         }
     }
     
-    // Executar após DOM estar pronto
+    // Executar apenas uma vez após DOM estar pronto (o script inline já definiu o src)
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function() {
-            updateHeroBanner();
-            // Executar novamente após um pequeno delay para garantir
-            setTimeout(updateHeroBanner, 100);
+            // Verificar apenas uma vez após um pequeno delay
+            setTimeout(updateHeroBanner, 50);
         });
     } else {
-        // DOM já está pronto
-        updateHeroBanner();
-        setTimeout(updateHeroBanner, 100);
+        // DOM já está pronto, verificar uma vez
+        setTimeout(updateHeroBanner, 50);
     }
     
-    // Executar após carregamento completo da página
-    window.addEventListener('load', function() {
-        setTimeout(updateHeroBanner, 200);
-    }, { once: true });
-    
-    // Executar ao redimensionar a janela (com debounce)
+    // Executar ao redimensionar a janela (com debounce maior para evitar verificações excessivas)
     let bannerResizeTimeout;
     window.addEventListener('resize', function() {
         clearTimeout(bannerResizeTimeout);
-        bannerResizeTimeout = setTimeout(updateHeroBanner, 150);
+        bannerResizeTimeout = setTimeout(updateHeroBanner, 300);
     }, { passive: true });
     
     // Listener de scroll com throttling

@@ -17,8 +17,28 @@
     
     <!-- Preload de recursos críticos -->
     <link rel="preload" href="assets/images/apps-logos/logoAmplanetSL3_branca.png" as="image" fetchpriority="high">
-    <link rel="preload" href="assets/images/banners/Banner mobile 1.png" as="image" media="(max-width: 768px)" fetchpriority="high">
-    <link rel="preload" href="assets/images/banners/Banner web 1.png" as="image" media="(min-width: 769px)" fetchpriority="high">
+    <!-- Preload do banner será feito via JavaScript para evitar carregamento duplo -->
+    <script>
+        // Detectar dispositivo ANTES do carregamento para otimizar preload
+        (function() {
+            const isMobile = window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            const bannerSrc = isMobile 
+                ? 'assets/images/banners/Banner mobile 1.png' 
+                : 'assets/images/banners/Banner web 1.png';
+            
+            // Preload apenas a imagem correta
+            const link = document.createElement('link');
+            link.rel = 'preload';
+            link.href = bannerSrc;
+            link.as = 'image';
+            link.setAttribute('fetchpriority', 'high');
+            document.head.appendChild(link);
+            
+            // Armazenar para uso posterior
+            window.__heroBannerSrc = bannerSrc;
+            window.__isMobileDevice = isMobile;
+        })();
+    </script>
     
     <!-- CSS principal -->
     <link rel="stylesheet" href="assets/css/style.css">
@@ -61,8 +81,23 @@
                 <picture>
                     <source media="(max-width: 768px)" srcset="assets/images/banners/Banner mobile 1.png" type="image/png">
                     <source media="(min-width: 769px)" srcset="assets/images/banners/Banner web 1.png" type="image/png">
-                    <img id="heroBannerImage" src="assets/images/banners/Banner web 1.png" alt="Amplanet - Internet Com Liberdade" class="hero-image" loading="eager" decoding="async" fetchpriority="high" data-mobile="assets/images/banners/Banner mobile 1.png" data-desktop="assets/images/banners/Banner web 1.png">
+                    <img id="heroBannerImage" src="" alt="Amplanet - Internet Com Liberdade" class="hero-image" loading="eager" decoding="async" fetchpriority="high" data-mobile="assets/images/banners/Banner mobile 1.png" data-desktop="assets/images/banners/Banner web 1.png">
                 </picture>
+                <script>
+                    // Definir src correto imediatamente após o elemento ser criado
+                    (function() {
+                        const img = document.getElementById('heroBannerImage');
+                        if (img && window.__heroBannerSrc) {
+                            img.src = window.__heroBannerSrc;
+                        } else if (img) {
+                            // Fallback se o script do head não executou
+                            const isMobile = window.innerWidth <= 768;
+                            img.src = isMobile 
+                                ? img.getAttribute('data-mobile') 
+                                : img.getAttribute('data-desktop');
+                        }
+                    })();
+                </script>
             </div>
         </div>
         <!-- Scroll Hint -->
