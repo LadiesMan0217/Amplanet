@@ -34,22 +34,30 @@ function adjustBodyPaddingForHeader() {
     }
 }
 
+// Debounce otimizado para evitar múltiplas chamadas
+let adjustTimeout = null;
+function debouncedAdjustBodyPadding() {
+    if (adjustTimeout) {
+        clearTimeout(adjustTimeout);
+    }
+    adjustTimeout = setTimeout(adjustBodyPaddingForHeader, 100);
+}
+
 // Executar quando o DOM estiver pronto
 document.addEventListener('DOMContentLoaded', function() {
     // Ajustar imediatamente
     adjustBodyPaddingForHeader();
     
-    // Ajustar após um pequeno delay para garantir que imagens/logos carregaram
-    setTimeout(adjustBodyPaddingForHeader, 100);
-    setTimeout(adjustBodyPaddingForHeader, 500);
+    // Ajustar após um delay para garantir que imagens/logos carregaram (consolidado)
+    adjustTimeout = setTimeout(adjustBodyPaddingForHeader, 300);
 });
 
-// Ajustar ao redimensionar a janela
+// Ajustar ao redimensionar a janela (com debounce)
 let resizeTimeout;
 window.addEventListener('resize', function() {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(adjustBodyPaddingForHeader, 100);
-});
+}, { passive: true });
 
 // Ajustar quando a página terminar de carregar (incluindo imagens)
 window.addEventListener('load', function() {
@@ -331,36 +339,105 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ========================================
-    // PLANOS EXPANSÃO/COLAPSO
+    // PLANOS EXPANSÃO/COLAPSO - SIMPLIFICADO
+    // Usa max-height para expansão interna sem afetar altura do card
     // ========================================
     const maisInfoButtons = document.querySelectorAll('.btn-mais-info');
     
     maisInfoButtons.forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
             const planoCard = this.closest('.plano-card');
             const planoDetails = planoCard.querySelector('.plano-details');
             
-            if (planoCard.classList.contains('expanded')) {
-                // Colapsar
-                planoCard.classList.remove('expanded');
-                planoDetails.style.maxHeight = '0';
-                planoDetails.style.opacity = '0';
-                planoDetails.style.paddingTop = '0';
-                planoDetails.style.paddingBottom = '0';
-                planoDetails.style.marginBottom = '0';
-            } else {
-                // Expandir
-                planoCard.classList.add('expanded');
-                // Calcular altura real do conteúdo com padding
-                const tempHeight = planoDetails.scrollHeight;
-                // Adicionar espaço extra para garantir que tudo seja visível
-                const contentHeight = tempHeight + 40; // Espaço extra para garantir visibilidade
-                planoDetails.style.maxHeight = contentHeight + 'px';
-                planoDetails.style.opacity = '1';
-                planoDetails.style.paddingTop = '';
-                planoDetails.style.paddingBottom = '';
-                planoDetails.style.marginBottom = '';
+            if (!planoCard || !planoDetails) {
+                return;
             }
+            
+            // Usar requestAnimationFrame para otimizar animação
+            requestAnimationFrame(() => {
+                if (planoCard.classList.contains('expanded')) {
+                    // Colapsar - card volta para altura mínima
+                    planoCard.classList.remove('expanded');
+                    planoDetails.style.maxHeight = '0';
+                    planoDetails.style.opacity = '0';
+                    planoDetails.style.paddingTop = '0';
+                    planoDetails.style.paddingBottom = '0';
+                    planoDetails.style.marginBottom = '0';
+                    planoDetails.style.pointerEvents = 'none';
+                    // Card volta para altura mínima
+                    planoCard.style.height = 'auto';
+                    planoCard.style.minHeight = '336px';
+                } else {
+                    // Expandir - card cresce para acomodar detalhes
+                    planoCard.classList.add('expanded');
+                    
+                    // Usar setTimeout para garantir que o DOM esteja atualizado
+                    setTimeout(() => {
+                        // Primeiro, tornar completamente visível temporariamente para medir
+                        planoDetails.style.maxHeight = 'none';
+                        planoDetails.style.height = 'auto';
+                        planoDetails.style.opacity = '1';
+                        planoDetails.style.padding = 'var(--spacing-md)';
+                        planoDetails.style.visibility = 'visible';
+                        planoDetails.style.overflow = 'visible';
+                        planoDetails.style.display = 'flex';
+                        planoDetails.style.marginBottom = 'var(--spacing-md)';
+                        
+                        // Garantir que elementos filhos sejam visíveis
+                        const features = planoDetails.querySelector('.plano-features');
+                        if (features) {
+                            features.style.opacity = '1';
+                            features.style.visibility = 'visible';
+                            features.style.display = 'flex';
+                            
+                            // Garantir que cada feature seja visível
+                            const featureItems = features.querySelectorAll('.plano-feature');
+                            featureItems.forEach(feature => {
+                                feature.style.opacity = '1';
+                                feature.style.visibility = 'visible';
+                                feature.style.display = 'flex';
+                            });
+                        }
+                        
+                        // Forçar reflow para garantir que o conteúdo seja renderizado
+                        void planoDetails.offsetHeight;
+                        
+                        // Medir altura real do conteúdo
+                        let contentHeight = planoDetails.scrollHeight;
+                        
+                        // Se scrollHeight for 0, usar método alternativo
+                        if (contentHeight === 0 || contentHeight < 50) {
+                            // Contar features e calcular altura estimada
+                            if (features) {
+                                const featureItems = features.querySelectorAll('.plano-feature');
+                                const numFeatures = featureItems.length;
+                                // Cada feature tem aproximadamente 40-45px de altura + gap
+                                contentHeight = (numFeatures * 48) + 60; // features + padding
+                            } else {
+                                // Altura padrão baseada em conteúdo típico
+                                contentHeight = 280;
+                            }
+                        }
+                        
+                        // Aplicar altura calculada aos detalhes
+                        planoDetails.style.maxHeight = contentHeight + 'px';
+                        planoDetails.style.height = 'auto';
+                        planoDetails.style.opacity = '1';
+                        planoDetails.style.padding = 'var(--spacing-md)';
+                        planoDetails.style.overflow = 'visible';
+                        planoDetails.style.visibility = 'visible';
+                        planoDetails.style.pointerEvents = 'auto';
+                        planoDetails.style.marginBottom = 'var(--spacing-md)';
+                        
+                        // Permitir que o card cresça para acomodar o conteúdo
+                        planoCard.style.height = 'auto';
+                        planoCard.style.minHeight = '336px';
+                    }, 10);
+                }
+            });
         });
     });
 
@@ -379,11 +456,18 @@ document.addEventListener('DOMContentLoaded', function() {
         return window.innerWidth <= 768;
     }
     
-    // Garantir visibilidade dos botões - FUNÇÃO CRÍTICA (APENAS MOBILE)
+    // Garantir visibilidade dos botões e scroll-hint - FUNÇÃO CRÍTICA (APENAS MOBILE)
     function ensureButtonsVisible() {
         // Só executar se for mobile
         if (!isMobile()) {
             return;
+        }
+        
+        // Garantir que scroll-hint seja visível (a menos que tenha classe hidden)
+        if (scrollHint && !scrollHint.classList.contains('hidden')) {
+            scrollHint.style.display = 'flex';
+            scrollHint.style.visibility = 'visible';
+            scrollHint.style.opacity = '1';
         }
         
         if (pillButtonLeft) {
@@ -464,10 +548,8 @@ document.addEventListener('DOMContentLoaded', function() {
             ensureButtonsVisible();
         }
         
-        // Executar após delays para garantir (múltiplas verificações)
-        setTimeout(ensureButtonsVisible, 100);
-        setTimeout(ensureButtonsVisible, 500);
-        setTimeout(ensureButtonsVisible, 1000);
+        // Executar após delay consolidado (otimizado)
+        setTimeout(ensureButtonsVisible, 300);
     } else {
         // Se não for mobile, esconder elementos mobile imediatamente
         hideMobileElements();
@@ -502,6 +584,10 @@ document.addEventListener('DOMContentLoaded', function() {
             // Voltar ao topo: mostrar hint, remover split-mode da cápsula, esconder WhatsApp
             if (scrollHint) {
                 scrollHint.classList.remove('hidden');
+                // Garantir visibilidade do scroll-hint
+                scrollHint.style.display = 'flex';
+                scrollHint.style.visibility = 'visible';
+                scrollHint.style.opacity = '1';
             }
             if (mobilePillWrapper) {
                 mobilePillWrapper.classList.remove('split-mode');
@@ -521,6 +607,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Chamar a função imediatamente ao carregar para verificar estado inicial
     if (isMobile()) {
         handleMobileScroll();
+        // Garantir que scroll-hint seja visível na inicialização
+        if (scrollHint) {
+            const scrollY = window.pageYOffset || window.scrollY;
+            if (scrollY <= 50) {
+                scrollHint.classList.remove('hidden');
+                scrollHint.style.display = 'flex';
+                scrollHint.style.visibility = 'visible';
+                scrollHint.style.opacity = '1';
+            }
+        }
     }
     
     // Inicializar estado no carregamento - ANTES de qualquer renderização
@@ -559,10 +655,76 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // ========================================
-    // BANNER MOBILE - REMOVIDO
-    // A tag <picture> nativa do HTML já gerencia isso automaticamente
-    // Não precisamos de JavaScript para isso, evitando carregamento duplo
+    // BANNER RESPONSIVO - FALLBACK JAVASCRIPT
+    // Garantir que o banner correto seja carregado mesmo se o picture element falhar
     // ========================================
+    function updateHeroBanner() {
+        const heroBannerImage = document.getElementById('heroBannerImage');
+        if (!heroBannerImage) {
+            // Tentar novamente após um pequeno delay se o elemento não existir
+            setTimeout(updateHeroBanner, 50);
+            return;
+        }
+        
+        const isMobileDevice = window.innerWidth <= 768;
+        const mobileSrc = heroBannerImage.getAttribute('data-mobile');
+        const desktopSrc = heroBannerImage.getAttribute('data-desktop');
+        
+        if (!mobileSrc || !desktopSrc) return;
+        
+        // Obter o caminho relativo da imagem atual (remover protocolo e domínio)
+        const currentSrc = heroBannerImage.src;
+        let currentPath = currentSrc;
+        try {
+            const url = new URL(currentSrc);
+            currentPath = url.pathname;
+        } catch (e) {
+            // Se não for uma URL completa, usar o caminho relativo
+            currentPath = currentSrc.split(window.location.origin)[1] || currentSrc;
+        }
+        
+        const isCurrentlyMobile = currentPath.includes('mobile') || currentPath.includes('Banner mobile');
+        const isCurrentlyDesktop = currentPath.includes('web') || currentPath.includes('Banner web');
+        
+        if (isMobileDevice) {
+            // Deve mostrar banner mobile
+            if (!isCurrentlyMobile) {
+                heroBannerImage.src = mobileSrc;
+                console.log('📱 Banner mobile carregado via JavaScript fallback');
+            }
+        } else {
+            // Deve mostrar banner desktop
+            if (!isCurrentlyDesktop) {
+                heroBannerImage.src = desktopSrc;
+                console.log('🖥️ Banner desktop carregado via JavaScript fallback');
+            }
+        }
+    }
+    
+    // Executar após DOM estar pronto
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            updateHeroBanner();
+            // Executar novamente após um pequeno delay para garantir
+            setTimeout(updateHeroBanner, 100);
+        });
+    } else {
+        // DOM já está pronto
+        updateHeroBanner();
+        setTimeout(updateHeroBanner, 100);
+    }
+    
+    // Executar após carregamento completo da página
+    window.addEventListener('load', function() {
+        setTimeout(updateHeroBanner, 200);
+    }, { once: true });
+    
+    // Executar ao redimensionar a janela (com debounce)
+    let bannerResizeTimeout;
+    window.addEventListener('resize', function() {
+        clearTimeout(bannerResizeTimeout);
+        bannerResizeTimeout = setTimeout(updateHeroBanner, 150);
+    }, { passive: true });
     
     // Listener de scroll com throttling
     let ticking = false;
