@@ -7951,6 +7951,65 @@ section + section {
     visibility: hidden; /* ADICIONADO: Garantir que elementos não sejam renderizados */
 }
 
+/* Garantir que elementos com apenas .revealed (sem .scroll-reveal) apareçam normalmente */
+.revealed:not(.scroll-reveal) {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+}
+
+/* Garantir que a primeira seção nas outras páginas (não home) apareça imediatamente */
+/* Regra específica para planos.html - primeira seção deve aparecer sempre */
+body.page-planos > section.planos-section:first-of-type,
+body.page-planos header + section.planos-section {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: block !important;
+    transform: none !important;
+}
+
+body.page-cobertura section.cobertura-section:first-of-type,
+body.page-servicos section:first-of-type:not(.hero),
+body.page-teste-velocidade section:first-of-type:not(.hero) {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: block !important;
+}
+
+/* Garantir que elementos dentro da primeira seção apareçam imediatamente */
+body.page-planos section.planos-section:first-of-type .section-title,
+body.page-planos section.planos-section:first-of-type .section-subtitle,
+body.page-planos section.planos-section:first-of-type .container,
+body.page-planos section.planos-section:first-of-type .plano-card {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Garantir que planos-grid mantenha display: grid na primeira seção */
+body.page-planos section.planos-section:first-of-type .planos-grid {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: grid !important; /* Manter grid layout */
+}
+
+/* Garantir que planos-section apareça imediatamente quando tem revealed (sem scroll-reveal) */
+.planos-section.revealed:not(.scroll-reveal),
+.planos-section.revealed:not(.scroll-reveal) .section-title,
+.planos-section.revealed:not(.scroll-reveal) .section-subtitle,
+.planos-section.revealed:not(.scroll-reveal) .container {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: block !important;
+}
+
+/* Garantir que planos-grid mantenha display: grid mesmo com revealed */
+.planos-section.revealed:not(.scroll-reveal) .planos-grid {
+    opacity: 1 !important;
+    visibility: visible !important;
+    /* NÃO alterar display - manter grid */
+    display: grid !important;
+}
+
 .scroll-reveal.revealed {
     opacity: 1;
     transform: translateY(0) scale(1);

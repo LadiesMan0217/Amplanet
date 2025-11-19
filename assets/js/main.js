@@ -226,6 +226,34 @@ document.addEventListener('DOMContentLoaded', function() {
     // ========================================
     // ENHANCED SCROLL REVEAL ANIMATION
     // ========================================
+    
+    // Detectar se estamos na home page (index.html)
+    function isHomePage() {
+        const pathname = window.location.pathname;
+        const filename = pathname.split('/').pop();
+        return filename === 'index.html' || filename === '' || pathname.endsWith('/');
+    }
+    
+    // Identificar a primeira seção nas outras páginas (primeira <section> após header, excluindo .hero)
+    function getFirstSection() {
+        const hero = document.querySelector('.hero');
+        const allSections = document.querySelectorAll('section');
+        
+        // Se não houver hero, retornar a primeira seção
+        if (!hero) {
+            return allSections.length > 0 ? allSections[0] : null;
+        }
+        
+        // Encontrar a primeira seção que não seja .hero
+        for (let i = 0; i < allSections.length; i++) {
+            if (!allSections[i].classList.contains('hero')) {
+                return allSections[i];
+            }
+        }
+        
+        return null;
+    }
+    
     const observerOptions = {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'
@@ -253,8 +281,35 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, observerOptions);
 
+    // Detectar se é home page
+    const isHome = isHomePage();
+    const firstSection = isHome ? null : getFirstSection();
+    
+    // Se não for home page, garantir que a primeira seção apareça imediatamente
+    // IMPORTANTE: Fazer isso ANTES de qualquer querySelectorAll para evitar que receba scroll-reveal
+    if (!isHome && firstSection) {
+        // Adicionar classe revealed ANTES de qualquer processamento
+        firstSection.classList.add('revealed');
+        // Remover estilos inline que possam estar escondendo
+        firstSection.style.opacity = '';
+        firstSection.style.visibility = '';
+        firstSection.style.display = '';
+        // Remover scroll-reveal se já foi adicionado por algum motivo
+        firstSection.classList.remove('scroll-reveal');
+        
+        // Também garantir que elementos filhos da primeira seção apareçam
+        const firstSectionChildren = firstSection.querySelectorAll('.section-title, .section-subtitle, .plano-card, .planos-grid, .container');
+        firstSectionChildren.forEach(child => {
+            child.classList.add('revealed');
+            child.classList.remove('scroll-reveal'); // Remover scroll-reveal se existir
+            child.style.opacity = '';
+            child.style.visibility = '';
+        });
+    }
+    
     // Add scroll-reveal class to sections, titles, and cards
-    const revealElements = document.querySelectorAll(`
+    // IMPORTANTE: Excluir a primeira seção e seus filhos se não for home page
+    let revealSelector = `
         section:not(.hero), 
         .section-title, 
         .section-subtitle,
@@ -267,9 +322,33 @@ document.addEventListener('DOMContentLoaded', function() {
         .info-card,
         .teste-velocidade-card,
         .teste-dicas-card
-    `);
+    `;
+    
+    const revealElements = document.querySelectorAll(revealSelector);
     
     revealElements.forEach(el => {
+        // Se não for home page e este elemento for a primeira seção ou estiver dentro dela, pular
+        if (!isHome && firstSection) {
+            // Verificar se o elemento é a primeira seção ou está dentro dela
+            const isFirstSection = el === firstSection;
+            const isInsideFirstSection = firstSection.contains(el);
+            
+            if (isFirstSection || isInsideFirstSection) {
+                // Não aplicar scroll-reveal na primeira seção e seus filhos das outras páginas
+                // Garantir que não tenha scroll-reveal
+                el.classList.remove('scroll-reveal');
+                // Garantir que tenha revealed
+                if (!el.classList.contains('revealed')) {
+                    el.classList.add('revealed');
+                }
+                // Garantir visibilidade
+                el.style.opacity = '';
+                el.style.visibility = '';
+                return;
+            }
+        }
+        
+        // Aplicar scroll-reveal normalmente apenas se não for a primeira seção
         el.classList.add('scroll-reveal');
         observer.observe(el);
     });
