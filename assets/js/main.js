@@ -2,6 +2,7 @@
 // HEADER SCROLL EFFECT
 // ========================================
 let lastScroll = 0;
+let hideHintTimeout = null; // Timeout para controle do fadeOut do scroll hint
 const header = document.querySelector('.header');
 
 // Efeito de scroll desabilitado - navbar estática
@@ -232,11 +233,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const observer = new IntersectionObserver(function(entries) {
         entries.forEach((entry) => {
+            // Usar uma margem de segurança para evitar flickering
             if (entry.isIntersecting) {
                 // Add revealed class with a small delay for smooth animation
+                // Sincronizar com o aparecimento do botão do WhatsApp se possível
+                const scrollY = window.pageYOffset || window.scrollY;
+                const isTop = scrollY < 50;
+                
+                // Se estiver no topo, pode ser um falso positivo do observer em telas altas
+                // Esperar um pouco mais ou verificar se realmente deve mostrar
+                
                 setTimeout(() => {
                     entry.target.classList.add('revealed');
                 }, 50);
+                
+                // Manter revelado permanentemente uma vez visto
                 observer.unobserve(entry.target);
             }
         });
@@ -404,11 +415,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // MOBILE PILL CONTAINER E SCROLL HINT
     // ========================================
     const scrollHint = document.getElementById('scrollHint');
+    const scrollHintText = document.getElementById('scrollHintText');
     const mobilePillWrapper = document.getElementById('mobilePillContainer'); // ID mantido, mas agora é wrapper
     const whatsappFloat = document.querySelector('.whatsapp-float');
     const heroSection = document.querySelector('.hero');
     const pillButtonLeft = document.getElementById('pillButtonLeft');
     const pillButtonRight = document.getElementById('pillButtonRight');
+    
+    // Variáveis para timer do scroll hint
+    let scrollHintTimer = null;
+    let hasScrolled = false;
+    let scrollHintTimerStarted = false;
     
     // Verificar se estamos em mobile e se os elementos existem
     function isMobile() {
@@ -514,6 +531,56 @@ document.addEventListener('DOMContentLoaded', function() {
         hideMobileElements();
     }
     
+    // Função para iniciar timer do scroll hint (mobile e desktop)
+    function startScrollHintTimer() {
+        // Limpar timer existente
+        if (scrollHintTimer) {
+            clearTimeout(scrollHintTimer);
+        }
+        
+        // Resetar flag
+        hasScrolled = false;
+        
+        // Iniciar timer de 5 segundos
+        scrollHintTimer = setTimeout(() => {
+            if (!hasScrolled) {
+                // Mostrar texto "Role para baixo" - mobile
+                if (scrollHintText) {
+                    scrollHintText.classList.add('show');
+                    if (scrollHint) scrollHint.classList.add('has-text');
+                }
+                // Mostrar texto "Role para baixo" - desktop
+                const desktopScrollHintText = document.getElementById('desktopScrollHintText');
+                if (desktopScrollHintText) {
+                    desktopScrollHintText.classList.add('show');
+                    const desktopScrollHint = document.getElementById('desktopScrollHint');
+                    if (desktopScrollHint) desktopScrollHint.classList.add('has-text');
+                }
+            }
+        }, 5000);
+        
+        scrollHintTimerStarted = true;
+    }
+    
+    // Função para resetar timer quando usuário rola
+    function resetScrollHintTimer() {
+        hasScrolled = true;
+        if (scrollHintTimer) {
+            clearTimeout(scrollHintTimer);
+            scrollHintTimer = null;
+        }
+        if (scrollHintText) {
+            scrollHintText.classList.remove('show');
+            if (scrollHint) scrollHint.classList.remove('has-text');
+        }
+        const desktopScrollHintText = document.getElementById('desktopScrollHintText');
+        if (desktopScrollHintText) {
+            desktopScrollHintText.classList.remove('show');
+            const desktopScrollHint = document.getElementById('desktopScrollHint');
+            if (desktopScrollHint) desktopScrollHint.classList.remove('has-text');
+        }
+    }
+    
     function handleMobileScroll() {
         // Verificar se estamos em mobile primeiro
         if (!isMobile()) {
@@ -521,50 +588,203 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         const scrollY = window.pageYOffset || window.scrollY;
-        const scrollThreshold = 50; // Gatilho quando rolar mais de 50px
+        const scrollThreshold = 50; // Limite aumentado para evitar desaparecimento acidental no topo
         
-        // Verificar se passou do threshold de scroll
+        // Lógica simplificada:
+        // 1. Se estiver no topo (< 50px), MOSTRAR TUDO
+        // 2. Se estiver rolando para baixo, ESCONDER
+        // 3. Se não, manter estado atual (ou podemos implementar "rolar para cima mostra")
+        
         if (scrollY > scrollThreshold) {
-            // Scroll para baixo: esconder hint, ativar split-mode na cápsula, mostrar WhatsApp
-            if (scrollHint) {
-                scrollHint.classList.add('hidden');
+            // Usuário rolou para baixo além do limite
+            if (!hasScrolled) {
+                resetScrollHintTimer();
             }
+            
+            if (scrollHint && !scrollHint.classList.contains('hidden')) {
+                // FadeOut e esconder
+                scrollHint.style.opacity = '0';
+                scrollHint.style.transform = 'translateX(-50%) translateY(20px)';
+                scrollHint.style.pointerEvents = 'none';
+                
+                // Adicionar classe hidden após transição
+                if (hideHintTimeout) clearTimeout(hideHintTimeout);
+                hideHintTimeout = setTimeout(() => {
+                    scrollHint.classList.add('hidden');
+                }, 300);
+            }
+            
             if (mobilePillWrapper) {
                 mobilePillWrapper.classList.add('split-mode');
             }
-            if (whatsappFloat && isMobile()) {
+            
+            // WhatsApp reaparece ao rolar para baixo (comportamento padrão de botão flutuante)
+            if (whatsappFloat) {
                 whatsappFloat.classList.remove('hidden-top');
-                // Remover estilos inline para permitir CSS
-                whatsappFloat.style.opacity = '';
-                whatsappFloat.style.pointerEvents = '';
-                whatsappFloat.style.transform = '';
+                whatsappFloat.style.opacity = '1';
+                whatsappFloat.style.pointerEvents = 'auto';
+                whatsappFloat.style.transform = 'translateY(0)';
+            }
+            
+            // SINCRONIZAR: Mostrar seção de planos junto com WhatsApp
+            const planosSection = document.querySelector('.planos-section');
+            if (planosSection && !planosSection.classList.contains('revealed')) {
+                planosSection.classList.add('revealed');
+                // Remover estilos inline que previnem FOUC
+                planosSection.style.opacity = '';
+                planosSection.style.visibility = '';
             }
         } else {
-            // Voltar ao topo: mostrar hint, remover split-mode da cápsula, esconder WhatsApp
+            // Usuário está no topo da página (Hero Section)
+            
+            // Cancelar qualquer timeout de ocultação pendente
+            if (hideHintTimeout) {
+                clearTimeout(hideHintTimeout);
+                hideHintTimeout = null;
+            }
+
+            // Mostrar Scroll Hint
             if (scrollHint) {
                 scrollHint.classList.remove('hidden');
-                // Garantir visibilidade do scroll-hint
-                scrollHint.style.display = 'flex';
-                scrollHint.style.visibility = 'visible';
-                scrollHint.style.opacity = '1';
+                requestAnimationFrame(() => {
+                    scrollHint.style.display = 'flex';
+                    scrollHint.style.visibility = 'visible';
+                    scrollHint.style.opacity = '1';
+                    scrollHint.style.transform = 'translateX(-50%) translateY(0)';
+                    scrollHint.style.pointerEvents = 'auto';
+                });
             }
+            
+            // Reiniciar timer do hint se necessário
+            if (!scrollHintTimerStarted || scrollY === 0) {
+                startScrollHintTimer();
+            }
+            
+            // Restaurar botões da pílula (unir novamente)
             if (mobilePillWrapper) {
                 mobilePillWrapper.classList.remove('split-mode');
-                // Garantir que ambos os botões sejam visíveis ao remover split-mode
-                ensureButtonsVisible();
+                ensureButtonsVisible(); // Forçar visibilidade dos botões
             }
-            if (whatsappFloat && isMobile()) {
+            
+            // Esconder WhatsApp no topo (para não poluir a hero)
+            if (whatsappFloat) {
                 whatsappFloat.classList.add('hidden-top');
-                // Forçar estilo inline para garantir que fique escondido
                 whatsappFloat.style.opacity = '0';
                 whatsappFloat.style.pointerEvents = 'none';
                 whatsappFloat.style.transform = 'translateY(20px)';
             }
+            
+            // SINCRONIZAR: Esconder seção de planos quando voltar ao topo
+            const planosSection = document.querySelector('.planos-section');
+            if (planosSection && planosSection.classList.contains('revealed')) {
+                planosSection.classList.remove('revealed');
+                // Reforçar ocultação com inline styles
+                planosSection.style.opacity = '0';
+                planosSection.style.visibility = 'hidden';
+            }
+        }
+    }
+    
+    // Função para handle scroll desktop
+    function handleDesktopScroll() {
+        if (isMobile()) {
+            return;
+        }
+        
+        const scrollY = window.pageYOffset || window.scrollY;
+        const scrollThreshold = 50;
+        
+        if (scrollY > scrollThreshold) {
+            if (!hasScrolled) {
+                resetScrollHintTimer();
+            }
+            const desktopScrollHint = document.getElementById('desktopScrollHint');
+            if (desktopScrollHint) {
+                desktopScrollHint.classList.add('hidden');
+            }
+        } else {
+            const desktopScrollHint = document.getElementById('desktopScrollHint');
+            if (desktopScrollHint) {
+                desktopScrollHint.classList.remove('hidden');
+                desktopScrollHint.style.display = 'flex';
+                desktopScrollHint.style.visibility = 'visible';
+                desktopScrollHint.style.opacity = '1';
+            }
+            // Reiniciar timer se voltou ao topo
+            if (!scrollHintTimerStarted || scrollY === 0) {
+                startScrollHintTimer();
+            }
+        }
+    }
+    
+    // Função para posicionar scroll hint abaixo do banner (mobile)
+    function positionScrollHintBelowBanner() {
+        if (!isMobile() || !scrollHint || !heroSection) return;
+        
+        // Calcular altura do banner
+        const heroImage = heroSection.querySelector('.hero-image');
+        let bannerHeight = 0;
+        
+        if (heroImage) {
+            // Usar altura natural da imagem ou altura renderizada
+            bannerHeight = heroImage.offsetHeight;
+        }
+        
+        if (!bannerHeight) {
+             // Fallback se imagem não carregou ou altura zero
+             return;
+        }
+        
+        // Adicionar pequeno espaçamento
+        const spacing = 32; // 2rem
+        const topPos = bannerHeight + spacing;
+        
+        // Posicionar scroll hint logo abaixo do banner
+        scrollHint.style.top = topPos + 'px';
+        scrollHint.style.position = 'absolute';
+        
+        // A visibilidade do texto agora é controlada via CSS (@media max-height)
+        // para garantir performance e evitar cálculos excessivos de layout
+        const scrollHintText = document.getElementById('scrollHintText');
+        if (scrollHintText) {
+            // Resetar estilos inline para permitir que o CSS controle
+            scrollHintText.style.display = '';
+            scrollHintText.style.opacity = '';
+            scrollHintText.style.visibility = '';
         }
     }
     
     // Chamar a função imediatamente ao carregar para verificar estado inicial
     if (isMobile()) {
+        // Posicionar scroll hint abaixo do banner
+        positionScrollHintBelowBanner();
+        
+        // Reposicionar quando a imagem carregar completamente
+        const heroImage = heroSection ? heroSection.querySelector('.hero-image') : null;
+        if (heroImage) {
+            if (heroImage.complete) {
+                // Imagem já carregada
+                setTimeout(positionScrollHintBelowBanner, 100);
+            } else {
+                // Aguardar carregamento da imagem
+                heroImage.addEventListener('load', () => {
+                    setTimeout(positionScrollHintBelowBanner, 100);
+                });
+            }
+        }
+        
+        // Reposicionar quando a página carregar completamente
+        window.addEventListener('load', () => {
+            setTimeout(positionScrollHintBelowBanner, 200);
+        });
+        
+        // Reposicionar ao redimensionar (com debounce)
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(positionScrollHintBelowBanner, 150);
+        });
+        
         handleMobileScroll();
         // Garantir que scroll-hint seja visível na inicialização
         if (scrollHint) {
@@ -574,7 +794,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 scrollHint.style.display = 'flex';
                 scrollHint.style.visibility = 'visible';
                 scrollHint.style.opacity = '1';
+                // Iniciar timer quando página carregar no topo
+                startScrollHintTimer();
             }
+        }
+    } else {
+        // Desktop: criar scroll hint se não existir
+        createDesktopScrollHint();
+        handleDesktopScroll();
+    }
+    
+    // Função para criar scroll hint desktop
+    function createDesktopScrollHint() {
+        if (isMobile()) return;
+        
+        // Verificar se já existe
+        let desktopScrollHint = document.getElementById('desktopScrollHint');
+        if (!desktopScrollHint && heroSection) {
+            desktopScrollHint = document.createElement('div');
+            desktopScrollHint.id = 'desktopScrollHint';
+            desktopScrollHint.className = 'scroll-hint-desktop';
+            desktopScrollHint.innerHTML = `
+                <div class="scroll-hint-icon-wrapper-desktop">
+                    <i class="fas fa-mouse"></i>
+                </div>
+                <span class="scroll-hint-text-desktop" id="desktopScrollHintText">Role para baixo</span>
+            `;
+            heroSection.appendChild(desktopScrollHint);
+            
+            // Iniciar timer
+            startScrollHintTimer();
         }
     }
     
@@ -592,6 +841,14 @@ document.addEventListener('DOMContentLoaded', function() {
         whatsappFloat.style.opacity = '';
         whatsappFloat.style.pointerEvents = '';
         whatsappFloat.style.transform = '';
+    }
+    
+    // CRÍTICO: Garantir que seção de planos comece escondida em mobile
+    if (isMobile()) {
+        const planosSection = document.querySelector('.planos-section');
+        if (planosSection) {
+            planosSection.classList.remove('revealed');
+        }
     }
     
     // Garantir que a página comece no topo
@@ -694,7 +951,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function requestScrollTick() {
         if (!ticking) {
             window.requestAnimationFrame(() => {
-                handleMobileScroll();
+                if (isMobile()) {
+                    handleMobileScroll();
+                } else {
+                    handleDesktopScroll();
+                }
                 ticking = false;
             });
             ticking = true;
@@ -702,6 +963,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     window.addEventListener('scroll', requestScrollTick, { passive: true });
+    
+    // Detectar scroll para resetar timer (já está sendo tratado no requestScrollTick)
+    // Removido para evitar duplicação
     
     // Verificar ao redimensionar a janela
     let resizeTimeout;

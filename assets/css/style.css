@@ -3,6 +3,29 @@
    ======================================== */
 /* Google Fonts movido para index.html para melhor performance */
 
+/* ========================================
+   Z-INDEX HIERARCHY - Camadas Globais
+   ======================================== */
+.header {
+    z-index: 100 !important;
+}
+
+.hero {
+    z-index: 1 !important;
+}
+
+.planos-section {
+    z-index: 2 !important;
+}
+
+.whatsapp-float {
+    z-index: 9998 !important;
+}
+
+.mobile-pill-wrapper {
+    z-index: 9999 !important;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -678,6 +701,7 @@ ul {
 @media (max-width: 768px) {
     .header {
         min-height: 70px; /* Altura menor em mobile: padding + logo 45px + padding */
+        z-index: 100; /* Garantir que o header fique acima de tudo */
     }
     
     body {
@@ -685,8 +709,17 @@ ul {
     }
     
     .hero {
-        min-height: auto;
-        margin-top: 0; /* Removido - padding-top aplicado no body via JS */
+        min-height: 80vh; /* Fallback */
+        min-height: 100svh !important; /* Altura real da viewport móvel */
+        height: auto !important;
+        padding-bottom: 15vh !important; 
+        margin-top: 0; 
+        /* Fundo branco abaixo do banner em mobile com gradiente de transição */
+        background: linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.3) 10%, #ffffff 20%, #ffffff 100%);
+        /* Transição suave para mudança de cor */
+        transition: background 0.6s ease;
+        position: relative;
+        z-index: 1; /* Camada base */
     }
     
     .hero-image {
@@ -705,13 +738,28 @@ ul {
     
     /* Hero em viewport completo para mobile */
     .hero {
-        padding-bottom: 0;
+        padding-bottom: 100px !important; /* Espaço equilibrado para o scroll hint */
+        margin-bottom: 0 !important; 
         position: relative;
-        height: 100vh;
-        height: 100dvh; /* Dynamic viewport height para mobile */
+        min-height: auto !important; /* Permitir altura natural baseada no conteúdo */
+        height: auto;
         display: flex;
         flex-direction: column;
-        overflow: hidden;
+        overflow: visible;
+        justify-content: flex-start;
+    }
+
+    /* Media Query para telas com altura reduzida (ex: celulares pequenos ou landscape) */
+    @media (max-height: 750px) {
+        .scroll-hint-text {
+            display: none !important; /* Ocultar texto para evitar sobreposição */
+        }
+        .scroll-hint {
+            margin-top: 1rem !important; /* Reduzir margem */
+        }
+        .mobile-pill-wrapper {
+            bottom: 20px !important; /* Baixar um pouco os botões para dar mais área útil */
+        }
     }
     
     .hero-background {
@@ -761,39 +809,144 @@ ul {
         display: block;
     }
     
-    /* Scroll Hint - Posicionado no espaço entre banner e botões */
+    /* Scroll Hint - Posicionado abaixo do banner, na seção branca */
     .scroll-hint {
         display: flex !important;
         visibility: visible !important;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 0.5rem;
-        position: fixed;
-        bottom: 150px; /* Acima dos botões fixos (ajustado considerando a nova posição dos botões) */
+        gap: 0.75rem;
+        position: absolute;
+        top: 0; /* Será calculado via JavaScript */
         left: 50%;
         transform: translateX(-50%);
-        z-index: 999;
-        color: rgba(255, 255, 255, 0.95);
-        font-size: 1.75rem;
-        animation: bounce-hint-enhanced 2s ease-in-out infinite;
+        z-index: 5; /* Menor que os botões fixos (z-index: 1000) */
         pointer-events: none;
-        transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s ease;
-        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4), 0 4px 20px rgba(0, 0, 0, 0.2);
-        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease, top 0.3s ease; /* Transição mais rápida */
+        will-change: transform, opacity;
+        margin-top: 2rem; /* Espaçamento após o banner */
+        width: 100%;
+    }
+    
+    /* Container do ícone com fundo circular - Efeito de clique e distorção */
+    .scroll-hint-icon-wrapper {
+        position: relative;
+        width: 64px;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.4);
+        border-radius: 50%;
+        border: 2px solid rgba(0, 51, 153, 0.2);
+        box-shadow: 0 4px 20px rgba(0, 51, 153, 0.1);
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        z-index: 2;
+        cursor: pointer;
+        /* Animação de "arrastar para baixo" - simula movimento de scroll */
+        animation: scroll-drag 2.5s ease-in-out infinite;
+    }
+    
+    /* Efeito de clique - distorção ao pressionar */
+    .scroll-hint-icon-wrapper:active {
+        transform: scale(0.85) !important;
+        border-radius: 30% 70% 70% 30% / 30% 30% 70% 70% !important;
+        box-shadow: 0 2px 10px rgba(0, 51, 153, 0.15);
+        animation-play-state: paused;
     }
     
     .scroll-hint i {
+        position: relative;
+        z-index: 1;
+        color: #003399;
+        font-size: 1.5rem;
         display: block;
-        animation: bounce-arrow 2s ease-in-out infinite;
-        filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.3));
+        transition: transform 0.3s ease;
+        filter: drop-shadow(0 1px 2px rgba(0, 51, 153, 0.2));
     }
+    
+    /* Animação que simula arrastar para baixo */
+    @keyframes scroll-drag {
+        0%, 100% {
+            transform: translateY(0) scale(1);
+            border-radius: 50%;
+        }
+        30% {
+            transform: translateY(0) scale(1);
+            border-radius: 50%;
+        }
+        50% {
+            transform: translateY(8px) scale(0.95);
+            border-radius: 45% 55% 55% 45% / 45% 45% 55% 55%;
+        }
+        70% {
+            transform: translateY(12px) scale(0.9);
+            border-radius: 40% 60% 60% 40% / 40% 40% 60% 60%;
+        }
+        100% {
+            transform: translateY(0) scale(1);
+            border-radius: 50%;
+        }
+    }
+    
+    /* Linha conectora alongada e elástica */
+    .scroll-hint::after {
+        content: '';
+        position: absolute;
+        top: 60px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 3px; /* Um pouco mais grossa */
+        height: 0;
+        background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(0, 51, 153, 0.2));
+        border-radius: 4px;
+        transition: height 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Efeito elástico */
+        z-index: 0;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+
+    /* Estado conectado: linha cresce mais */
+    .scroll-hint.has-text::after {
+        height: 40px; /* Puxada mais longa */
+    }
+
+    /* Texto "Role para baixo" - Design Pílula Moderna */
+    .scroll-hint-text {
+        opacity: 0;
+        visibility: hidden;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #003399;
+        text-align: center;
+        white-space: nowrap;
+        padding: 0.8rem 1.5rem;
+        background: #ffffff; /* Fundo branco sólido para contraste máximo */
+        border-radius: 50px;
+        box-shadow: 0 10px 25px -5px rgba(0, 51, 153, 0.25), 0 8px 10px -6px rgba(0, 51, 153, 0.1);
+        border: 2px solid rgba(255, 255, 255, 1); /* Borda branca para acabamento premium */
+        transform: translateY(-20px) scale(0.8);
+        transition: all 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Animação elástica */
+        pointer-events: none;
+        margin-top: 35px; /* Ajustado para nova linha */
+    }
+    
+    .scroll-hint-text.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0) scale(1);
+    }
+
+    /* Removido: efeitos de pulso e ripple - substituídos por efeito de arrastar */
     
     .scroll-hint.hidden {
         opacity: 0 !important;
         pointer-events: none !important;
         visibility: hidden !important;
         transform: translateX(-50%) translateY(20px) !important;
+        display: none !important; /* Remover completamente do layout */
     }
     
     /* Animação aprimorada com múltiplos efeitos */
@@ -836,19 +989,20 @@ ul {
         }
     }
     
-    /* Efeito de pulso adicional */
-    .scroll-hint::before {
+    /* Efeito de pulso adicional - anel externo */
+    .scroll-hint-icon-wrapper::after {
         content: '';
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        width: 60px;
-        height: 60px;
+        width: 80px;
+        height: 80px;
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(0, 51, 153, 0.15);
         animation: pulse-ring-hint 2s ease-out infinite;
         pointer-events: none;
+        z-index: -1;
     }
     
     @keyframes pulse-ring-hint {
@@ -862,6 +1016,47 @@ ul {
         }
         100% {
             transform: translate(-50%, -50%) scale(1.5);
+            opacity: 0;
+        }
+    }
+    
+    /* Novas animações para scroll hint melhorado */
+    @keyframes pulse-glow {
+        0%, 100% {
+            box-shadow: 0 0 20px rgba(0, 51, 153, 0.4), 0 0 40px rgba(0, 51, 153, 0.2);
+        }
+        50% {
+            box-shadow: 0 0 30px rgba(0, 51, 153, 0.6), 0 0 60px rgba(0, 51, 153, 0.4);
+        }
+    }
+    
+    @keyframes shine {
+        0% {
+            background-position: -200% center;
+        }
+        100% {
+            background-position: 200% center;
+        }
+    }
+    
+    @keyframes fade-in-up {
+        0% {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes ripple {
+        0% {
+            transform: scale(0);
+            opacity: 1;
+        }
+        100% {
+            transform: scale(4);
             opacity: 0;
         }
     }
@@ -880,7 +1075,7 @@ ul {
         gap: 0; /* Sem gap entre os botões */
         width: 90%;
         max-width: 400px;
-        z-index: 1000;
+        z-index: 9999 !important; /* Aumentado para garantir prioridade máxima fora do hero */
         pointer-events: none; /* Container não clicável, apenas os botões */
     }
     
@@ -927,25 +1122,29 @@ ul {
     }
     
     .pill-button-left {
-        background: #ffffff !important;
-        color: #003399 !important;
+        background: #e5e7eb !important; /* Cinza claro para destacar do fundo branco */
+        color: #003399 !important; /* Texto azul escuro para contraste */
+        border: 2px solid #d1d5db !important; /* Borda cinza para definição */
         border-radius: 50px 0 0 50px; /* Arredondado à esquerda */
-        box-shadow: 0 10px 25px rgba(0, 51, 153, 0.3);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
         margin-right: -1px; /* Sobreposição mínima para unir visualmente */
         display: flex !important; /* Forçar display */
         opacity: 1 !important; /* Garantir visibilidade */
         visibility: visible !important; /* Garantir visibilidade */
+        transition: all 0.3s ease;
     }
     
     .pill-button-right {
-        background: #003399 !important;
+        background: #25D366 !important; /* Verde WhatsApp */
         color: #ffffff !important;
+        border: 2px solid #25D366 !important;
         border-radius: 0 50px 50px 0; /* Arredondado à direita */
-        box-shadow: 0 10px 25px rgba(0, 51, 153, 0.3);
+        box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3), 0 2px 4px rgba(37, 211, 102, 0.2);
         margin-left: -1px; /* Sobreposição mínima para unir visualmente */
         display: flex !important; /* Forçar display */
         opacity: 1 !important; /* Garantir visibilidade */
         visibility: visible !important; /* Garantir visibilidade */
+        transition: all 0.3s ease;
     }
     
     .pill-button i {
@@ -959,17 +1158,47 @@ ul {
     }
     
     .pill-button-left:hover {
-        background: #f8f9fa;
+        background: #d1d5db !important; /* Tom mais escuro de cinza no hover */
+        border-color: #9ca3af !important;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.1);
     }
     
     .pill-button-right:hover {
-        background: #002d7a;
+        background: #20BA5A !important; /* Verde mais escuro no hover */
+        border-color: #20BA5A !important;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(37, 211, 102, 0.4), 0 3px 6px rgba(37, 211, 102, 0.3);
     }
     
     /* Efeitos de toque/click - mais visíveis */
     .pill-button:active {
-        transform: scale(0.96);
+        transform: scale(0.95);
         transition: transform 0.1s ease;
+    }
+    
+    /* Efeito ripple nos botões */
+    .pill-button {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .pill-button::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+    
+    .pill-button:active::after {
+        width: 300px;
+        height: 300px;
     }
     
     .pill-button:active i {
@@ -1122,6 +1351,7 @@ ul {
         min-height: auto;
         margin-top: 0 !important;
         padding-top: 0 !important;
+        position: relative;
     }
     
     .hero-background {
@@ -1138,6 +1368,140 @@ ul {
     }
     
     /* Picture element gerencia automaticamente a seleção de imagem */
+    
+    /* ========================================
+       SCROLL HINT DESKTOP
+       ======================================== */
+    .scroll-hint-desktop {
+        display: flex !important;
+        visibility: visible !important;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0; /* Gap zerado pois usaremos margin no texto para acomodar a linha */
+        position: absolute;
+        bottom: 60px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+        pointer-events: none;
+        transition: opacity 0.4s ease;
+    }
+    
+    .scroll-hint-desktop.hidden {
+        opacity: 0 !important;
+        pointer-events: none !important;
+        visibility: hidden !important;
+    }
+    
+    .scroll-hint-icon-wrapper-desktop {
+        position: relative;
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.35); /* Mais visível */
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.8);
+        box-shadow: 0 8px 32px rgba(0, 51, 153, 0.15), inset 0 0 20px rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        animation: bounce-hint-soft 2s ease-in-out infinite;
+        transition: all 0.4s ease;
+        z-index: 2;
+    }
+    
+    .scroll-hint-icon-wrapper-desktop::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 50%;
+        border-radius: 50% 50% 0 0;
+        background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9) 0%, transparent 100%);
+        opacity: 0.8;
+        pointer-events: none;
+    }
+    
+    /* Linha conectora desktop alongada */
+    .scroll-hint-desktop::after {
+        content: '';
+        position: absolute;
+        top: 78px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 3px;
+        height: 0;
+        background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(0, 51, 153, 0.2));
+        border-radius: 4px;
+        transition: height 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        z-index: 0;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+    
+    .scroll-hint-desktop.has-text::after {
+        height: 45px; /* Puxada bem longa */
+    }
+    
+    /* Pulse ripple desktop */
+    .scroll-hint-icon-wrapper-desktop::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        opacity: 0;
+        z-index: -1;
+        animation: ripple-out 2s infinite;
+    }
+    
+    .scroll-hint-icon-wrapper-desktop i {
+        position: relative;
+        z-index: 1;
+        color: #003399;
+        font-size: 2rem;
+        display: block;
+        animation: bounce-arrow-inner 2s ease-in-out infinite;
+        filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.5));
+    }
+    
+    .scroll-hint-text-desktop {
+        opacity: 0;
+        visibility: hidden;
+        font-size: 0.95rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: #003399;
+        text-align: center;
+        white-space: nowrap;
+        padding: 0.9rem 2rem;
+        background: #ffffff;
+        border-radius: 50px;
+        box-shadow: 0 12px 30px -8px rgba(0, 51, 153, 0.3), 0 6px 12px -4px rgba(0, 51, 153, 0.15);
+        border: 2px solid rgba(255, 255, 255, 1);
+        transition: all 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        transform: translateY(-20px) scale(0.9);
+        pointer-events: none;
+        margin-top: 40px;
+    }
+    
+    .scroll-hint-text-desktop.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0) scale(1);
+    }
+
+    @keyframes pulse-ring-soft {
+        0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
+        100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+    }
     
     /* ========================================
        GARANTIR QUE ELEMENTOS MOBILE ESTEJAM ESCONDIDOS EM DESKTOP
@@ -1551,9 +1915,18 @@ section + section {
     contain-intrinsic-size: auto 600px;
 }
 
-/* Ajuste para primeira seção de planos após o header */
-.header + .planos-section {
+/* Ajuste para primeira seção de planos após o hero */
+.hero + .planos-section {
     padding-top: var(--spacing-lg);
+}
+
+/* Ajuste específico para Mobile - Recuo extra solicitado */
+@media (max-width: 768px) {
+    .hero + .planos-section {
+        margin-top: 80px !important; /* AUMENTADO: Recuo extra para separar do banner */
+        position: relative;
+        z-index: 2 !important; /* Camada acima do hero, mas abaixo de modais/menus */
+    }
 }
 
 /* Ajuste para primeira seção de cobertura após o header */
@@ -7440,11 +7813,13 @@ section + section {
     transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
                 transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: opacity, transform;
+    visibility: hidden; /* ADICIONADO: Garantir que elementos não sejam renderizados */
 }
 
 .scroll-reveal.revealed {
     opacity: 1;
     transform: translateY(0) scale(1);
+    visibility: visible; /* ADICIONADO: Restaurar visibilidade ao revelar */
     will-change: auto; /* Remove will-change após animação para melhor performance */
 }
 
