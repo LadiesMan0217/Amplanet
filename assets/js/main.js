@@ -424,9 +424,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Variáveis para timer do scroll hint
     let scrollHintTimer = null;
+    let scrollHintIconTimer = null;
     let hasScrolled = false;
     let scrollHintTimerStarted = false;
     let desktopScrollHintShown = false; // Flag para desktop: scroll hint só aparece uma vez
+    
+    // Função auxiliar para obter o wrapper do ícone
+    function getScrollHintIconWrapper() {
+        if (!scrollHint) return null;
+        return scrollHint.querySelector('.scroll-hint-icon-wrapper');
+    }
     
     // Verificar se estamos em mobile e se os elementos existem
     function isMobile() {
@@ -526,15 +533,28 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Função para iniciar timer do scroll hint (mobile e desktop)
     function startScrollHintTimer() {
-        // Limpar timer existente
+        // Limpar timers existentes
         if (scrollHintTimer) {
             clearTimeout(scrollHintTimer);
+        }
+        if (scrollHintIconTimer) {
+            clearTimeout(scrollHintIconTimer);
         }
         
         // Resetar flag
         hasScrolled = false;
         
-        // Iniciar timer de 5 segundos
+        // Iniciar timer de 3 segundos para mostrar o ícone
+        scrollHintIconTimer = setTimeout(() => {
+            if (!hasScrolled) {
+                const iconWrapper = getScrollHintIconWrapper();
+                if (iconWrapper) {
+                    iconWrapper.classList.add('show');
+                }
+            }
+        }, 3000);
+        
+        // Iniciar timer de 6 segundos para mostrar o texto
         scrollHintTimer = setTimeout(() => {
             if (!hasScrolled) {
                 // Mostrar texto "Role para baixo" (mobile e desktop usam o mesmo elemento)
@@ -543,7 +563,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (scrollHint) scrollHint.classList.add('has-text');
                 }
             }
-        }, 5000);
+        }, 6000);
         
         scrollHintTimerStarted = true;
     }
@@ -554,6 +574,15 @@ document.addEventListener('DOMContentLoaded', function() {
         if (scrollHintTimer) {
             clearTimeout(scrollHintTimer);
             scrollHintTimer = null;
+        }
+        if (scrollHintIconTimer) {
+            clearTimeout(scrollHintIconTimer);
+            scrollHintIconTimer = null;
+        }
+        // Remover classe show do ícone
+        const iconWrapper = getScrollHintIconWrapper();
+        if (iconWrapper) {
+            iconWrapper.classList.remove('show');
         }
         // Remover texto "Role para baixo" (mobile e desktop usam o mesmo elemento)
         if (scrollHintText) {
@@ -708,9 +737,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if (scrollHint) {
                 scrollHint.classList.remove('scrolled-down');
             }
-            // Reiniciar timer se voltou ao topo (texto aparecerá após 5 segundos se não rolar)
+            // Reiniciar timer se voltou ao topo (ícone aparecerá após 3 segundos, texto após 6 segundos)
             if (!scrollHintTimerStarted || scrollY === 0) {
-                // Esconder texto ao voltar ao topo (será mostrado após 5 segundos)
+                // Esconder ícone e texto ao voltar ao topo (serão mostrados após os timers)
+                const iconWrapper = getScrollHintIconWrapper();
+                if (iconWrapper) {
+                    iconWrapper.classList.remove('show');
+                }
                 if (scrollHintText) {
                     scrollHintText.classList.remove('show');
                     if (scrollHint) scrollHint.classList.remove('has-text');
@@ -797,6 +830,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 scrollHint.style.display = 'flex';
                 scrollHint.style.visibility = 'visible';
                 scrollHint.style.opacity = '1';
+                // Garantir que ícone e texto comecem escondidos
+                const iconWrapper = getScrollHintIconWrapper();
+                if (iconWrapper) {
+                    iconWrapper.classList.remove('show');
+                }
+                if (scrollHintText) {
+                    scrollHintText.classList.remove('show');
+                    if (scrollHint) scrollHint.classList.remove('has-text');
+                }
                 // Iniciar timer quando página carregar no topo
                 startScrollHintTimer();
             }
@@ -804,11 +846,15 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         // Desktop: usar o mesmo elemento .scroll-hint (CSS cuida do estilo)
         handleDesktopScroll();
-        // Garantir que comece visível no topo (mas texto escondido até 5 segundos)
+        // Garantir que comece visível no topo (mas ícone e texto escondidos até os timers)
         // Apenas se ainda não rolou (desktopScrollHintShown = false)
         if (scrollHint && !desktopScrollHintShown) {
             scrollHint.classList.remove('scrolled-down');
-            // Garantir que texto comece escondido
+            // Garantir que ícone e texto comecem escondidos
+            const iconWrapper = getScrollHintIconWrapper();
+            if (iconWrapper) {
+                iconWrapper.classList.remove('show');
+            }
             if (scrollHintText) {
                 scrollHintText.classList.remove('show');
                 if (scrollHint) scrollHint.classList.remove('has-text');
