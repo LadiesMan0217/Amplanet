@@ -1795,6 +1795,33 @@ section + section {
     padding-top: var(--spacing-lg); /* Reduz padding-top quando há seção anterior (32px) */
 }
 
+/* Reduzir espaçamento entre seção de planos e apps-section */
+.planos-section + .apps-section {
+    padding-top: var(--spacing-sm) !important; /* Reduzido para 8px (sm) para diminuir distanciamento */
+}
+
+/* Reduzir espaçamento entre seção de planos residenciais e planos corporativos */
+.planos-section:not(.planos-section-alt) + .planos-section-alt {
+    padding-top: 0 !important; /* Removido padding-top para eliminar distanciamento */
+    margin-top: calc(-1 * var(--spacing-2xl)) !important; /* Margem negativa para reduzir ainda mais o espaço */
+}
+
+/* Reduzir padding-bottom da primeira seção quando seguida por planos corporativos */
+.planos-section:not(.planos-section-alt) + .planos-section-alt .container {
+    padding-top: var(--spacing-sm) !important; /* Reduzido padding-top do container interno */
+}
+
+/* Reduzir espaçamento entre seção de planos corporativos e planos para condomínios */
+.planos-section-corporativo + .planos-section-condominios {
+    padding-top: 0 !important; /* Removido padding-top para eliminar distanciamento */
+    margin-top: calc(-1 * var(--spacing-2xl)) !important; /* Margem negativa para reduzir ainda mais o espaço */
+}
+
+/* Reduzir padding-top do container da seção de condomínios */
+.planos-section-corporativo + .planos-section-condominios .container {
+    padding-top: var(--spacing-sm) !important; /* Reduzido padding-top do container interno */
+}
+
 /* Exceções: hero não deve ter padding reduzido */
 /* Desktop: padding normal após hero */
 @media (min-width: 768px) {
@@ -2944,7 +2971,7 @@ section + section {
     justify-content: center;
     align-items: center;
     gap: var(--spacing-xl);
-    margin-top: var(--spacing-3xl);
+    margin-top: var(--spacing-lg);
     max-width: 1000px;
     margin-left: auto;
     margin-right: auto;
