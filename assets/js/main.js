@@ -426,6 +426,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let scrollHintTimer = null;
     let hasScrolled = false;
     let scrollHintTimerStarted = false;
+    let desktopScrollHintShown = false; // Flag para desktop: scroll hint só aparece uma vez
     
     // Verificar se estamos em mobile e se os elementos existem
     function isMobile() {
@@ -463,15 +464,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Esconder elementos mobile quando detectar desktop
     function hideMobileElements() {
         if (!isMobile()) {
-            // Esconder scroll hint - FORÇAR OCULTAÇÃO TOTAL
-            if (scrollHint) {
-                scrollHint.style.display = 'none';
-                scrollHint.style.visibility = 'hidden';
-                scrollHint.style.opacity = '0';
-                scrollHint.style.position = 'absolute';
-                scrollHint.style.left = '-9999px';
-                scrollHint.style.top = '-9999px';
-            }
+            // NOTA: scroll-hint NÃO é escondido - CSS cuida do estilo desktop em @media (min-width: 1024px)
             
             // Esconder wrapper de botões - FORÇAR OCULTAÇÃO TOTAL
             if (mobilePillWrapper) {
@@ -544,17 +537,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // Iniciar timer de 5 segundos
         scrollHintTimer = setTimeout(() => {
             if (!hasScrolled) {
-                // Mostrar texto "Role para baixo" - mobile
+                // Mostrar texto "Role para baixo" (mobile e desktop usam o mesmo elemento)
                 if (scrollHintText) {
                     scrollHintText.classList.add('show');
                     if (scrollHint) scrollHint.classList.add('has-text');
-                }
-                // Mostrar texto "Role para baixo" - desktop
-                const desktopScrollHintText = document.getElementById('desktopScrollHintText');
-                if (desktopScrollHintText) {
-                    desktopScrollHintText.classList.add('show');
-                    const desktopScrollHint = document.getElementById('desktopScrollHint');
-                    if (desktopScrollHint) desktopScrollHint.classList.add('has-text');
                 }
             }
         }, 5000);
@@ -569,15 +555,10 @@ document.addEventListener('DOMContentLoaded', function() {
             clearTimeout(scrollHintTimer);
             scrollHintTimer = null;
         }
+        // Remover texto "Role para baixo" (mobile e desktop usam o mesmo elemento)
         if (scrollHintText) {
             scrollHintText.classList.remove('show');
             if (scrollHint) scrollHint.classList.remove('has-text');
-        }
-        const desktopScrollHintText = document.getElementById('desktopScrollHintText');
-        if (desktopScrollHintText) {
-            desktopScrollHintText.classList.remove('show');
-            const desktopScrollHint = document.getElementById('desktopScrollHint');
-            if (desktopScrollHint) desktopScrollHint.classList.remove('has-text');
         }
     }
     
@@ -695,23 +676,45 @@ document.addEventListener('DOMContentLoaded', function() {
         const scrollThreshold = 50;
         
         if (scrollY > scrollThreshold) {
+            // Marcar que usuário já rolou (desktop: scroll hint não aparece mais)
+            desktopScrollHintShown = true;
+            
             if (!hasScrolled) {
                 resetScrollHintTimer();
             }
-            const desktopScrollHint = document.getElementById('desktopScrollHint');
-            if (desktopScrollHint) {
-                desktopScrollHint.classList.add('hidden');
+            // Esconder scroll hint ao rolar para baixo (desktop)
+            if (scrollHint) {
+                scrollHint.classList.add('scrolled-down');
+            }
+            // Esconder texto imediatamente ao rolar
+            if (scrollHintText) {
+                scrollHintText.classList.remove('show');
+                if (scrollHint) scrollHint.classList.remove('has-text');
             }
         } else {
-            const desktopScrollHint = document.getElementById('desktopScrollHint');
-            if (desktopScrollHint) {
-                desktopScrollHint.classList.remove('hidden');
-                desktopScrollHint.style.display = 'flex';
-                desktopScrollHint.style.visibility = 'visible';
-                desktopScrollHint.style.opacity = '1';
+            // Se já rolou antes, não mostrar mais o scroll hint (desktop)
+            if (desktopScrollHintShown) {
+                if (scrollHint) {
+                    scrollHint.classList.add('scrolled-down');
+                }
+                if (scrollHintText) {
+                    scrollHintText.classList.remove('show');
+                    if (scrollHint) scrollHint.classList.remove('has-text');
+                }
+                return;
             }
-            // Reiniciar timer se voltou ao topo
+            
+            // Mostrar scroll hint no topo (desktop) - apenas se ainda não rolou
+            if (scrollHint) {
+                scrollHint.classList.remove('scrolled-down');
+            }
+            // Reiniciar timer se voltou ao topo (texto aparecerá após 5 segundos se não rolar)
             if (!scrollHintTimerStarted || scrollY === 0) {
+                // Esconder texto ao voltar ao topo (será mostrado após 5 segundos)
+                if (scrollHintText) {
+                    scrollHintText.classList.remove('show');
+                    if (scrollHint) scrollHint.classList.remove('has-text');
+                }
                 startScrollHintTimer();
             }
         }
@@ -799,31 +802,21 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     } else {
-        // Desktop: criar scroll hint se não existir
-        createDesktopScrollHint();
+        // Desktop: usar o mesmo elemento .scroll-hint (CSS cuida do estilo)
         handleDesktopScroll();
-    }
-    
-    // Função para criar scroll hint desktop
-    function createDesktopScrollHint() {
-        if (isMobile()) return;
-        
-        // Verificar se já existe
-        let desktopScrollHint = document.getElementById('desktopScrollHint');
-        if (!desktopScrollHint && heroSection) {
-            desktopScrollHint = document.createElement('div');
-            desktopScrollHint.id = 'desktopScrollHint';
-            desktopScrollHint.className = 'scroll-hint-desktop';
-            desktopScrollHint.innerHTML = `
-                <div class="scroll-hint-icon-wrapper-desktop">
-                    <i class="fas fa-mouse"></i>
-                </div>
-                <span class="scroll-hint-text-desktop" id="desktopScrollHintText">Role para baixo</span>
-            `;
-            heroSection.appendChild(desktopScrollHint);
-            
-            // Iniciar timer
-            startScrollHintTimer();
+        // Garantir que comece visível no topo (mas texto escondido até 5 segundos)
+        // Apenas se ainda não rolou (desktopScrollHintShown = false)
+        if (scrollHint && !desktopScrollHintShown) {
+            scrollHint.classList.remove('scrolled-down');
+            // Garantir que texto comece escondido
+            if (scrollHintText) {
+                scrollHintText.classList.remove('show');
+                if (scrollHint) scrollHint.classList.remove('has-text');
+            }
+            const scrollY = window.pageYOffset || window.scrollY;
+            if (scrollY <= 50) {
+                startScrollHintTimer();
+            }
         }
     }
     
@@ -1000,11 +993,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 // Garantir que elementos mobile estejam completamente escondidos (dupla verificação)
-                if (scrollHint) {
-                    scrollHint.style.display = 'none';
-                    scrollHint.style.visibility = 'hidden';
-                    scrollHint.style.opacity = '0';
-                }
+                // NOTA: scrollHint NÃO é escondido - CSS cuida do estilo desktop em @media (min-width: 1024px)
                 if (mobilePillWrapper) {
                     mobilePillWrapper.style.display = 'none';
                     mobilePillWrapper.style.visibility = 'hidden';

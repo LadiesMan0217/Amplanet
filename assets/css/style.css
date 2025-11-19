@@ -1441,7 +1441,7 @@ ul {
     /* ========================================
        GARANTIR QUE ELEMENTOS MOBILE ESTEJAM ESCONDIDOS EM DESKTOP
        ======================================== */
-    .scroll-hint,
+    /* NOTA: .scroll-hint removido - será redefinido em @media (min-width: 1024px) */
     .mobile-pill-wrapper,
     .mobile-pill-container {
         display: none !important;
@@ -1454,6 +1454,7 @@ ul {
     }
     
     /* Garantir que botões mobile não apareçam - REGRAS MAIS ESPECÍFICAS */
+    /* NOTA: .scroll-hint removido - será redefinido em @media (min-width: 1024px) */
     .pill-button-left,
     .pill-button-right,
     .mobile-pill-wrapper .pill-button-left,
@@ -1461,8 +1462,7 @@ ul {
     .mobile-pill-wrapper .pill-button,
     .hero .pill-button-left,
     .hero .pill-button-right,
-    .hero .mobile-pill-wrapper,
-    .hero .scroll-hint {
+    .hero .mobile-pill-wrapper {
         display: none !important;
         visibility: hidden !important;
         opacity: 0 !important;
@@ -1478,7 +1478,6 @@ ul {
 
 /* REGRA ADICIONAL: Garantir ocultação em qualquer tela >= 768px */
 @media (min-width: 768px) {
-    .scroll-hint,
     .mobile-pill-wrapper,
     .mobile-pill-container,
     .pill-button-left,
@@ -1493,6 +1492,164 @@ ul {
         width: 0 !important;
         height: 0 !important;
         overflow: hidden !important;
+    }
+}
+
+/* ========================================
+   SCROLL HINT DESKTOP (1024px+)
+   ======================================== */
+@media (min-width: 1024px) {
+    /* Redefinir .scroll-hint para desktop - NÃO esconder */
+    .scroll-hint {
+        position: fixed !important;
+        bottom: 40px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 0.6rem !important;
+        pointer-events: none !important;
+        z-index: 20 !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        width: auto !important;
+        height: auto !important;
+        overflow: visible !important;
+        transition: opacity 0.3s ease, visibility 0.3s ease !important;
+    }
+
+    /* Esconder scroll hint quando rolar para baixo (desktop) */
+    .scroll-hint.scrolled-down {
+        opacity: 0 !important;
+        visibility: hidden !important;
+        transform: translateX(-50%) translateY(20px) !important;
+        pointer-events: none !important;
+    }
+    
+    /* Pausar animação quando escondido */
+    .scroll-hint.scrolled-down .scroll-hint-icon-wrapper {
+        animation-play-state: paused !important;
+    }
+
+    .scroll-hint-icon-wrapper {
+        width: 32px !important;
+        height: 50px !important;
+        border-radius: 16px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+        border: 2px solid rgba(0, 51, 153, 0.2) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+        position: relative !important;
+        aspect-ratio: auto !important;
+        animation: mouseScrollBounce 2s ease-in-out infinite !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+    }
+
+    /* Mouse wheel - menor e mais discreto */
+    .scroll-hint-icon-wrapper::before {
+        content: '' !important;
+        position: absolute !important;
+        top: 8px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 4px !important;
+        height: 6px !important;
+        background: #003399 !important;
+        border-radius: 2px !important;
+        animation: mouseWheelDesktop 2s ease-in-out infinite !important;
+    }
+
+    /* Linha divisória do mouse */
+    .scroll-hint-icon-wrapper::after {
+        content: '' !important;
+        position: absolute !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        width: 20px !important;
+        height: 1px !important;
+        background: rgba(0, 51, 153, 0.15) !important;
+    }
+
+    /* Animação do mouse inteiro - movimento suave para baixo e volta */
+    @keyframes mouseScrollBounce {
+        0% { 
+            transform: translateY(0);
+        }
+        50% { 
+            transform: translateY(8px);
+        }
+        100% { 
+            transform: translateY(0);
+        }
+    }
+
+    /* Animação da roda do mouse - sincronizada com o movimento do mouse */
+    @keyframes mouseWheelDesktop {
+        0% { 
+            transform: translateX(-50%) translateY(0); 
+            opacity: 1; 
+        }
+        25% { 
+            transform: translateX(-50%) translateY(4px); 
+            opacity: 0.8; 
+        }
+        50% { 
+            transform: translateX(-50%) translateY(8px); 
+            opacity: 0.6; 
+        }
+        75% { 
+            transform: translateX(-50%) translateY(12px); 
+            opacity: 0.4; 
+        }
+        100% { 
+            transform: translateX(-50%) translateY(0); 
+            opacity: 1; 
+        }
+    }
+
+    .scroll-hint i {
+        display: none !important;
+    }
+
+    .scroll-hint-text {
+        font-size: 0.85rem !important;
+        letter-spacing: 0.2rem !important;
+        color: #003399 !important;
+        text-transform: uppercase !important;
+        font-weight: 600 !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+        border: 1px solid rgba(0, 51, 153, 0.15) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+        padding: 0.5rem 1rem !important;
+        margin-top: 0.5rem !important;
+        border-radius: 20px !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        transform: translateY(8px) !important;
+        transition: all 0.35s ease !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+        pointer-events: none !important;
+    }
+
+    /* Mostrar texto apenas quando classe .show for adicionada (após 5 segundos) */
+    .scroll-hint-text.show {
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: translateY(0) !important;
+    }
+
+    /* Garantir que seção de planos esteja visível no desktop */
+    #planos,
+    .planos-section {
+        opacity: 1 !important;
+        visibility: visible !important;
     }
 }
 
