@@ -809,134 +809,69 @@ ul {
         display: block;
     }
     
-    /* Scroll Hint - Posicionado abaixo do banner, na seção branca */
+    /* Scroll hint (mobile) */
     .scroll-hint {
-        display: flex !important;
-        visibility: visible !important;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 0.75rem;
-        position: absolute;
-        top: 0; /* Será calculado via JavaScript */
+        position: fixed;
+        bottom: 180px;
         left: 50%;
         transform: translateX(-50%);
-        z-index: 5; /* Menor que os botões fixos (z-index: 1000) */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
         pointer-events: none;
-        transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease, top 0.3s ease; /* Transição mais rápida */
-        will-change: transform, opacity;
-        margin-top: 2rem; /* Espaçamento após o banner */
-        width: 100%;
+        z-index: 10000;
+        width: auto;
+        opacity: 1;
+        visibility: visible;
     }
-    
-    /* Container do ícone com fundo circular - Efeito de clique e distorção */
+
     .scroll-hint-icon-wrapper {
-        position: relative;
-        width: 64px;
-        height: 64px;
+        width: 72px;
+        aspect-ratio: 1 / 1;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: rgba(255, 255, 255, 0.4);
+        background: rgba(255, 255, 255, 0.95);
+        border: 2px solid rgba(0, 51, 153, 0.15);
         border-radius: 50%;
-        border: 2px solid rgba(0, 51, 153, 0.2);
-        box-shadow: 0 4px 20px rgba(0, 51, 153, 0.1);
-        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        z-index: 2;
-        cursor: pointer;
-        /* Animação de "arrastar para baixo" - simula movimento de scroll */
-        animation: scroll-drag 2.5s ease-in-out infinite;
+        box-shadow: 0 8px 24px rgba(0, 51, 153, 0.15);
+        animation: scrollHintBounce 2.5s ease-in-out infinite;
     }
-    
-    /* Efeito de clique - distorção ao pressionar */
-    .scroll-hint-icon-wrapper:active {
-        transform: scale(0.85) !important;
-        border-radius: 30% 70% 70% 30% / 30% 30% 70% 70% !important;
-        box-shadow: 0 2px 10px rgba(0, 51, 153, 0.15);
-        animation-play-state: paused;
+
+    @keyframes scrollHintBounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
     }
-    
+
     .scroll-hint i {
-        position: relative;
-        z-index: 1;
+        font-size: 1.8rem;
         color: #003399;
-        font-size: 1.5rem;
-        display: block;
-        transition: transform 0.3s ease;
-        filter: drop-shadow(0 1px 2px rgba(0, 51, 153, 0.2));
-    }
-    
-    /* Animação que simula arrastar para baixo */
-    @keyframes scroll-drag {
-        0%, 100% {
-            transform: translateY(0) scale(1);
-            border-radius: 50%;
-        }
-        30% {
-            transform: translateY(0) scale(1);
-            border-radius: 50%;
-        }
-        50% {
-            transform: translateY(8px) scale(0.95);
-            border-radius: 45% 55% 55% 45% / 45% 45% 55% 55%;
-        }
-        70% {
-            transform: translateY(12px) scale(0.9);
-            border-radius: 40% 60% 60% 40% / 40% 40% 60% 60%;
-        }
-        100% {
-            transform: translateY(0) scale(1);
-            border-radius: 50%;
-        }
-    }
-    
-    /* Linha conectora alongada e elástica */
-    .scroll-hint::after {
-        content: '';
-        position: absolute;
-        top: 60px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 3px; /* Um pouco mais grossa */
-        height: 0;
-        background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(0, 51, 153, 0.2));
-        border-radius: 4px;
-        transition: height 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Efeito elástico */
-        z-index: 0;
-        box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
     }
 
-    /* Estado conectado: linha cresce mais */
-    .scroll-hint.has-text::after {
-        height: 40px; /* Puxada mais longa */
-    }
-
-    /* Texto "Role para baixo" - Design Pílula Moderna */
     .scroll-hint-text {
-        opacity: 0;
-        visibility: hidden;
-        font-size: 0.85rem;
+        font-size: 0.95rem;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 1.5px;
+        letter-spacing: 1px;
         color: #003399;
-        text-align: center;
-        white-space: nowrap;
-        padding: 0.8rem 1.5rem;
-        background: #ffffff; /* Fundo branco sólido para contraste máximo */
-        border-radius: 50px;
-        box-shadow: 0 10px 25px -5px rgba(0, 51, 153, 0.25), 0 8px 10px -6px rgba(0, 51, 153, 0.1);
-        border: 2px solid rgba(255, 255, 255, 1); /* Borda branca para acabamento premium */
-        transform: translateY(-20px) scale(0.8);
-        transition: all 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Animação elástica */
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 999px;
+        padding: 0.85rem 1.6rem;
+        border: 2px solid rgba(0, 51, 153, 0.12);
+        box-shadow: 0 8px 20px rgba(0, 51, 153, 0.18);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(8px);
+        transition: all 0.35s ease;
         pointer-events: none;
-        margin-top: 35px; /* Ajustado para nova linha */
+        z-index: 10001;
     }
-    
+
     .scroll-hint-text.show {
         opacity: 1;
         visibility: visible;
-        transform: translateY(0) scale(1);
+        transform: translateY(0);
     }
 
     /* Removido: efeitos de pulso e ripple - substituídos por efeito de arrastar */
@@ -1102,7 +1037,7 @@ ul {
         text-decoration: none;
         font-family: 'Inter', 'Roboto', sans-serif;
         font-weight: 800;
-        font-size: 0.875rem;
+        font-size: 1rem; /* AUMENTADO: de 0.875rem para 1rem */
         text-transform: uppercase;
         letter-spacing: 0.5px;
         transition: transform 0.5s ease, opacity 0.3s ease;
