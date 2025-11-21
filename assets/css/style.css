@@ -1019,7 +1019,7 @@ ul {
         animation: scrollHintBounce 2.5s ease-in-out infinite;
         opacity: 0;
         visibility: hidden;
-        transition: opacity 0.35s ease, visibility 0.35s ease;
+        transition: opacity 1s ease, visibility 1s ease;
     }
 
     .scroll-hint-icon-wrapper.show {
@@ -1051,7 +1051,7 @@ ul {
         opacity: 0;
         visibility: hidden;
         transform: translateY(8px);
-        transition: all 0.35s ease;
+        transition: opacity 1s ease, visibility 1s ease, transform 1s ease;
         pointer-events: none;
         z-index: 10001;
     }
@@ -1738,7 +1738,7 @@ ul {
         -webkit-backdrop-filter: blur(10px) !important;
         opacity: 0 !important;
         visibility: hidden !important;
-        transition: opacity 0.35s ease, visibility 0.35s ease !important;
+        transition: opacity 1s ease, visibility 1s ease !important;
     }
 
     .scroll-hint-icon-wrapper.show {
@@ -1828,13 +1828,13 @@ ul {
         opacity: 0 !important;
         visibility: hidden !important;
         transform: translateY(8px) !important;
-        transition: all 0.35s ease !important;
+        transition: opacity 1s ease, visibility 1s ease, transform 1s ease !important;
         backdrop-filter: blur(10px) !important;
         -webkit-backdrop-filter: blur(10px) !important;
         pointer-events: none !important;
     }
 
-    /* Mostrar texto apenas quando classe .show for adicionada (após 5 segundos) */
+    /* Mostrar texto apenas quando classe .show for adicionada (após 10 segundos) */
     .scroll-hint-text.show {
         opacity: 1 !important;
         visibility: visible !important;
