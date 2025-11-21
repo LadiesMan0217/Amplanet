@@ -1,4 +1,61 @@
 // ========================================
+// FORCE TABLET VISIBILITY - Fix crítico para tablets (750px-1100px)
+// ========================================
+function forceTabletVisibility() {
+    const width = window.innerWidth;
+    // Range estendido para garantir cobertura
+    if (width >= 750 && width <= 1100) {
+        const planosSection = document.querySelector('.planos-section');
+        if (planosSection) {
+            // Remove classes de animação que podem estar travadas
+            planosSection.classList.remove('scroll-reveal');
+            planosSection.classList.add('revealed');
+            
+            // Força bruta nos estilos para garantir visibilidade imediata
+            // Usando setProperty com !important para máxima prioridade
+            planosSection.style.setProperty('opacity', '1', 'important');
+            planosSection.style.setProperty('visibility', 'visible', 'important');
+            planosSection.style.setProperty('transform', 'none', 'important');
+            planosSection.style.setProperty('display', 'block', 'important');
+            
+            // Garantir que elementos filhos também fiquem visíveis
+            const planosElements = planosSection.querySelectorAll('.section-title, .planos-grid, .plano-card');
+            planosElements.forEach(element => {
+                element.style.setProperty('opacity', '1', 'important');
+                element.style.setProperty('visibility', 'visible', 'important');
+                element.style.setProperty('transform', 'none', 'important');
+                element.classList.add('revealed');
+                element.classList.remove('scroll-reveal');
+            });
+            
+            // Garantir que o grid mantenha display: grid
+            const planosGrid = planosSection.querySelector('.planos-grid');
+            if (planosGrid) {
+                planosGrid.style.setProperty('display', 'grid', 'important');
+            }
+            
+            console.log('Tablet Fix: Planos forçados a aparecer.');
+        }
+    }
+}
+
+// Executar imediatamente se DOM já está pronto
+if (document.readyState !== 'loading') {
+    forceTabletVisibility();
+}
+
+// Executar em todos os momentos possíveis para garantir
+document.addEventListener('DOMContentLoaded', forceTabletVisibility);
+window.addEventListener('load', forceTabletVisibility);
+
+// Executar no resize com throttle
+let tabletResizeTimeout;
+window.addEventListener('resize', function() {
+    clearTimeout(tabletResizeTimeout);
+    tabletResizeTimeout = setTimeout(forceTabletVisibility, 100);
+}, { passive: true });
+
+// ========================================
 // HEADER SCROLL EFFECT
 // ========================================
 let lastScroll = 0;
@@ -1138,4 +1195,51 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 150);
     });
 });
+
+// ========================================
+// FIX DE EMERGÊNCIA: Forçar visibilidade dos planos em Tablet
+// Solução "força bruta" no final do arquivo para máxima prioridade
+// ========================================
+function forceTabletVisibility() {
+    const width = window.innerWidth;
+    // Range estendido para garantir cobertura
+    if (width >= 750 && width <= 1100) {
+        const planosSection = document.querySelector('.planos-section');
+        if (planosSection) {
+            // Remove classes de animação que podem estar travadas
+            planosSection.classList.remove('scroll-reveal');
+            planosSection.classList.add('revealed');
+            
+            // Força bruta nos estilos para garantir visibilidade imediata
+            // Usando setProperty com !important para máxima prioridade
+            planosSection.style.setProperty('opacity', '1', 'important');
+            planosSection.style.setProperty('visibility', 'visible', 'important');
+            planosSection.style.setProperty('transform', 'none', 'important');
+            planosSection.style.setProperty('display', 'block', 'important');
+            
+            // Garantir que elementos filhos também fiquem visíveis
+            const planosElements = planosSection.querySelectorAll('.section-title, .planos-grid, .plano-card');
+            planosElements.forEach(element => {
+                element.style.setProperty('opacity', '1', 'important');
+                element.style.setProperty('visibility', 'visible', 'important');
+                element.style.setProperty('transform', 'none', 'important');
+                element.classList.add('revealed');
+                element.classList.remove('scroll-reveal');
+            });
+            
+            // Garantir que o grid mantenha display: grid
+            const planosGrid = planosSection.querySelector('.planos-grid');
+            if (planosGrid) {
+                planosGrid.style.setProperty('display', 'grid', 'important');
+            }
+            
+            console.log('Tablet Fix: Planos forçados a aparecer.');
+        }
+    }
+}
+
+// Executar em todos os momentos possíveis para garantir
+document.addEventListener('DOMContentLoaded', forceTabletVisibility);
+window.addEventListener('load', forceTabletVisibility);
+window.addEventListener('resize', forceTabletVisibility);
 
