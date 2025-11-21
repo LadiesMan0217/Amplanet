@@ -834,6 +834,76 @@ ul {
 }
 
 /* ========================================
+   INDICADORES DE NAVEGAÇÃO DO CARROSSEL
+   ======================================== */
+.carousel-indicators {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.carousel-indicators button {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.carousel-indicators button:hover {
+    background: rgba(255, 255, 255, 0.6);
+    transform: scale(1.2);
+}
+
+.carousel-indicators button:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.9);
+    outline-offset: 2px;
+}
+
+.carousel-indicators button.active {
+    background: #ffffff;
+    width: 32px;
+    border-radius: 6px;
+    border-color: #ffffff;
+}
+
+/* Responsividade dos Indicadores */
+@media (max-width: 768px) {
+    .carousel-indicators {
+        bottom: 15px;
+        gap: 8px;
+        padding: 6px 10px;
+        background: rgba(0, 0, 0, 0.3);
+    }
+    
+    .carousel-indicators button {
+        width: 10px;
+        height: 10px;
+        border-width: 1.5px;
+    }
+    
+    .carousel-indicators button.active {
+        width: 24px;
+    }
+}
+
+/* ========================================
    BANNER ÚNICO RESPONSIVO (OBSOLETO - Mantido para referência)
    ======================================== */
 

@@ -69,9 +69,36 @@ window.addEventListener('resize', function() {
         const prevBtn = document.querySelector('.hero-slider-prev');
         const nextBtn = document.querySelector('.hero-slider-next');
         const slider = document.querySelector('.hero-slider');
+        const indicatorsContainer = document.querySelector('.carousel-indicators');
         
         if (!slides.length || !slider) {
             return; // Carrossel não existe nesta página
+        }
+        
+        // Criar indicadores dinamicamente
+        let indicators = [];
+        if (indicatorsContainer) {
+            slides.forEach((slide, index) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.setAttribute('aria-label', `Ir para banner ${index + 1}`);
+                button.setAttribute('role', 'tab');
+                button.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
+                if (index === 0) {
+                    button.classList.add('active');
+                }
+                
+                // Event listener para navegar diretamente para o slide
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    showSlide(index);
+                    startTimer(); // Reiniciar timer após navegação manual
+                });
+                
+                indicatorsContainer.appendChild(button);
+                indicators.push(button);
+            });
         }
         
         // Função para mostrar slide específico
@@ -91,6 +118,19 @@ window.addEventListener('resize', function() {
                     slide.classList.remove('active');
                 }
             });
+            
+            // Atualizar indicadores
+            if (indicators.length > 0) {
+                indicators.forEach((indicator, i) => {
+                    if (i === index) {
+                        indicator.classList.add('active');
+                        indicator.setAttribute('aria-selected', 'true');
+                    } else {
+                        indicator.classList.remove('active');
+                        indicator.setAttribute('aria-selected', 'false');
+                    }
+                });
+            }
             
             currentSlide = index;
         }
