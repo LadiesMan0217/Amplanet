@@ -886,7 +886,8 @@ ul {
 /* Responsividade dos Indicadores */
 @media (max-width: 768px) {
     .carousel-indicators {
-        bottom: 15px;
+        bottom: auto;
+        top: 15px;
         gap: 8px;
         padding: 6px 10px;
         background: rgba(0, 0, 0, 0.3);
@@ -945,7 +946,7 @@ ul {
         min-height: 80vh; /* Fallback */
         min-height: 100svh !important; /* Altura real da viewport móvel */
         height: auto !important;
-        padding-bottom: 15vh !important; 
+        padding-bottom: 120px !important; /* Espaço para scroll hint na área branca */
         margin-top: 0; 
         /* Fundo branco abaixo do banner em mobile com gradiente de transição */
         background: linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.3) 10%, #ffffff 20%, #ffffff 100%);
@@ -1061,8 +1062,10 @@ ul {
     
     /* Scroll hint (mobile) */
     .scroll-hint {
-        position: fixed;
-        bottom: 180px;
+        position: relative;
+        bottom: auto;
+        top: auto;
+        margin-top: 2rem;
         left: 50%;
         transform: translateX(-50%);
         display: flex;
@@ -1574,8 +1577,8 @@ ul {
         gap: 0; /* Gap zerado pois usaremos margin no texto para acomodar a linha */
         position: absolute;
         bottom: 60px;
-        left: 50%;
-        transform: translateX(-50%);
+        left: 10%;
+        transform: none;
         z-index: 10;
         pointer-events: none;
         transition: opacity 0.4s ease;
@@ -1761,11 +1764,12 @@ ul {
     .scroll-hint {
         position: fixed !important;
         bottom: 40px !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
+        left: 18% !important;
+        right: auto !important;
+        transform: none !important;
         display: flex !important;
         flex-direction: column !important;
-        align-items: center !important;
+        align-items: flex-start !important;
         gap: 0.6rem !important;
         pointer-events: none !important;
         z-index: 20 !important;
@@ -1781,7 +1785,7 @@ ul {
     .scroll-hint.scrolled-down {
         opacity: 0 !important;
         visibility: hidden !important;
-        transform: translateX(-50%) translateY(20px) !important;
+        transform: translateY(20px) !important;
         pointer-events: none !important;
     }
     
@@ -1798,14 +1802,14 @@ ul {
         align-items: center !important;
         justify-content: center !important;
         padding: 0 !important;
-        background: rgba(255, 255, 255, 0.95) !important;
+        background: rgba(255, 255, 255, 0.9) !important;
         border: 2px solid rgba(0, 51, 153, 0.2) !important;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
         position: relative !important;
         aspect-ratio: auto !important;
         animation: mouseScrollBounce 2s ease-in-out infinite !important;
-        backdrop-filter: blur(10px) !important;
-        -webkit-backdrop-filter: blur(10px) !important;
+        backdrop-filter: blur(5px) !important;
+        -webkit-backdrop-filter: blur(5px) !important;
         opacity: 0 !important;
         visibility: hidden !important;
         transition: opacity 1s ease, visibility 1s ease !important;
@@ -1889,7 +1893,7 @@ ul {
         color: #003399 !important;
         text-transform: uppercase !important;
         font-weight: 600 !important;
-        background: rgba(255, 255, 255, 0.95) !important;
+        background: rgba(255, 255, 255, 0.9) !important;
         border: 1px solid rgba(0, 51, 153, 0.15) !important;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
         padding: 0.5rem 1rem !important;
@@ -1899,9 +1903,10 @@ ul {
         visibility: hidden !important;
         transform: translateY(8px) !important;
         transition: opacity 1s ease, visibility 1s ease, transform 1s ease !important;
-        backdrop-filter: blur(10px) !important;
-        -webkit-backdrop-filter: blur(10px) !important;
+        backdrop-filter: blur(5px) !important;
+        -webkit-backdrop-filter: blur(5px) !important;
         pointer-events: none !important;
+        text-align: left !important;
     }
 
     /* Mostrar texto apenas quando classe .show for adicionada (após 10 segundos) */
