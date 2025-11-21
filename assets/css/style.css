@@ -394,12 +394,19 @@ ul {
     width: 100%;
 }
 
+/* Garantir que o botão não seja cortado em telas médias */
+.navbar > .btn-area-cliente {
+    flex-shrink: 0;
+    order: 3;
+}
+
 .navbar-brand {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: var(--spacing-md);
-    flex-shrink: 0;
+    flex-shrink: 1;
+    min-width: 0;
     position: relative;
     padding: 0;
     border-radius: var(--radius-lg);
@@ -494,6 +501,8 @@ ul {
     display: flex;
     gap: var(--spacing-xl);
     align-items: center;
+    flex-shrink: 1;
+    min-width: 0;
 }
 
 .navbar-menu a {
@@ -564,6 +573,55 @@ ul {
     justify-content: center;
     flex-shrink: 0;
     min-width: fit-content;
+}
+
+/* Ajustes para telas médias (tablets) - manter botão visível */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .btn-area-cliente {
+        font-size: clamp(0.7rem, 1.5vw, 0.85rem);
+        padding: 0.65rem 1.2rem;
+        white-space: nowrap;
+    }
+    
+    .navbar {
+        gap: var(--spacing-sm);
+        padding: 1.25rem var(--spacing-md);
+    }
+    
+    .navbar-menu {
+        gap: var(--spacing-md);
+    }
+    
+    .navbar-menu a {
+        font-size: 0.9rem;
+    }
+}
+
+/* Ajustes para telas pequenas (tablets pequenos) - manter botão visível */
+@media (max-width: 900px) and (min-width: 769px) {
+    .btn-area-cliente {
+        font-size: 0.75rem;
+        padding: 0.6rem 1rem;
+        min-width: auto;
+    }
+    
+    .navbar {
+        gap: var(--spacing-xs);
+        padding: 1rem var(--spacing-sm);
+    }
+    
+    .navbar-menu {
+        gap: var(--spacing-sm);
+    }
+    
+    .navbar-menu a {
+        font-size: 0.85rem;
+        padding: 0.4rem 0;
+    }
+    
+    .navbar-brand .logo {
+        height: 70px;
+    }
 }
 
 .btn-area-cliente:hover {
@@ -6935,6 +6993,7 @@ section + section {
         gap: 0.5rem;
         flex-wrap: nowrap;
         align-items: center;
+        justify-content: space-between;
     }
     
     /* Header mobile com altura aumentada */
@@ -6944,9 +7003,19 @@ section + section {
         align-items: center;
     }
     
-    /* Botão Área do Cliente escondido no mobile */
+    /* Botão Área do Cliente escondido no mobile - aparece no menu mobile */
     .btn-area-cliente {
         display: none !important;
+    }
+    
+    /* Garantir que o navbar tenha espaço suficiente */
+    .navbar-brand {
+        flex-shrink: 1;
+        min-width: 0;
+    }
+    
+    .navbar-menu {
+        flex-shrink: 0;
     }
     
     /* Logo aumentada em mobile */
