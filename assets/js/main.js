@@ -56,6 +56,138 @@ window.addEventListener('resize', function() {
 }, { passive: true });
 
 // ========================================
+// CARROSSEL DE BANNERS ROTATIVOS
+// ========================================
+(function() {
+    let currentSlide = 0;
+    let carouselTimer = null;
+    let isPaused = false;
+    const SLIDE_INTERVAL = 5000; // 5 segundos
+    
+    function initCarousel() {
+        const slides = document.querySelectorAll('.hero-slide');
+        const prevBtn = document.querySelector('.hero-slider-prev');
+        const nextBtn = document.querySelector('.hero-slider-next');
+        const slider = document.querySelector('.hero-slider');
+        
+        if (!slides.length || !slider) {
+            return; // Carrossel não existe nesta página
+        }
+        
+        // Função para mostrar slide específico
+        function showSlide(index) {
+            // Garantir que o índice esteja dentro dos limites
+            if (index < 0) {
+                index = slides.length - 1;
+            } else if (index >= slides.length) {
+                index = 0;
+            }
+            
+            // Remover classe active de todos os slides
+            slides.forEach((slide, i) => {
+                if (i === index) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+            
+            currentSlide = index;
+        }
+        
+        // Função para avançar para o próximo slide
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+        
+        // Função para voltar para o slide anterior
+        function prevSlide() {
+            showSlide(currentSlide - 1);
+        }
+        
+        // Função para iniciar o timer automático
+        function startTimer() {
+            if (carouselTimer) {
+                clearInterval(carouselTimer);
+            }
+            if (!isPaused) {
+                carouselTimer = setInterval(nextSlide, SLIDE_INTERVAL);
+            }
+        }
+        
+        // Função para pausar o timer
+        function pauseTimer() {
+            if (carouselTimer) {
+                clearInterval(carouselTimer);
+                carouselTimer = null;
+            }
+        }
+        
+        // Event listeners para os botões
+        if (prevBtn) {
+            prevBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                prevSlide();
+                startTimer(); // Reiniciar timer após navegação manual
+            });
+        }
+        
+        if (nextBtn) {
+            nextBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                nextSlide();
+                startTimer(); // Reiniciar timer após navegação manual
+            });
+        }
+        
+        // Pausar no hover e retomar quando sair
+        if (slider) {
+            slider.addEventListener('mouseenter', function() {
+                isPaused = true;
+                pauseTimer();
+            });
+            
+            slider.addEventListener('mouseleave', function() {
+                isPaused = false;
+                startTimer();
+            });
+            
+            // Pausar no touch (mobile)
+            slider.addEventListener('touchstart', function() {
+                isPaused = true;
+                pauseTimer();
+            });
+            
+            slider.addEventListener('touchend', function() {
+                // Retomar após um delay para evitar mudança imediata
+                setTimeout(function() {
+                    isPaused = false;
+                    startTimer();
+                }, 2000);
+            });
+        }
+        
+        // Inicializar: mostrar primeiro slide e iniciar timer
+        showSlide(0);
+        startTimer();
+        
+        // Limpar timer ao sair da página
+        window.addEventListener('beforeunload', function() {
+            pauseTimer();
+        });
+    }
+    
+    // Inicializar quando DOM estiver pronto
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initCarousel);
+    } else {
+        initCarousel();
+    }
+})();
+
+// ========================================
 // HEADER SCROLL EFFECT
 // ========================================
 let lastScroll = 0;
@@ -1047,8 +1179,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // ========================================
     // BANNER RESPONSIVO - FALLBACK JAVASCRIPT OTIMIZADO
-    // Verificar apenas se necessário, evitando carregamento duplo
+    // REMOVIDO: Função obsoleta após implementação do carrossel
+    // O carrossel usa <picture> nativo que gerencia automaticamente mobile/desktop
     // ========================================
+    /*
+    // Código removido - substituído pelo carrossel de banners
     let lastBannerCheck = {
         width: window.innerWidth,
         src: null
@@ -1120,6 +1255,7 @@ document.addEventListener('DOMContentLoaded', function() {
         clearTimeout(bannerResizeTimeout);
         bannerResizeTimeout = setTimeout(updateHeroBanner, 300);
     }, { passive: true });
+    */
     
     // Listener de scroll com throttling
     let ticking = false;

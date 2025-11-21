@@ -729,7 +729,112 @@ ul {
 }
 
 /* ========================================
-   BANNER ÚNICO RESPONSIVO
+   CARROSSEL DE BANNERS ROTATIVOS
+   ======================================== */
+.hero-slider {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0;
+    padding: 0;
+}
+
+.hero-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+    z-index: 1;
+}
+
+.hero-slide.active {
+    position: relative;
+    opacity: 1;
+    visibility: visible;
+    z-index: 2;
+}
+
+.hero-slide picture {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.hero-slide .hero-image {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Botões de Navegação do Carrossel */
+.hero-slider-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.3);
+    border: none;
+    color: white;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: background 0.3s ease, opacity 0.3s ease;
+    opacity: 0.7;
+    font-size: 18px;
+}
+
+.hero-slider-btn:hover {
+    background: rgba(0, 0, 0, 0.6);
+    opacity: 1;
+}
+
+.hero-slider-btn:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.hero-slider-btn:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.8);
+    outline-offset: 2px;
+}
+
+.hero-slider-prev {
+    left: 20px;
+}
+
+.hero-slider-next {
+    right: 20px;
+}
+
+/* Responsividade dos Botões */
+@media (max-width: 768px) {
+    .hero-slider-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+        opacity: 0.6;
+    }
+    
+    .hero-slider-prev {
+        left: 10px;
+    }
+    
+    .hero-slider-next {
+        right: 10px;
+    }
+}
+
+/* ========================================
+   BANNER ÚNICO RESPONSIVO (OBSOLETO - Mantido para referência)
    ======================================== */
 
 /* ========================================
@@ -837,6 +942,23 @@ ul {
         align-items: flex-start;
         justify-content: center;
         min-height: 0;
+        position: relative;
+    }
+    
+    /* Carrossel Mobile */
+    .hero-slider {
+        width: 100%;
+        height: 100%;
+        position: relative;
+    }
+    
+    .hero-slide {
+        width: 100%;
+        height: 100%;
+    }
+    
+    .hero-slide.active {
+        position: relative;
     }
     
     .hero-image {
@@ -849,7 +971,7 @@ ul {
     }
     
     /* Garantir que o picture funcione corretamente */
-    .hero-banner picture {
+    .hero-slide picture {
         width: 100%;
         height: 100%;
         display: flex;
@@ -858,7 +980,7 @@ ul {
         min-height: 0;
     }
     
-    .hero-banner picture img {
+    .hero-slide picture img {
         width: 100%;
         height: auto;
         max-height: 100%;

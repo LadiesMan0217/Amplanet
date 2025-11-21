@@ -77,27 +77,48 @@
     <section class="hero">
         <div class="hero-background">
             <div class="hero-banner">
-                <!-- Banner Responsivo com Picture -->
-                <picture>
-                    <source media="(max-width: 768px)" srcset="assets/images/banners/Banner%20mobile%201.png" type="image/png">
-                    <source media="(min-width: 769px)" srcset="assets/images/banners/Banner%20web%201.png" type="image/png">
-                    <img id="heroBannerImage" src="" alt="Amplanet - Internet Com Liberdade" class="hero-image" loading="eager" decoding="async" fetchpriority="high" data-mobile="assets/images/banners/Banner%20mobile%201.png" data-desktop="assets/images/banners/Banner%20web%201.png">
-                </picture>
-                <script>
-                    // Definir src correto imediatamente após o elemento ser criado
-                    (function() {
-                        const img = document.getElementById('heroBannerImage');
-                        if (img && window.__heroBannerSrc) {
-                            img.src = window.__heroBannerSrc;
-                        } else if (img) {
-                            // Fallback se o script do head não executou
-                            const isMobile = window.innerWidth <= 768;
-                            img.src = isMobile 
-                                ? img.getAttribute('data-mobile') 
-                                : img.getAttribute('data-desktop');
-                        }
-                    })();
-                </script>
+                <!-- Carrossel de Banners Rotativos -->
+                <div class="hero-slider">
+                    <!-- Slide 1 -->
+                    <div class="hero-slide active">
+                        <picture>
+                            <source media="(max-width: 768px)" srcset="assets/images/banners/Banner%20mobile%201.png" type="image/png">
+                            <source media="(min-width: 769px)" srcset="assets/images/banners/Banner%20web%201.png" type="image/png">
+                            <img src="assets/images/banners/Banner%20web%201.png" alt="Amplanet - Internet Com Liberdade" class="hero-image" loading="eager" decoding="async" fetchpriority="high">
+                        </picture>
+                    </div>
+                    <!-- Slide 2 -->
+                    <div class="hero-slide">
+                        <picture>
+                            <source media="(max-width: 768px)" srcset="assets/images/banners/Banner%20mobile%202.png" type="image/png">
+                            <source media="(min-width: 769px)" srcset="assets/images/banners/Banner%20web%202.png" type="image/png">
+                            <img src="assets/images/banners/Banner%20web%202.png" alt="Amplanet - Internet Com Liberdade" class="hero-image" loading="lazy" decoding="async">
+                        </picture>
+                    </div>
+                    <!-- Slide 3 -->
+                    <div class="hero-slide">
+                        <picture>
+                            <source media="(max-width: 768px)" srcset="assets/images/banners/Banner%20mobile%203.png" type="image/png">
+                            <source media="(min-width: 769px)" srcset="assets/images/banners/Banner%20web%203.png" type="image/png">
+                            <img src="assets/images/banners/Banner%20web%203.png" alt="Amplanet - Internet Com Liberdade" class="hero-image" loading="lazy" decoding="async">
+                        </picture>
+                    </div>
+                    <!-- Slide 4 -->
+                    <div class="hero-slide">
+                        <picture>
+                            <source media="(max-width: 768px)" srcset="assets/images/banners/Banner%20mobile%204.png" type="image/png">
+                            <source media="(min-width: 769px)" srcset="assets/images/banners/Banner%20web%204.png" type="image/png">
+                            <img src="assets/images/banners/Banner%20web%204.png" alt="Amplanet - Internet Com Liberdade" class="hero-image" loading="lazy" decoding="async">
+                        </picture>
+                    </div>
+                </div>
+                <!-- Botões de Navegação -->
+                <button class="hero-slider-btn hero-slider-prev" aria-label="Banner anterior">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="hero-slider-btn hero-slider-next" aria-label="Próximo banner">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
             </div>
         </div>
     </section>
