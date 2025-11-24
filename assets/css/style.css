@@ -8537,7 +8537,7 @@ section.scroll-reveal.revealed {
     background: #ffffff;
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #ffffff 100%);
     position: relative;
-    padding: var(--spacing-2xl) 0;
+    padding: var(--spacing-2xl) 0 var(--spacing-md) 0;
     overflow: hidden;
     min-height: 400px;
     width: 100%;
@@ -8657,6 +8657,55 @@ section.scroll-reveal.revealed {
     font-size: 1rem;
 }
 
+/* Animação de pulso para botão WhatsApp */
+@keyframes btnPulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.4);
+    }
+    70% {
+        transform: scale(1.03);
+        box-shadow: 0 0 0 6px rgba(37, 211, 102, 0);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+    }
+}
+
+/* Botão WhatsApp no FAQ */
+.faq-whatsapp-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    margin-bottom: 0;
+    padding: 10px 20px;
+    background-color: rgba(37, 211, 102, 0.1);
+    color: #128C7E;
+    border: 1px solid rgba(37, 211, 102, 0.3);
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    animation: btnPulse 2s infinite;
+}
+
+.faq-whatsapp-btn:hover {
+    background-color: rgba(37, 211, 102, 0.15);
+    border-color: rgba(37, 211, 102, 0.5);
+    color: #075E54;
+    text-decoration: none;
+    animation: none;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+}
+
+.faq-whatsapp-btn i {
+    font-size: 1.1rem;
+}
+
 /* CTA Section */
 .faq-cta-section {
     padding: var(--spacing-3xl) 0;
@@ -8701,6 +8750,127 @@ section.scroll-reveal.revealed {
 
 .faq-cta-section .btn i {
     font-size: 1.25rem;
+}
+
+/* ========================================
+   AUTOATENDIMENTO SECTION
+   ======================================== */
+.autoatendimento-section {
+    padding: var(--spacing-xl);
+    margin-top: var(--spacing-sm);
+    margin-bottom: var(--spacing-xl);
+    background-color: #f1f5f9;
+    position: relative;
+    border-radius: var(--radius-2xl);
+}
+
+.autoatendimento-title {
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+    color: var(--text-dark);
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--text-dark) 0%, var(--primary-color) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+@supports not (background-clip: text) {
+    .autoatendimento-title {
+        color: var(--text-dark);
+        background: none;
+        -webkit-text-fill-color: var(--text-dark);
+    }
+}
+
+.autoatendimento-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-md);
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.auto-card {
+    background: #ffffff;
+    border: 1px solid rgba(0, 51, 153, 0.05);
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-decoration: none;
+    color: var(--text-dark);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.auto-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    text-decoration: none;
+    color: var(--text-dark);
+}
+
+.auto-card i {
+    font-size: 1.2rem;
+    color: #ffffff;
+    flex-shrink: 0;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--gradient-blue);
+    background: linear-gradient(135deg, #0066cc 0%, #003399 100%);
+    border-radius: 50%;
+}
+
+.auto-card:hover i {
+    transform: scale(1.05);
+}
+
+.auto-card span {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.4;
+    flex: 1;
+    color: var(--text-dark);
+}
+
+/* Mobile Autoatendimento */
+@media (max-width: 768px) {
+    .autoatendimento-section {
+        padding: var(--spacing-lg);
+        margin-top: var(--spacing-lg);
+        margin-bottom: var(--spacing-lg);
+        border-radius: var(--radius-xl);
+    }
+    
+    .autoatendimento-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+    
+    .auto-card {
+        padding: 1.25rem;
+        gap: 1.25rem;
+    }
+    
+    .auto-card i {
+        font-size: 1.1rem;
+        width: 45px;
+        height: 45px;
+    }
+    
+    .auto-card span {
+        font-size: 0.95rem;
+    }
 }
 
 /* Mobile FAQ */
