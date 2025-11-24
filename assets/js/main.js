@@ -1419,3 +1419,70 @@ document.addEventListener('DOMContentLoaded', forceTabletVisibility);
 window.addEventListener('load', forceTabletVisibility);
 window.addEventListener('resize', forceTabletVisibility);
 
+// ========================================
+// FAQ ACCORDION FUNCTIONALITY
+// ========================================
+(function() {
+    function initFAQ() {
+        const faqItems = document.querySelectorAll('.faq-item');
+        
+        if (!faqItems.length) {
+            return; // FAQ não existe nesta página
+        }
+        
+        faqItems.forEach(item => {
+            const question = item.querySelector('.faq-question');
+            const answer = item.querySelector('.faq-answer');
+            
+            if (!question || !answer) {
+                return;
+            }
+            
+            question.addEventListener('click', function() {
+                const isActive = item.classList.contains('active');
+                
+                // Fechar todos os outros itens (efeito sanfona)
+                faqItems.forEach(otherItem => {
+                    if (otherItem !== item) {
+                        otherItem.classList.remove('active');
+                        const otherQuestion = otherItem.querySelector('.faq-question');
+                        const otherAnswer = otherItem.querySelector('.faq-answer');
+                        if (otherQuestion) {
+                            otherQuestion.setAttribute('aria-expanded', 'false');
+                        }
+                        if (otherAnswer) {
+                            otherAnswer.style.maxHeight = '0';
+                        }
+                    }
+                });
+                
+                // Toggle do item atual
+                if (isActive) {
+                    item.classList.remove('active');
+                    question.setAttribute('aria-expanded', 'false');
+                    answer.style.maxHeight = '0';
+                } else {
+                    item.classList.add('active');
+                    question.setAttribute('aria-expanded', 'true');
+                    // Calcular altura real do conteúdo
+                    answer.style.maxHeight = answer.scrollHeight + 'px';
+                }
+            });
+            
+            // Ajustar altura ao redimensionar janela
+            window.addEventListener('resize', function() {
+                if (item.classList.contains('active')) {
+                    answer.style.maxHeight = answer.scrollHeight + 'px';
+                }
+            });
+        });
+    }
+    
+    // Inicializar quando DOM estiver pronto
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initFAQ);
+    } else {
+        initFAQ();
+    }
+})();
+

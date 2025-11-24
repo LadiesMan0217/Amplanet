@@ -3,125 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Teste a velocidade da sua internet Amplanet usando Fast.com. Verifique sua conexão de forma rápida e confiável.">
-    <title>Teste de Velocidade - Amplanet</title>
+    <meta name="description" content="Dúvidas Frequentes Amplanet - Tire suas dúvidas de forma rápida e simples sobre nossos serviços de internet.">
+    <title>Dúvidas Frequentes - Amplanet</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
     <link rel="icon" href="../assets/images/favicon.ico">
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-        
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow-x: hidden;
-            background: #ffffff;
-        }
-        
-        body {
-            display: flex;
-            flex-direction: column;
-            background: #ffffff;
-            color: #000000;
-        }
-        
-        /* Header seguindo padrão das outras páginas */
-        .header {
-            flex-shrink: 0;
-            width: 100%;
-        }
-        
-        /* Speedtest wrapper totalmente integrado */
-        .speedtest-wrapper {
-            flex: 1 1 auto;
-            position: relative;
-            width: 100%;
-            background: #ffffff;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            min-height: calc(100vh - 200px);
-            border: none !important;
-            box-shadow: none !important;
-            outline: none !important;
-        }
-        
-        .speedtest-wrapper::before,
-        .speedtest-wrapper::after {
-            display: none !important;
-        }
-        
-        .speedtest-iframe {
-            width: 100%;
-            height: 100%;
-            min-height: 600px;
-            border: none !important;
-            display: block;
-            margin: 0;
-            padding: 0;
-            background: #ffffff;
-            box-shadow: none !important;
-            outline: none !important;
-        }
-        
-        /* Footer sem bordas superiores */
-        .footer {
-            flex-shrink: 0;
-            width: 100%;
-            margin-top: 0;
-            position: relative;
-            z-index: 100;
-            border-top: none !important;
-        }
-        
-        /* Estilos para conteúdo da página */
-        body {
-            color: #000000 !important;
-            background: #ffffff !important;
-        }
-        
-        /* Remover bordas apenas do speedtest-wrapper e footer */
-        .speedtest-wrapper,
-        .speedtest-wrapper *,
-        .footer {
-            border-top: none !important;
-            border-bottom: none !important;
-            border-left: none !important;
-            border-right: none !important;
-        }
-        
-        /* Container mantém padding apenas interno */
-        .header .container,
-        .footer .container {
-            padding: 0 var(--spacing-lg);
-        }
-        
-        @media (max-width: 768px) {
-            .speedtest-wrapper {
-                min-height: calc(100vh - 180px);
-            }
-            
-            .speedtest-iframe {
-                min-height: 500px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .speedtest-wrapper {
-                min-height: calc(100vh - 160px);
-            }
-            
-            .speedtest-iframe {
-                min-height: 400px;
-            }
-        }
-    </style>
 </head>
-<body class="teste-velocidade-page">
+<body class="page-faq">
     <!-- Header -->
     <header class="header">
         <nav class="navbar container">
@@ -138,25 +26,95 @@
             <ul class="navbar-menu" id="navbarMenu">
                 <li><a href="../index.html">Início</a></li>
                 <li><a href="planos.html">Planos</a></li>
-                <li><a href="teste-velocidade.html" class="active">Teste de Velocidade</a></li>
-                <li><a href="faq.html">Ajuda</a></li>
+                <li><a href="teste-velocidade.html">Teste de Velocidade</a></li>
+                <li><a href="faq.html" class="active">Ajuda</a></li>
             </ul>
             <a href="https://amplanet.com.br/central_assinante_web/login" class="btn btn-primary btn-area-cliente" target="_blank">Área do Cliente</a>
         </nav>
     </header>
 
-    <!-- Fast.com iframe integrado -->
-    <div class="speedtest-wrapper">
-        <iframe 
-            src="https://fast.com/pt/"
-            class="speedtest-iframe"
-            frameborder="0"
-            scrolling="no"
-            allowtransparency="true"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            title="Fast.com - Teste de Velocidade Amplanet"
-        ></iframe>
-    </div>
+    <!-- FAQ Section -->
+    <section class="faq-section">
+        <div class="container">
+            <h2 class="section-title">Dúvidas Frequentes</h2>
+            <p class="section-subtitle">Tire suas dúvidas de forma rápida e simples</p>
+            <div class="faq-container">
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        <span>Como proceder em casos de problema com a conexão?</span>
+                        <i class="fas fa-plus faq-icon"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Oferecemos Suporte Técnico gratuito, disponível todos os dias da semana das 8h às 18h, sábados das 8h às 12h e 14h às 18h.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        <span>Quais as formas de pagamento de mensalidades?</span>
+                        <i class="fas fa-plus faq-icon"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Os pagamentos podem ser feitos através de boleto bancário, débito em conta e transferência.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        <span>Minha internet vai ter velocidade reduzida quando atingir o limite do pacote?</span>
+                        <i class="fas fa-plus faq-icon"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Não. Nossos serviços não funcionam como um pacote de dados. Oferecemos uma conexão estável e com uso ilimitado, onde a velocidade vai ser constante 24 horas por dia, 7 dias por semana e sem limite de download/upload.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        <span>O que posso fazer se minha internet não está funcionando?</span>
+                        <i class="fas fa-plus faq-icon"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Se ocorrer lentidão, ou alguma outra dificuldade relacionada à conexão, desligue o equipamento da energia elétrica por cerca de 2 minutos. Se o problema persistir, entre em contato com o suporte técnico. Estamos disponíveis com profissionais capacitados para auxiliá-lo. Mantenha suas faturas sempre em dia.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        <span>Existe fibra óptica em todas as ruas?</span>
+                        <i class="fas fa-plus faq-icon"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Não. Porém, nossa rede de fibra óptica está em plena expansão. Caso tenha interesse neste serviço, entre em contato com nossa equipe comercial.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        <span>Não recebi a fatura desse mês, como faço para pagá-la?</span>
+                        <i class="fas fa-plus faq-icon"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>A 2ª via da fatura está disponível na Área do Cliente. Você também pode solicitar por e-mail, pelas redes sociais ou retira-la na unidade da sua região. Não esqueça de manter seu cadastro sempre atualizado.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="faq-cta-section">
+        <div class="container">
+            <div class="faq-cta-content">
+                <h2 class="faq-cta-title">Ainda tem dúvidas?</h2>
+                <p class="faq-cta-text">Entre em contato conosco pelo WhatsApp e nossa equipe terá prazer em ajudá-lo!</p>
+                <a href="https://wa.me/558621063800?text=Olá!%20Gostaria%20de%20tirar%20algumas%20dúvidas" class="btn btn-primary btn-large" target="_blank">
+                    <i class="fab fa-whatsapp"></i>
+                    Falar no WhatsApp
+                </a>
+            </div>
+        </div>
+    </section>
 
     <!-- Footer -->
     <footer class="footer">
@@ -221,38 +179,6 @@
     </footer>
 
     <script src="../assets/js/main.js"></script>
-    <script>
-        // Ajustar altura do iframe dinamicamente para ocupar melhor o espaço
-        function adjustIframeHeight() {
-            const header = document.querySelector('.header');
-            const footer = document.querySelector('.footer');
-            const wrapper = document.querySelector('.speedtest-wrapper');
-            const iframe = document.querySelector('.speedtest-iframe');
-            
-            if (header && footer && wrapper && iframe) {
-                const headerHeight = header.offsetHeight;
-                const footerHeight = footer.offsetHeight;
-                const windowHeight = window.innerHeight;
-                const availableHeight = windowHeight - headerHeight - footerHeight;
-                
-                // Garantir altura mínima
-                const minHeight = 600;
-                const finalHeight = Math.max(availableHeight - 20, minHeight);
-                
-                iframe.style.height = finalHeight + 'px';
-                wrapper.style.minHeight = finalHeight + 'px';
-            }
-        }
-        
-        // Ajustar na carga e ao redimensionar
-        window.addEventListener('load', adjustIframeHeight);
-        window.addEventListener('resize', adjustIframeHeight);
-        
-        // Ajustar após delays para garantir que tudo carregou
-        setTimeout(adjustIframeHeight, 100);
-        setTimeout(adjustIframeHeight, 500);
-        setTimeout(adjustIframeHeight, 1000);
-    </script>
 </body>
 </html>
 
