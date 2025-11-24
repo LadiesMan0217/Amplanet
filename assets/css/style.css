@@ -7061,6 +7061,34 @@ section + section {
     box-shadow: 0 6px 25px rgba(37, 211, 102, 0.5), 0 10px 40px rgba(37, 211, 102, 0.4);
 }
 
+/* Tooltip para o botão do WhatsApp */
+.whatsapp-float::after {
+    content: 'Atendimento';
+    position: absolute;
+    right: 75px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #333;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    pointer-events: none;
+    z-index: 10001;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    font-weight: 500;
+}
+
+/* Mostrar tooltip ao passar o mouse */
+.whatsapp-float:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
 .whatsapp-float:active {
     transform: scale(0.95);
 }
