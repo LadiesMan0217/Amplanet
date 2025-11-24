@@ -29,29 +29,10 @@
             color: #000000;
         }
         
-        /* Header moderno sem bordas */
+        /* Header seguindo padrão das outras páginas */
         .header {
             flex-shrink: 0;
             width: 100%;
-            position: relative;
-            z-index: 100;
-            background: #ffffff !important;
-            box-shadow: none !important;
-            border-bottom: none !important;
-            margin: 0;
-            padding: 0;
-        }
-        
-        .header.scrolled {
-            background: #ffffff !important;
-            box-shadow: none !important;
-            border-bottom: none !important;
-        }
-        
-        /* Navbar sem bordas */
-        .navbar {
-            border: none !important;
-            box-shadow: none !important;
         }
         
         /* Speedtest wrapper totalmente integrado */
@@ -97,38 +78,13 @@
             border-top: none !important;
         }
         
-        /* Estilos para texto preto */
+        /* Estilos para conteúdo da página */
         body {
             color: #000000 !important;
             background: #ffffff !important;
         }
         
-        .navbar-menu a {
-            color: #000000 !important;
-            text-shadow: none !important;
-        }
-        
-        .navbar-menu a:hover,
-        .navbar-menu a.active {
-            color: #003399 !important;
-            text-shadow: none !important;
-        }
-        
-        .btn-area-cliente {
-            background: var(--gradient-blue) !important;
-            color: #ffffff !important;
-            border-color: transparent !important;
-            text-shadow: none !important;
-        }
-        
-        .btn-area-cliente:hover {
-            background: var(--primary-dark) !important;
-            color: #ffffff !important;
-        }
-        
-        /* Remover todas as bordas e separadores */
-        .header,
-        .header *,
+        /* Remover bordas apenas do speedtest-wrapper e footer */
         .speedtest-wrapper,
         .speedtest-wrapper *,
         .footer {
@@ -171,7 +127,7 @@
         <nav class="navbar container">
             <div class="navbar-brand">
                 <a href="../index.html">
-                    <img src="../assets/images/apps-logos/logo_amplanet_sl32.png" alt="Amplanet Logo" class="logo">
+                    <img src="../assets/images/apps-logos/logoAmplanetSL3_branca.png" alt="Amplanet Logo" class="logo">
                 </a>
             </div>
             <button class="menu-toggle" aria-label="Abrir menu" id="menuToggle">
@@ -264,14 +220,6 @@
 
     <script src="../assets/js/main.js"></script>
     <script>
-        // Garantir que o header fique branco desde o início
-        document.addEventListener('DOMContentLoaded', function() {
-            const header = document.querySelector('.header');
-            if (header) {
-                header.classList.add('scrolled');
-            }
-        });
-        
         // Ajustar altura do iframe dinamicamente para ocupar melhor o espaço
         function adjustIframeHeight() {
             const header = document.querySelector('.header');
