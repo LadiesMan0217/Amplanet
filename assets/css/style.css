@@ -398,6 +398,24 @@ ul {
     width: 100%;
 }
 
+/* Garantir que o botão Área do Cliente tenha prioridade sobre .btn-primary */
+.btn.btn-primary.btn-area-cliente,
+.btn-area-cliente.btn-primary {
+    background: #ffffff !important;
+    border: 2px solid #ffffff !important;
+    color: var(--primary-color) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+}
+
+.btn.btn-primary.btn-area-cliente:hover,
+.btn-area-cliente.btn-primary:hover {
+    background: #f8fafc !important;
+    border-color: #f8fafc !important;
+    color: var(--primary-dark) !important;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3) !important;
+}
+
 /* Garantir que o botão não seja cortado em telas médias */
 .navbar > .btn-area-cliente {
     flex-shrink: 0;
@@ -503,7 +521,7 @@ ul {
 
 .navbar-menu {
     display: flex;
-    gap: var(--spacing-xl);
+    gap: var(--spacing-md);
     align-items: center;
     flex-shrink: 1;
     min-width: 0;
@@ -518,6 +536,7 @@ ul {
     transition: var(--transition-base);
     letter-spacing: 0.01em;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5), 0 1px 4px rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
 }
 
 /* .header.scrolled .navbar-menu a {
@@ -563,14 +582,14 @@ ul {
     white-space: nowrap;
     font-size: clamp(0.75rem, 2vw, 0.9rem);
     padding: 0.75rem 1.5rem;
-    background: var(--gradient-blue);
-    border: 2px solid transparent;
-    color: #ffffff !important;
-    backdrop-filter: blur(10px);
+    background: #ffffff !important;
+    border: 2px solid #ffffff !important;
+    color: var(--primary-color) !important;
+    backdrop-filter: none;
     text-shadow: none;
-    font-weight: 600;
+    font-weight: 700;
     border-radius: var(--radius-lg);
-    box-shadow: 0 4px 15px rgba(0, 51, 153, 0.3), 0 2px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: inline-flex;
     align-items: center;
@@ -629,11 +648,11 @@ ul {
 }
 
 .btn-area-cliente:hover {
-    background: var(--primary-dark);
-    border-color: transparent;
-    color: #ffffff;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 51, 153, 0.4), 0 2px 8px rgba(0, 0, 0, 0.15);
+    background: #f8fafc !important;
+    border-color: #f8fafc !important;
+    color: var(--primary-dark) !important;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3) !important;
 }
 
 /* .header.scrolled .btn-area-cliente {
