@@ -6,6 +6,23 @@
     <meta name="description" content="Amplanet - Internet Fibra Óptica de alta velocidade em Teresina e São Luís. Planos residenciais, corporativos e para condomínios.">
     <title>Amplanet - Internet Com Liberdade</title>
     
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://amplanet.com.br/">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://amplanet.com.br/">
+    <meta property="og:title" content="Amplanet - Internet Com Liberdade">
+    <meta property="og:description" content="Internet Fibra Óptica de alta velocidade em Teresina e São Luís. Conheça nossos planos.">
+    <meta property="og:image" content="https://amplanet.com.br/assets/images/share-image.jpg">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://amplanet.com.br/">
+    <meta property="twitter:title" content="Amplanet - Internet Com Liberdade">
+    <meta property="twitter:description" content="Internet Fibra Óptica de alta velocidade em Teresina e São Luís.">
+    <meta property="twitter:image" content="https://amplanet.com.br/assets/images/share-image.jpg">
+    
     <!-- Preconnect para recursos externos -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -50,6 +67,9 @@
     <link rel="icon" href="assets/images/favicon.ico">
 </head>
 <body>
+    <!-- H1 para SEO - Visualmente oculto mas acessível -->
+    <h1 class="visually-hidden">Amplanet - Internet Fibra Óptica em Teresina e São Luís</h1>
+    
     <!-- Header -->
     <header class="header">
         <nav class="navbar container">
@@ -731,6 +751,47 @@
     </a>
 
     <script src="assets/js/main.js?v=2.4" defer></script>
+    
+    <!-- Dados Estruturados Schema.org - LocalBusiness -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "Amplanet",
+      "image": "https://amplanet.com.br/assets/images/apps-logos/logoAmplanetSL3_branca.png",
+      "@id": "",
+      "url": "https://amplanet.com.br",
+      "telephone": "+558621063800",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Avenida Ininga 1201, 392 - Jóquei Clube",
+        "addressLocality": "Teresina",
+        "addressRegion": "PI",
+        "postalCode": "64048-110",
+        "addressCountry": "BR"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": -5.085,
+        "longitude": -42.808
+      },
+      "openingHoursSpecification": {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday"
+        ],
+        "opens": "08:00",
+        "closes": "18:00"
+      },
+      "sameAs": [
+        "https://www.instagram.com/amplanet/"
+      ]
+    }
+    </script>
 </body>
 </html>
 
