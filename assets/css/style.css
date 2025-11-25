@@ -1792,7 +1792,7 @@ ul {
         transform: none !important;
         display: flex !important;
         flex-direction: column !important;
-        align-items: flex-start !important;
+        align-items: center !important;
         gap: 0.6rem !important;
         pointer-events: none !important;
         z-index: 20 !important;
@@ -1929,7 +1929,7 @@ ul {
         backdrop-filter: blur(5px) !important;
         -webkit-backdrop-filter: blur(5px) !important;
         pointer-events: none !important;
-        text-align: left !important;
+        text-align: center !important;
     }
 
     /* Mostrar texto apenas quando classe .show for adicionada (após 10 segundos) */
