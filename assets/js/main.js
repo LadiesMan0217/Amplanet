@@ -852,7 +852,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Resetar flag
         hasScrolled = false;
         
-        // Iniciar timer de 5 segundos para mostrar o ícone (tempo suficiente para ver o primeiro banner)
+        // Iniciar timer de 10 segundos para mostrar o ícone (tempo suficiente para ver o primeiro banner)
         scrollHintIconTimer = setTimeout(() => {
             if (!hasScrolled) {
                 const iconWrapper = getScrollHintIconWrapper();
@@ -860,9 +860,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     iconWrapper.classList.add('show');
                 }
             }
-        }, 5000);
+        }, 10000);
         
-        // Iniciar timer de 10 segundos para mostrar o texto (após usuário ter tempo de ver os banners)
+        // Iniciar timer de 12 segundos para mostrar o texto (após usuário ter tempo de ver os banners)
         scrollHintTimer = setTimeout(() => {
             if (!hasScrolled) {
                 // Mostrar texto "Role para baixo" (mobile e desktop usam o mesmo elemento)
@@ -871,7 +871,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (scrollHint) scrollHint.classList.add('has-text');
                 }
             }
-        }, 10000);
+        }, 12000);
         
         scrollHintTimerStarted = true;
     }
