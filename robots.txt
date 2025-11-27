@@ -1,3 +1,4 @@
 User-agent: *
+Disallow: /pages/cobertura.html
 Allow: /
 
