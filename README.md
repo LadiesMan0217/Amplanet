@@ -111,7 +111,7 @@ http-server
 
 ### Links Externos
 
-- **Área do Cliente**: `https://amplanet.com.br/central_assinante_web/login`
+- **Área do Cliente**: `https://sistema.amplanet.com.br/central_assinante_web/login`
 - **WhatsApp**: Links configuráveis nos CTAs
 
 
